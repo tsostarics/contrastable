@@ -7,7 +7,7 @@
 .reinstate_dropped_trends(formulas)
 }
 \arguments{
-\item{formulas}{formulas passed to `set_contrasts`}
+\item{formulas}{formulas passed to \code{set_contrasts}}
 }
 \value{
 Cleaned up formulas as needed

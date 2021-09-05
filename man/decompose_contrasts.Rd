@@ -29,5 +29,5 @@ of the given factor's contrasts
 \description{
 First draft of pulling out the contrast coding numbers from the model matrix
 and adding them into new columns. Currently only handles 1 column at a time
-and does not work within `mutate`, which is where it would be most helpful.
+and does not work within \code{mutate}, which is where it would be most helpful.
 }

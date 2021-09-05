@@ -10,7 +10,7 @@
 \item{model_data}{Model data}
 
 \item{fx}{Function to apply, must be something that returns a logical value.
-Usually either `is.factor` or `is.ordered`}
+Usually either \code{is.factor} or \code{is.ordered}}
 
 \item{use.names}{Whether the resulting vector should be named}
 

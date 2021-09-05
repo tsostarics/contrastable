@@ -25,7 +25,7 @@ scheme's default (typically grand mean, unless using contr.treatment, which does
 the reference level)}
 
 \item{drop_trends}{Which trends to drop from the final matrix, should only
-be used with `contr.poly` to remove higher order trends}
+be used with \code{contr.poly} to remove higher order trends}
 }
 \description{
 Set contrast coding with function

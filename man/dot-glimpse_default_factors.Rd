@@ -28,6 +28,6 @@ columns
 Given a dataframe with some factor columns and a character vector of
 which columns you've already set yourself, look at all the other
 factor columns and get a glimpse at how they're treated by the defaults
-specified in `options('contrasts')`. Reference level is assumed to be the
+specified in \code{options('contrasts')}. Reference level is assumed to be the
 first level for unordered factors and nonexistent for ordered factors.
 }

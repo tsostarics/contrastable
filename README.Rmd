@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/tsostarics/contrastable/branch/master/graph/badge.svg)](https://codecov.io/gh/tsostarics/contrastable?branch=master)
+`r lifecycle::badge('experimental')`
 <!-- badges: end -->
 
 This is just a collection of functions I use in my research that I use

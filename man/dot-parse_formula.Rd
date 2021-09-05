@@ -13,7 +13,7 @@
 A list of parameters to use for a contrast_code call
 }
 \description{
-Takes a formula and extracts the parameters for `contrast_code` if it is
+Takes a formula and extracts the parameters for \code{contrast_code} if it is
 a valid formula. Validity checked via regexes, parameters extracted via
 recursively parsing the abstract syntax tree.
 }

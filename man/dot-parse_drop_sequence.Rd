@@ -16,6 +16,6 @@ can correspond to variable names bound in var_envir or numbers.}
 A sequence of numbers
 }
 \description{
-This parses any sequences following a `-` operator and expands them to
+This parses any sequences following a \code{-} operator and expands them to
 a numeric vector.
 }

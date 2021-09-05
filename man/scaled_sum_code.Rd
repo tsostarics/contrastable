@@ -19,17 +19,17 @@ the field and source. Use this to compare each level to a reference level.
 \details{
 For n levels of factors, generate a matrix with n-1 comparisons where:
 \itemize{
- \item Reference level = -1/n
- \item Comparison level = (n-1)/n
- \item All others = -1/n
+\item Reference level = -1/n
+\item Comparison level = (n-1)/n
+\item All others = -1/n
 }
 
 Example interpretation for a 4 level factor:
 \itemize{
- \item Intercept = Grand mean (mean of the means of each level)
- \item grp2 = mean(grp2) - mean(grp1)
- \item grp3 = mean(grp3) - mean(grp1)
- \item grp4 = mean(grp4) - mean(grp1)
+\item Intercept = Grand mean (mean of the means of each level)
+\item grp2 = mean(grp2) - mean(grp1)
+\item grp3 = mean(grp3) - mean(grp1)
+\item grp4 = mean(grp4) - mean(grp1)
 }
 Note: grp coefficient estimates are the same as with contr.treatment, but
 the intercept is changed to the grand mean instead of the mean of grp1.

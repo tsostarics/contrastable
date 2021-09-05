@@ -7,11 +7,11 @@
 .formula_to_char(formulas)
 }
 \arguments{
-\item{formulas}{Series of formulas passed by `enlist_contrasts`}
+\item{formulas}{Series of formulas passed by \code{enlist_contrasts}}
 }
 \value{
 list of formulas coerced to character, or an error
 }
 \description{
-Adds a more helpful hint when handling the initial coercion in `enlist_contrasts`
+Adds a more helpful hint when handling the initial coercion in \code{enlist_contrasts}
 }

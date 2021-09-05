@@ -39,8 +39,8 @@ A dataframe is return.list is FALSE, a list with a dataframe and list
 of named contrasts if TRUE.
 }
 \description{
-Uses the same syntax as `enlist_contrasts` and `set_contrasts`. Returns
-a summary table of the contrasts you've set. If you set `return.list` to TRUE
+Uses the same syntax as \code{enlist_contrasts} and \code{set_contrasts}. Returns
+a summary table of the contrasts you've set. If you set \code{return.list} to TRUE
 then you can access a list of contrasts in the second element of the resulting
 list. The glimpse dataframe is the first element. FALSE will return just
 the glimpse data frame.

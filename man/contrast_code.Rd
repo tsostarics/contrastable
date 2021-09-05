@@ -19,8 +19,10 @@ A contrast coding matrix with labels and proper reference level
 }
 \description{
 Helper to do contrast coding. There are two options:
- - Manually specify a matrix for code_by (implements manual_code). Reference level
- is automatically set to the row that's always negative.
- - Specify a style of contrast coding as a function (implements functional_code).
- Label of the reference level should be specified in ...
+\itemize{
+\item Manually specify a matrix for code_by (implements manual_code). Reference level
+is automatically set to the row that's always negative.
+\item Specify a style of contrast coding as a function (implements functional_code).
+Label of the reference level should be specified in ...
+}
 }

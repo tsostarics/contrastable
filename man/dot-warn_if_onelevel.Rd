@@ -22,7 +22,7 @@ Warns if factors with only one level are detected.
 }
 \description{
 Factors with only one level happen if a character vector is converted to a
-factor using `factor()` but without specifying anything for the `levels`
+factor using \code{factor()} but without specifying anything for the \code{levels}
 parameter. If you try to access or set the contrasts for a one-level factor,
 you'll get an error that contrasts are undefined because you have 0 degrees
 of freedom.
