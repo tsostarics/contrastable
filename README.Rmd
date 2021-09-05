@@ -35,6 +35,61 @@ You can install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 ```
 
-## Contrast coding functionality
+# Example
 
-See the `contrasts` vignette with `vignette('contrasts', 'contrastable')`.
+Here is a simple example showing how to set particular factors to a specific
+contrast scheme. 
+
+```{r}
+library(contrastable)
+my_data <- mtcars
+my_data$gear <- ordered(my_data$gear) # Set as ordered factor in dataframe
+```
+
+We can use `glimpse_contrasts` to get information about
+the factors and diagnostics about the scheme we have set.
+
+```{r, message = TRUE}
+# Specify the contrast schemes we want, factor conversion done automatically
+# Set reference level with + and intercept with *
+contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
+                         carb ~ helmert_code,
+                         vs   ~ sum_code + 1)
+
+# Get information about our contrasts, even those we didn't explicitly set
+glimpse_contrasts(my_data, 
+                  contrast_schemes, 
+                  clean.schemes = TRUE,
+                  all.factors = TRUE) |> 
+  knitr::kable()
+```
+
+
+`enlist_contrasts` can be used to generate a named list of contrasts
+that can be used in the `contrasts` argument of various modeling functions.
+
+```{r, message = TRUE}
+# Get a list of the contrasts we've explicitly set
+enlist_contrasts(mtcars, contrast_schemes)
+```
+
+`set_contrasts` can be used to set the contrasts onto the dataframe itself,
+which is needed when a modeling function lacks a `contrasts` argument.
+
+```{r, message = TRUE}
+# Set contrasts to dataframe itself
+my_data <- set_contrasts(my_data, contrast_schemes)
+MASS::fractions(contrasts(my_data$carb))
+```
+
+Functions will give various messages and warnings such as:
+
+ - When non-factor columns are coerced to factors
+ - When ordered factors are set to non-polynomial contrasts
+ - When a factor with only one level is detected
+ - When a factor is not explicitly set
+ - and more
+
+
+Detailed usage is available in the `contrasts` vignette with 
+`vignette('contrasts', 'contrastable')`.
