@@ -1,4 +1,4 @@
 library(testthat)
-library(sostools)
+library(contrastable)
 
-test_check("sostools")
+test_check("contrastable")

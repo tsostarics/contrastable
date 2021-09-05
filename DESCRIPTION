@@ -1,4 +1,4 @@
-Package: sostools
+Package: contrastable
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
@@ -38,6 +38,6 @@ Suggests:
     bayestestR,
     covr
 Config/testthat/edition: 3
-URL: https://github.com/tsostarics/sostools
-BugReports: https://github.com/tsostarics/sostools/issues
+URL: https://github.com/tsostarics/contrastable
+BugReports: https://github.com/tsostarics/contrastable/issues
 VignetteBuilder: knitr
