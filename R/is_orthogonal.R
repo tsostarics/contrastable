@@ -20,7 +20,7 @@ is_orthogonal <- function(.contrasts) {
 
            # 2 level factor contrasts return logical(0)s
            if (identical(cor_upper, logical(0)) || identical(cor_lower, logical(0)))
-             return(FALSE)
+             return(NA)
 
            all(c(cor_upper, cor_lower))
          },

@@ -34,7 +34,7 @@ test_that("Orthogonality checks are correct", {
 
 })
 
-test_that("Two level factors return FALSE", {
+test_that("Two level factors return NA", {
   tst_df <- tibble::tibble(a = factor(c('a','b')),
                     b = a,
                     c = a)
@@ -47,6 +47,6 @@ test_that("Two level factors return FALSE", {
   )
   )
 
-  expect_equal(orth_vector, c(FALSE, FALSE, FALSE), ignore_attr = TRUE)
+  expect_equal(orth_vector, c(NA, NA, NA), ignore_attr = TRUE)
 
 })
