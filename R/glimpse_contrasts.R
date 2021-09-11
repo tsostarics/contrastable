@@ -48,8 +48,8 @@ glimpse_contrasts <- function(model_data,
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
   reference_levels <- .get_reference_levels(contrast_list, params, formulas)
-  orthogonal_contrasts <- vapply(contrast_list, is_orthogonal, TRUE, USE.NAMES = FALSE)
-  centered_contrasts <- vapply(contrast_list, is_centered, TRUE, USE.NAMES = FALSE)
+  orthogonal_contrasts <- is_orthogonal(contrast_list)
+  centered_contrasts <- is_centered(contrast_list)
   intercept_interpretations <- vapply(contrast_list, interpret_intercept,"char", USE.NAMES = FALSE)
 
   # Double check that dropped trends are only included for polynomial contrasts
@@ -139,8 +139,8 @@ glimpse_contrasts <- function(model_data,
                                       as.character(levels(model_data[[x]])[[1L]])),
                              "char")
   intercept_interpretations <- vapply(new_contrasts, interpret_intercept, "char", USE.NAMES = FALSE)
-  orthogonal_contrasts <- vapply(new_contrasts, is_orthogonal, TRUE)
-  centered_contrasts <- vapply(new_contrasts, is_centered, TRUE)
+  orthogonal_contrasts <-  is_orthogonal(new_contrasts)
+  centered_contrasts <- is_centered(new_contrasts)
 
   dropped_trends <- rep(NA, length(unset_factors)) # Trends are never dropped w/ R's defaults
 

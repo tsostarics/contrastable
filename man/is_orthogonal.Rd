@@ -4,10 +4,12 @@
 \alias{is_orthogonal}
 \title{Check for orthogonality}
 \usage{
-is_orthogonal(.contrasts)
+is_orthogonal(.contrasts, USE.NAMES = FALSE)
 }
 \arguments{
 \item{.contrasts}{Contrast matrix or list of contrast matrices}
+
+\item{USE.NAMES}{Logical, whether vector should be named}
 }
 \value{
 Logical vector, will retain names of a passed list

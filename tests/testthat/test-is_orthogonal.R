@@ -17,7 +17,7 @@ test_that("Orthogonality checks are correct", {
                        e ~ backward_difference_code,
                        f ~ backward_difference_code * 3,
                        g ~ reverse_helmert_code,
-                       h ~ reverse_helmert_code * 3)
+                       h ~ reverse_helmert_code * 3), USE.NAMES = TRUE
     )
 
   references <-
@@ -50,3 +50,4 @@ test_that("Two level factors return NA", {
   expect_equal(orth_vector, c(NA, NA, NA), ignore_attr = TRUE)
 
 })
+
