@@ -13,8 +13,7 @@ enlist_contrasts(model_data, ..., verbose = TRUE)
 desired contrast scheme on the RHS, reference levels can be set with + and the
 intercept can be overwritten with * (+ should come first if both are set)}
 
-\item{verbose}{Should messages be sent to user? Defaults to TRUE, MUST be
-a named argument, or it will get parsed as part of ...}
+\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
 }
 \value{
 List of named contrast matrices

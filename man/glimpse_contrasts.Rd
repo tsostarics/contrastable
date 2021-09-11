@@ -8,7 +8,7 @@ glimpse_contrasts(
   model_data,
   ...,
   return.list = FALSE,
-  verbose = TRUE,
+  verbose = FALSE,
   all.factors = TRUE,
   clean.schemes = FALSE,
   incl.one.levels = FALSE

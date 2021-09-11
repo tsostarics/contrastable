@@ -25,8 +25,8 @@
 glimpse_contrasts <- function(model_data,
                               ...,
                               return.list = FALSE,
-                              verbose=TRUE,
-                              all.factors=TRUE,
+                              verbose = FALSE,
+                              all.factors = TRUE,
                               clean.schemes = FALSE,
                               incl.one.levels = FALSE) {
   formulas <- suppressWarnings(rlang::dots_splice(...)) # outer names warning?
@@ -144,8 +144,7 @@ glimpse_contrasts <- function(model_data,
 
   dropped_trends <- rep(NA, length(unset_factors)) # Trends are never dropped w/ R's defaults
 
-  if (verbose)
-    .warn_if_nondefault(new_contrasts, unset_factors, factor_sizes, is_ordered_factor)
+  .warn_if_nondefault(new_contrasts, unset_factors, factor_sizes, is_ordered_factor)
 
   glimpse <- tibble::tibble("factor"         = unset_factors,
                             "n_levels"       = factor_sizes,

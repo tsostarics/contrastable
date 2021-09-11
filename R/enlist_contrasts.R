@@ -12,8 +12,7 @@
 #' @param ... A series of 2 sided formulas with factor name on the LHS and
 #' desired contrast scheme on the RHS, reference levels can be set with + and the
 #' intercept can be overwritten with * (+ should come first if both are set)
-#' @param verbose Should messages be sent to user? Defaults to TRUE, MUST be
-#' a named argument, or it will get parsed as part of ...
+#' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
 #' @return List of named contrast matrices
 #' @export
@@ -75,8 +74,7 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   char_formulas <- char_formulas[!is_onelevel_factor]
   vars_in_model <- vars_in_model[!is_onelevel_factor]
 
-  if (verbose)
-    .warn_if_onelevel(names(is_onelevel_factor)[is_onelevel_factor])
+  .warn_if_onelevel(names(is_onelevel_factor)[is_onelevel_factor])
 
   formula_indices <- seq_along(char_formulas)
   stats::setNames(
