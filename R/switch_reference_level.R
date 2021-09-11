@@ -10,7 +10,7 @@
 #' @return A matrix with the correct values for the reference level
 #' @export
 .switch_reference_level <- function(contrast_matrix, coding_fx, old_reference, new_reference){
-  if (identical(coding_fx, contr.treatment))
+  if (identical(coding_fx, contr.treatment) | identical(coding_fx, treatment_code))
     old_reference <- 1L
   if (is.na(new_reference) | new_reference == old_reference)
     return(contrast_matrix)
@@ -18,7 +18,7 @@
   contrast_matrix[old_reference,] <- as.matrix(contrast_matrix[new_reference,])
   contrast_matrix[new_reference,] <- reference_row
   comparison_order <- seq_len(old_reference - 1)
-  if (identical(coding_fx, contr.treatment))
+  if (identical(coding_fx, contr.treatment) | identical(coding_fx, treatment_code))
     return(contrast_matrix)
   if (old_reference != 2) # Avoid dimension length issues with n=2
     comparison_order <- c(comparison_order[comparison_order != new_reference], new_reference)
