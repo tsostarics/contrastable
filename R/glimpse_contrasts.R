@@ -261,7 +261,7 @@ glimpse_contrasts <- function(model_data,
                         "char")
   nondefaults <- paste(" - ", nondefaults, sep = "") |> paste(collapse = "\n")
 
-  warning(glue::glue("These factors not explicitly set and do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.
+  warning(glue::glue("Unset factors do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.
              {nondefaults}"))
 
 }
