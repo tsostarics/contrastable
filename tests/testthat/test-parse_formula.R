@@ -8,6 +8,7 @@ test_that("Formula validation works", {
   f_badseq <- gear ~ contr.poly + 3:5
   f_firstterm1 <- gear ~ -1 + contr.poly
   f_firstterm2 <- gear ~ 1 + contr.poly
+  f_labelorder <- gear ~ contr.poly | c('t1','t2') - 1
 
   expect_error(.check_if_valid_formula(f_onesided, deparse(f_onesided), deparse(f_onesided)),
                regexp = "two sided")
@@ -16,7 +17,7 @@ test_that("Formula validation works", {
   expect_error(.check_if_valid_formula(f_biglhs2, deparse(f_biglhs2), deparse(f_biglhs2)),
                regexp = "1 variable name on left")
   expect_error(.check_if_valid_formula(f_toomanyops, deparse(f_toomanyops), deparse(f_toomanyops)),
-               regexp = "may only use \\+, \\*, and - once")
+               regexp = "may only use .+ once")
   expect_error(.check_if_valid_formula(f_badop1, deparse(f_badop1), deparse(f_badop1)),
                regexp = "operators in this formula")
   expect_error(.check_if_valid_formula(f_badop2, deparse(f_badop2), deparse(f_badop2)),
@@ -27,7 +28,8 @@ test_that("Formula validation works", {
                regexp = "in right hand side must be a contrast")
   expect_error(.check_if_valid_formula(f_firstterm2, deparse(f_firstterm2), deparse(f_firstterm2)),
                regexp = "in right hand side must be a contrast")
-
+  expect_error(.check_if_valid_formula(f_labelorder, deparse(f_labelorder), deparse(f_labelorder)),
+               regexp = "last operator")
 })
 
 test_that("Formula validation with matrix calls works", {
@@ -57,7 +59,8 @@ test_that("Formula parsing with matrix call works", {
          "code_by" = ref_mat,
          "reference_level" = 4,
          "intercept_level" = 2,
-         "drop_trends" = str2lang("3:5"))
+         "drop_trends" = str2lang("3:5"),
+         "labels" = NULL)
 
   expect_equal(params, reference, ignore_attr = TRUE)
 })
@@ -70,7 +73,8 @@ test_that("Formula parsing with functions works", {
          "code_by" = sym("contr.poly"),
          "reference_level" = "a",
          "intercept_level" = "b",
-         "drop_trends" = str2lang("a:b"))
+         "drop_trends" = str2lang("a:b"),
+         "labels" = NULL)
 
   f_noops <- gear ~ contr.poly
   params_noops <- .parse_formula(f_noops)
@@ -79,7 +83,8 @@ test_that("Formula parsing with functions works", {
          "code_by" = sym("contr.poly"),
          "reference_level" = NA,
          "intercept_level" = NA,
-         "drop_trends" = NA)
+         "drop_trends" = NA,
+         "labels" = NULL)
 
   expect_equal(params_allops, reference_allops)
   expect_equal(params_noops, reference_noops)

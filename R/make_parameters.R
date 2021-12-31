@@ -18,7 +18,8 @@
                                            "code_by" = NA,
                                            "reference_level" = NA,
                                            "intercept_level" = NA,
-                                           "drop_trends" = NA),
+                                           "drop_trends" = NA,
+                                           "labels" = NULL),
                              EMBEDDED = FALSE){
   cur_expr <- as.list(formula)
   node <- cur_expr[[1]]
@@ -66,6 +67,11 @@
       params <- .make_parameters(LHS, params)
 
 
+  } else if (.is_operator(node, "|")) {
+    LHS <- cur_expr[[2L]]
+    RHS <- cur_expr[[3L]]
+    params[["labels"]] <- RHS
+    params <- .make_parameters(LHS, params)
   } else {
     params[["code_by"]] <- formula
   }
@@ -77,7 +83,7 @@
   if (!missing(check.sym))
     ops <- syms(check.sym)
   else
-    ops <- syms(c("+","-","*"))
+    ops <- syms(c("+","-","*","|"))
 
   any(vapply(ops, function(x) identical(node, x), FUN.VALUE = TRUE))
 }
