@@ -59,10 +59,11 @@ test_that("Different combinations of formula operations work", {
                 params$f11$intercept_level == 4 &
                 identical(params$f11$drop_trends, expr(5:6)))
 
-  purrr::walk(params[12:15],
+  purrr::walk(params[12:16],
               function(ps)
               expect_equal(ps, params$f11))
 })
+
 
 test_that("Operator checking works", {
   expect_true(.is_operator(sym('+')))

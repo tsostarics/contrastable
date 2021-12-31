@@ -105,3 +105,30 @@ test_that("Non matrix or function error works", {
   expect_error(contrast_code(factor(c(1,2,3)), c(0,1,0,0,0,1)), regexp = "Invalid value for code_by")
 })
 
+
+test_that("Labelling parsing works", {
+
+  tst_data <-
+    tibble::tribble(
+      ~two, ~three, ~four,
+      "a",    "a",   "a",
+      "b",    "b",   "b",
+      "a",    "c",   "c",
+      "b",    "a",   "d"
+    ) %>%
+    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
+
+  my_labels = c('test1','test2')
+
+  test_contrasts <-
+    enlist_contrasts(tst_data,
+                   two ~ treatment_code | "test",
+                   three ~ treatment_code | my_labels,
+                   four ~ treatment_code | c('t1','t2','t3'))
+
+  expect_equal(colnames(test_contrasts[['two']]), "test")
+  expect_equal(colnames(test_contrasts[['three']]), c('test1', 'test2'))
+  expect_equal(colnames(test_contrasts[['four']]), c('t1', 't2', 't3'))
+
+  expect_error(suppressMessages(set_contrasts(tst_data, three ~ treamtent_code | my_labels + "a" )), regexp = "must be the last operator")
+})
