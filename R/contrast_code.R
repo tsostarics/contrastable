@@ -8,17 +8,27 @@
 #'
 #' @param factor_col The factor column to use, eg data$gender
 #' @param code_by Either a matrix or a function
+#' @param use_labels Labels to use in the contrast matrix, must equal number of contrasts
 #' @param ... Additional arguments to be passed to functional_code, specifically,
 #' which level you want the reference level to be
 #'
 #' @return A contrast coding matrix with labels and proper reference level
 #' @export
-contrast_code <- function(factor_col, code_by=NA, ...) {
-  if (is.matrix(code_by))
-    return(manual_code(factor_col, code_by))
-  if (is.function(code_by))
-    return(functional_code(factor_col, code_by, ...))
-  if (length(contrasts(factor_col)) == 2)
-    return(manual_code(factor_col))
+contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, ...) {
+  if (is.matrix(code_by)) {
+    contrast_matrix <- manual_code(factor_col, code_by)
+  } else if (is.function(code_by)) {
+    contrast_matrix <- functional_code(factor_col, code_by, ...)
+  } else if (length(contrasts(factor_col)) == 2) {
+    contrast_matrix <- manual_code(factor_col)
+  } else {
   stop("Invalid value for code_by, must be a matrix or coding function")
+  }
+
+  if (!is.null(use_labels)) {
+    stopifnot("Provided labels must be same length as number of columns in contrast matrix." = ncol(contrast_matrix) == length(use_labels))
+    colnames(contrast_matrix) <- use_labels
+  }
+
+  contrast_matrix
 }

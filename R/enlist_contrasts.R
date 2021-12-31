@@ -109,6 +109,7 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   contrast_code(
     factor_col = get(params[["factor_col"]], model_data),
     code_by = eval(params[["code_by"]], var_envir),
+    use_labels = eval(params[['labels']], var_envir),
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir)
