@@ -20,7 +20,7 @@ schemes for use with regression models.
 You can install the development version from
 [GitHub](https://github.com/) with:
 
-Note that this packages requires R version `>=4.1`
+Note that this package requires R version `>=4.1`
 
 ``` r
 # install.packages("devtools")
