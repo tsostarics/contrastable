@@ -156,7 +156,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="https://osf.io/pnumg/">Regresion modeling for linguistic data (preprint)</a></li>
 </ul>
 <p>There is a very small overview of hypothesis matrices in the second to last section, but I will not provide a discussion of orthogonality as it relates to contrasts.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sostools)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(contrastable)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>mdl_data <span class="ot">&lt;-</span> </span>
@@ -198,7 +198,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="contrast-coding" class="section level2">
 <h2>Contrast coding</h2>
-<p>This package provides a useful function called <code>contrast_code()</code> which takes a factor column and a desired contrast scheme and returns a new contrast matrix. The contrast scheme can be passed as either a function that generates contrast matrices, such as <code>contr.sum</code>, or a matrix you’ve created yourself.</p>
+<p>The basis for this package is the <code>contrast_code()</code> function, which takes a factor vector (i.e., a factor column in a dataframe) and a desired contrast scheme and returns a new contrast matrix. The contrast scheme can be passed as either a function that generates contrast matrices, such as <code>contr.sum</code>, or a matrix you’ve created yourself. In the next section I will outline additional functionality that allows you to more quickly set contrasts to your data, but for the time being this section will discuss what the general output you can get would look like.</p>
+<p>Here we use <code>contr.sum</code> to get a contrast matrix using the <code>carb</code> column.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>carb, contr.sum)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    2  3  4  6  8</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 -1 -1 -1 -1 -1</span></span>
@@ -207,7 +208,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  0  0  1  0  0</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  0  0  0  1  0</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  0  0  0  0  1</span></span></code></pre></div>
-<p>There are two things to note here. First, the comparison labels have been retained. This makes model intepretation easier. Second, the reference level has been set to the first level alphabetically, rather than the last level. This is the default behavior, but can be set to whatever you want.</p>
+<p>There are two things to note here. First, the comparison labels have been retained. This makes model interpretation easier. Second, the reference level has been set to the first level alphabetically, rather than the last level. This is the default behavior, inherited from R’s normal alphabetical ordering, but can be set to whatever you want.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>carb, contr.sum, <span class="at">reference_level =</span> <span class="dv">4</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    1  2  3  6  8</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  1  0  0  0  0</span></span>
@@ -217,72 +218,80 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  0  0  0  1  0</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  0  0  0  0  1</span></span></code></pre></div>
 <p>Note how the comparison labels have also changed appropriately.</p>
-<p>The setting of reference levels only applies to schemes that utilize a reference level. These include the following functions:</p>
+<p>The setting of reference levels only applies to schemes that utilize a reference level. These include the following functions (R’s default functions use a <code>.</code> while this package’s functions use <code>_</code>s)</p>
 <ul>
-<li><code>contr.sum</code>: compare each non-reference level to the grand mean</li>
-<li><code>contr.treatment</code>: compare each level to the reference level (intercept = mean of reference level)</li>
+<li><code>contr.sum</code> and <code>sum_code</code>: compare each non-reference level to the grand mean</li>
+<li><code>contr.treatment</code> and <code>treatment_code</code>: compare each level to the reference level (intercept = mean of reference level)</li>
 <li><code>scaled_sum_code</code>: compare each level to the reference level (intercept = grand mean)</li>
 </ul>
-<p>The following schemes depend on a particular order of factors. By default, R orders levels alphabetically. If this isn’t what you want, use <code>levels&lt;-</code> to change the ordering manually before applying contrasts coding.</p>
+<p>The following schemes depend on a particular order of factors. By default, R orders levels alphabetically. If this isn’t what you want, use <code>levels&lt;-</code> to change the ordering manually <em>before</em> applying contrast coding.</p>
 <ul>
 <li><code>forward_difference_code</code>: compare each level k to level k+1 (eg 1-2, 2-3)</li>
 <li><code>backward_difference_code</code>: compare each level k to level k-1 (eg 3-2, 2-1)</li>
 <li><code>helmert_code</code>: compare each level k to the mean of all levels above it (eg &gt;1, &gt;2)</li>
-<li><code>reverse_helmert_code</code>: compare each level k to the mean of all levels below if (eg &lt;2, &lt;3)</li>
+<li><code>reverse_helmert_code</code> and <code>contr.helmert</code>: compare each level k to the mean of all levels below if (eg &lt;2, &lt;3)</li>
 </ul>
-<p>Orthogonal polynomial contrasts with <code>contr.poly</code> are typically used to identify trends in ordinal predictors. In fact, just as <code>contr.treatment</code> is the default contrast setting for unordered factors in R, <code>contr.poly</code> is the default for ordered factors. Nonetheless, orthogonal polynomial contrasts aren’t used for group comparisons, so the “comparison” labels are different. But this isn’t an issue, and will still work as expected.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>carb, contr.poly)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           .L         .Q         .C         ^4          ^5</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 -0.5976143  0.5455447 -0.3726780  0.1889822 -0.06299408</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -0.3585686 -0.1091089  0.5217492 -0.5669467  0.31497039</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -0.1195229 -0.4364358  0.2981424  0.3779645 -0.62994079</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  0.1195229 -0.4364358 -0.2981424  0.3779645  0.62994079</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  0.3585686 -0.1091089 -0.5217492 -0.5669467 -0.31497039</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  0.5976143  0.5455447  0.3726780  0.1889822  0.06299408</span></span></code></pre></div>
+<p>Orthogonal polynomial contrasts with <code>contr.poly</code> and <code>orth_polynomial_code</code> are typically used to identify trends in ordinal predictors. In fact, just as <code>contr.treatment</code> is the default contrast setting for unordered factors in R, <code>contr.poly</code> is the default for ordered factors. You can view the default settings using <code>options()</code>, but in general I do not recommend changing the defaults and relying on them.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="st">&#39;contrasts&#39;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $contrasts</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         unordered           ordered </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &quot;contr.treatment&quot;      &quot;contr.poly&quot;</span></span></code></pre></div>
+<p>Nonetheless, orthogonal polynomial contrasts aren’t used for group comparisons, rather looking for polynomial trends across ordered scores assigned to each level, so the “comparison” labels are different. But this isn’t an issue, and will still work as expected.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>carb, contr.poly)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           .L         .Q         .C         ^4          ^5</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 -0.5976143  0.5455447 -0.3726780  0.1889822 -0.06299408</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -0.3585686 -0.1091089  0.5217492 -0.5669467  0.31497039</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -0.1195229 -0.4364358  0.2981424  0.3779645 -0.62994079</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  0.1195229 -0.4364358 -0.2981424  0.3779645  0.62994079</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  0.3585686 -0.1091089 -0.5217492 -0.5669467 -0.31497039</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  0.5976143  0.5455447  0.3726780  0.1889822  0.06299408</span></span></code></pre></div>
 </div>
-<div id="utilizing-contrasts-argument-in-model-functions" class="section level2">
-<h2>Utilizing <code>contrasts</code> argument in model functions</h2>
-<p>Rather than manually setting the contrasts on the data frame itself, you can also utilize the contrasts argument in functions like <code>lm</code>, which take a named list of contrast matrices where the names correspond to factor predictors. This package provides a function <code>enlist_contrasts</code> to take advantage of this. Make sure your model fitting function supports this argument, as <code>brm</code> does not use this (see the next section for a workaround).</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enlist_contrasts</span>(mdl_data,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   cyl <span class="sc">~</span> contr.sum <span class="sc">+</span> <span class="dv">6</span>, <span class="co"># Set the reference level with + ___</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                   twolevel <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">&quot;a&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                   gear <span class="sc">~</span> forward_difference_code,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                   carb <span class="sc">~</span> helmert_code)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>my_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> twolevel <span class="sc">+</span> gear <span class="sc">+</span> carb, </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> mdl_data,  </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">contrasts =</span> my_contrasts)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_model)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; lm(formula = mpg ~ cyl + twolevel + gear + carb, data = mdl_data, </span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     contrasts = my_contrasts)</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -4.2690 -1.8577 -0.2335  1.2946  5.4821 </span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  19.5029     0.8851  22.034 5.36e-16 ***</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cyl4          1.5626     1.5715   0.994   0.3314    </span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cyl8         -1.5413     1.5980  -0.965   0.3457    </span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; twolevelb     2.0493     1.1724   1.748   0.0951 .  </span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; gear3-4      -6.3872     2.2672  -2.817   0.0103 *  </span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; gear4-5      -0.2447     2.0279  -0.121   0.9051    </span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;1        5.9767     2.4381   2.451   0.0231 *  </span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;2        4.7821     2.1133   2.263   0.0344 *  </span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;3        6.6296     2.8863   2.297   0.0320 *  </span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;4        3.2354     2.9499   1.097   0.2851    </span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;6        3.1800     4.6687   0.681   0.5032    </span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 2.916 on 21 degrees of freedom</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.8415, Adjusted R-squared:  0.766 </span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; F-statistic: 11.15 on 10 and 21 DF,  p-value: 2.508e-06</span></span></code></pre></div>
+<div id="setting-contrasts-en-masse" class="section level2">
+<h2>Setting contrasts en masse</h2>
+<p>This section will outline the main functionality of this package: setting multiple contrast schemes quickly. This can be done by either creating a list of contrasts to give to the <code>contrasts</code> argument in model-fitting functions or by setting them directly to the dataframe.</p>
+<div id="utilizing-contrasts-argument-in-model-functions" class="section level3">
+<h3>Utilizing <code>contrasts</code> argument in model functions</h3>
+<p>Rather than manually setting the contrasts on the data frame itself, you can use the contrasts argument in functions like <code>lm</code>, which take a named list of contrast matrices where the names correspond to factor predictors. This package provides a function <code>enlist_contrasts</code> to take advantage of this. Make sure your model fitting function supports this argument, as <code>brm</code> does not use this (see the next section).</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enlist_contrasts</span>(mdl_data,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                   cyl <span class="sc">~</span> contr.sum <span class="sc">+</span> <span class="dv">6</span>, <span class="co"># Set the reference level with + ___</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                   twolevel <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">&quot;a&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                   gear <span class="sc">~</span> forward_difference_code,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                   carb <span class="sc">~</span> helmert_code)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>my_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> twolevel <span class="sc">+</span> gear <span class="sc">+</span> carb, </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> mdl_data,  </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">contrasts =</span> my_contrasts)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_model)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; lm(formula = mpg ~ cyl + twolevel + gear + carb, data = mdl_data, </span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     contrasts = my_contrasts)</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -5.6021 -1.6439 -0.0659  1.8221  5.4979 </span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  19.7918     0.9250  21.397 9.68e-16 ***</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cyl4          2.2337     1.7741   1.259   0.2218    </span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cyl8         -1.7511     1.7093  -1.024   0.3173    </span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; twolevelb     0.6956     1.4639   0.475   0.6396    </span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; gear3-4      -5.5592     2.3626  -2.353   0.0284 *  </span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; gear4-5      -0.8202     2.1306  -0.385   0.7041    </span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;1        6.1736     2.6196   2.357   0.0282 *  </span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;2        4.2597     2.2709   1.876   0.0747 .  </span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;3        5.3383     2.9704   1.797   0.0867 .  </span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;4        2.5715     3.2188   0.799   0.4333    </span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; carb&gt;6        3.4315     4.9768   0.689   0.4981    </span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 3.104 on 21 degrees of freedom</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.8203, Adjusted R-squared:  0.7348 </span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; F-statistic: 9.588 on 10 and 21 DF,  p-value: 8.523e-06</span></span></code></pre></div>
 <p>The left hand side of each formula in <code>enlist_contrasts</code> should be the unquoted name of a factor column, and the right hand side should be of the following:</p>
 <ul>
 <li>An unquoted function name that generates contrast matrices</li>
@@ -290,56 +299,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong><em>OR</em></strong> A <code>matrix()</code> call, which will be captured and evaluated</li>
 <li><strong><em>AND</em></strong> An optional reference level when applicable, following a <code>+</code>. String names should be quoted, if the label happens to be numeric you can leave the number unquoted. You can also use an unquoted variable name that contains the reference level.</li>
 <li><strong><em>AND</em></strong> An optional specification for which level to use as the intercept following a <code>*</code>. Same syntax as the reference level, see section titled “Changing Underlying Intercept”</li>
-<li><strong><em>AND</em></strong> If you use polynomial contrasts, an optional sequence (integer vector) of which trends you would like to drop following a <code>-</code>. Typically of the form <code>- a:b</code> where a and b are integers (eg <code>- 3:5</code> to drop cubic through 5th power trends)</li>
+<li><strong><em>AND</em></strong> If you use polynomial contrasts, an optional sequence (integer vector) of which trends you would like to drop following a <code>-</code>. Typically of the form <code>- a:b</code> where a and b are integers (eg <code>- 3:5</code> to drop cubic through 5th power trends) 0 <strong><em>AND</em></strong> an optional vector of labels to use for the comparisons following a <code>|</code>, which must be the last operator on the RHS if used.</li>
 </ul>
-<p>When using this method you should set contrasts for all factors. You’ll receive a message if you don’t set one or more, along with what the default contrasts are as specified by <code>options(&#39;contrasts&#39;)</code> for both ordered and unordered factors. While not shown in this vignette, these are also color coded (blue for unordered, red for ordered).</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>contrast_list <span class="ot">&lt;-</span> <span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> helmert_code)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl gear twolevel</span></span></code></pre></div>
+<p>When using this method you should set contrasts for all factors. You’ll receive a message if you don’t set one or more, along with what the default contrasts are as specified by <code>options(&#39;contrasts&#39;)</code> for both ordered and unordered factors. While not shown in this vignette, these are also color coded (blue for unordered, red for ordered) in the console.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>contrast_list <span class="ot">&lt;-</span> <span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> helmert_code)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span></code></pre></div>
 </div>
-<div id="setting-multiple-contrasts-at-once" class="section level2">
-<h2>Setting multiple contrasts at once</h2>
-<p>As previously mentioned, the <code>brm</code> function from the <code>brms</code> package (used to fit bayesian models) does not have a <code>contrasts</code> argument. This means we need to set the contrasts on the dataframe itself. But, this doesn’t mean we need to revert to multiple <code>contrasts&lt;-</code> lines. We can use <code>set_contrasts</code>, which uses the same syntax as <code>enlist_contrasts</code> but returns a new copy of the dataframe where the factor levels are set. The usual warnings and messages still apply.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mdl_data2 <span class="ot">&lt;-</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_contrasts</span>(mdl_data,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                cyl <span class="sc">~</span> contr.sum <span class="sc">+</span> <span class="dv">6</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                twolevel <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">&quot;a&quot;</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                gear <span class="sc">~</span> forward_difference_code,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                carb <span class="sc">~</span> helmert_code)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(mdl_data<span class="sc">$</span>carb)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   2 3 4 6 8</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 0 0 0 0 0</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 1 0 0 0 0</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 0 1 0 0 0</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0 1 0 0</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 0 0 0 1 0</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 0 0 0 0 1</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(mdl_data2<span class="sc">$</span>carb) <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &gt;1   &gt;2   &gt;3   &gt;4   &gt;6  </span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  5/6    0    0    0    0</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/6  4/5    0    0    0</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/6 -1/5  3/4    0    0</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/6 -1/5 -1/4  2/3    0</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 -1/6 -1/5 -1/4 -1/3  1/2</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 -1/6 -1/5 -1/4 -1/3 -1/2</span></span></code></pre></div>
-<p>One other thing to know is that when calling <code>get_prior</code> or setting priors for coefficients in general, <code>brms</code> actually changes the names slightly when prepping the model for running in stan. For example, using backward difference coding gives coefficient names like <code>2-1</code>, but this gets changed to <code>2M1</code>. If you’re doing programmatic setting of priors or something, it’s something to keep in mind. Maybe I’ll add some functionality around this in the future.</p>
+<div id="setting-multiple-contrasts-on-dataframe" class="section level3">
+<h3>Setting multiple contrasts on dataframe</h3>
+<p>As previously mentioned, the <code>brm</code> function from the <code>brms</code> package (used to fit bayesian models) does not have a <code>contrasts</code> argument. This means we need to set the contrasts on the dataframe itself. But, this doesn’t mean we need to revert to multiple <code>contrasts&lt;-</code> lines. We can use <code>set_contrasts</code>, which uses the same syntax as <code>enlist_contrasts</code> but returns a new copy of the dataframe where the contrast schemes are applied accordingly. The usual warnings and messages still apply.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mdl_data2 <span class="ot">&lt;-</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_contrasts</span>(mdl_data,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                cyl <span class="sc">~</span> contr.sum <span class="sc">+</span> <span class="dv">6</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                twolevel <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">&quot;a&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                gear <span class="sc">~</span> forward_difference_code,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                carb <span class="sc">~</span> helmert_code)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare treatment coding to helmert coding (note these are different dfs)</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(mdl_data<span class="sc">$</span>carb)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   2 3 4 6 8</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 0 0 0 0 0</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 1 0 0 0 0</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 0 1 0 0 0</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0 1 0 0</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 0 0 0 1 0</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 0 0 0 0 1</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(mdl_data2<span class="sc">$</span>carb) <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &gt;1   &gt;2   &gt;3   &gt;4   &gt;6  </span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  5/6    0    0    0    0</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/6  4/5    0    0    0</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/6 -1/5  3/4    0    0</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/6 -1/5 -1/4  2/3    0</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 -1/6 -1/5 -1/4 -1/3  1/2</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 -1/6 -1/5 -1/4 -1/3 -1/2</span></span></code></pre></div>
+<p>One other thing to know is that when calling <code>get_prior</code> or setting priors for coefficients in general, <code>brms</code> actually changes the names slightly when prepping the model for running in stan. For example, using backward difference coding gives coefficient names like <code>2-1</code>, but this gets changed to <code>2M1</code>. If you’re doing programmatic setting of priors, it’s something to keep in mind. You can also use <code>|</code> to set the names to something yourself.</p>
+</div>
 </div>
 <div id="note-about-2-level-factors" class="section level2">
 <h2>Note about 2 level factors</h2>
 <p>Coding factors with only 2 levels is a bit tricky conceptually because there is only one possible comparison you can make: level A to level B. Thus, many of the different coding schemes end up being mathematically equivalent.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to &gt;k</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1]</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.5</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -0.5</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to reference level</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1]</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  0.5</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -0.5</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">forward_difference_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to k+1</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1]</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.5</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -0.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to &gt;k</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1]</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.5</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -0.5</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to reference level</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1]</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  0.5</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -0.5</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">forward_difference_code</span>(<span class="dv">2</span>) <span class="co"># Compare k to k+1</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1]</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.5</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -0.5</span></span></code></pre></div>
 <p>In many introductions to contrast coding, the motivation for using <code>+/-.5</code> is something like this:</p>
 <ul>
 <li><code>0, 1</code> from <code>contr.treatment(2)</code> puts the intercept at the reference level, which we don’t always want</li>
@@ -347,330 +357,376 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>-.5, .5</code> from <code>-contr.sum(2)/2</code> scales the estimate so it tests the full difference between levels.</li>
 </ul>
 <p>All of this is true, but it leads to an issue when naively extending this line of thinking beyond 2 levels. That is, one might be tempted to use the following matrix for “sum coding a 4 level factor”</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span><span class="fu">contr.sum</span>(<span class="dv">4</span>)<span class="sc">/</span><span class="dv">2</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3]</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 -0.5  0.0  0.0</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  0.0 -0.5  0.0</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  0.0  0.0 -0.5</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  0.5  0.5  0.5</span></span></code></pre></div>
-<p>Yet, this contrast matrix <strong><em>does not</em></strong> test the hypotheses that <span class="math inline">\(\mu_1=\mu_4\)</span> and <span class="math inline">\(\mu_2=\mu_4\)</span> and <span class="math inline">\(\mu_3=\mu_1\)</span> in the same way that the 2 level matrix tested <span class="math inline">\(\mu_1=\mu_2\)</span>. Rather, it tests the hypothesis that <span class="math inline">\(1.5\mu_1 =.5\mu_2+.5\mu_3 + .5\mu_4\)</span> etc. To actually compare, and test the difference between, each level and the reference level, you need to use the following matrix, which this package provides a helper for:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">4</span>) <span class="sc">%&gt;%</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span><span class="fu">contr.sum</span>(<span class="dv">4</span>)<span class="sc">/</span><span class="dv">2</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3]</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  3/4 -1/4 -1/4</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/4  3/4 -1/4</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/4 -1/4  3/4</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/4 -1/4 -1/4</span></span></code></pre></div>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 -0.5  0.0  0.0</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  0.0 -0.5  0.0</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  0.0  0.0 -0.5</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  0.5  0.5  0.5</span></span></code></pre></div>
+<p>Yet, this contrast matrix <strong><em>does not</em></strong> test the hypotheses that <span class="math inline">\(\mu_1=\mu_4\)</span> and <span class="math inline">\(\mu_2=\mu_4\)</span> and <span class="math inline">\(\mu_3=\mu_1\)</span> in the same way that the 2 level matrix tested <span class="math inline">\(\mu_1=\mu_2\)</span>. Rather, it tests the hypothesis that <span class="math inline">\(1.5\mu_1 =.5\mu_2+.5\mu_3 + .5\mu_4\)</span> etc. To actually compare, and test the difference between, each level and the reference level, you need to use the following matrix, which this package provides a helper for:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">4</span>) <span class="sc">%&gt;%</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3]</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  3/4 -1/4 -1/4</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/4  3/4 -1/4</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/4 -1/4  3/4</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/4 -1/4 -1/4</span></span></code></pre></div>
 <p>We can verify this by looking at the hypothesis matrices.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not what we want</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="sc">-</span><span class="fu">contr.sum</span>(<span class="dv">4</span>)<span class="sc">/</span><span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>() <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  1/4 -3/2  1/2  1/2</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  1/4  1/2 -3/2  1/2</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]  1/4  1/2  1/2 -3/2</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  1/4  1/2  1/2  1/2</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Actually what we want</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)), <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>() <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/4    1    0    0 </span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/4    0    1    0 </span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/4    0    0    1 </span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/4   -1   -1   -1</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not what we want</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="sc">-</span><span class="fu">contr.sum</span>(<span class="dv">4</span>)<span class="sc">/</span><span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>() <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  1/4 -3/2  1/2  1/2</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  1/4  1/2 -3/2  1/2</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]  1/4  1/2  1/2 -3/2</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  1/4  1/2  1/2  1/2</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Actually what we want</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)), <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>() <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/4    1    0    0 </span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/4    0    1    0 </span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/4    0    0    1 </span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/4   -1   -1   -1</span></span></code></pre></div>
 <p>Rather than thinking about “testing half the difference,” framing things in terms of the underlying hypothesis matrix being tested is more generalizable. Assume level 1 is <code>A</code> (and is the reference level) and level 2 is <code>B</code> in these descriptions:</p>
 <ul>
 <li><code>0, 1</code> from <code>contr.treatment(2)</code> puts the intercept at the reference level and tests the difference <span class="math inline">\(\mu_B-\mu_A\)</span>. Each comparison tests a distance from the reference level. We use the term <em>treatment coding</em>.</li>
 <li><code>-1, 1</code> from <code>-contr.sum(2)</code> puts the intercept at the grand mean (<span class="math inline">\(GM=\frac{\mu_A+\mu_B}{2}\)</span>) and tests the difference <span class="math inline">\(\mu_B - GM\)</span>. Each comparison tests a distance from the grand mean. We use the term <em>sum coding</em></li>
 <li><code>-.5, .5</code> from <code>-contr.sum(2)/2</code> puts the intercept at the grand mean and tests the difference <span class="math inline">\(\mu_B - \mu_A\)</span>. Each comparison tests a distance from the reference level. We use the term <em>scaled sum coding</em>.</li>
 </ul>
-<p>It’s worth noting that the terms “sum coding” and “scaled sum coding” are <strong><em>not</em></strong> consistent across disciplines. Other terms that are used are simple coding, deviation coding, sum to zero coding, and contrast coding. When referring specifically to coding factors with 2 levels, sometimes the numbers are used as in 0/1 coding, -1/1 coding, -.5/+.5 coding. I recommend that you choose a term from your discipline and stick to it, but also provide the exact contrast or hypothesis matrices in an appendix, preregistration, or supplementary material.</p>
+<p>It’s worth noting that the terms “sum coding” and “scaled sum coding” are <strong><em>not</em></strong> consistent across disciplines. Other terms that are used are simple coding, deviation coding, effects coding, sum to zero coding, and contrast coding. When referring specifically to coding factors with 2 levels, sometimes just the numbers are used as in 0/1 coding, -1/1 coding, -.5/+.5 coding. I recommend that you choose a term from your discipline and stick to it, but also provide the exact contrast or hypothesis matrices in an appendix, preregistration, or supplementary material. Some examples:</p>
+<ul>
+<li>Not useful: Group is a categorical predictor. (I’m assuming you’re using treatment coding if you didn’t manually set anything.)</li>
+<li>Not useful: Our categorical predictors are contrast coded (to what??)</li>
+<li>Not useful: We use sum coding (how are <em>you</em> using this term?)</li>
+<li>Better: Our group predictor is scaled sum coded, centering the intercept while encoding a null hypothesis that the pairwise differences between each level (B) and the reference level (A) is 0. (more verbose but explicit about what the interpretation reflects)</li>
+<li>Better: The group predictor tests the difference between Group A (the reference, coded with -.5) and Group B (+.5). (less verbose, gives values explicitly)</li>
+<li>Bonus: The specific contrast matrices used for each predictor is available in the appendix/supplementary material.</li>
+</ul>
 </div>
 <div id="changing-underlying-intercept" class="section level2">
 <h2>Changing Underlying Intercept</h2>
 <p>I know I said I wouldn’t give a discussion on how contrasts are derived, but there’s one additional functionality that kind of necessitates describing the process a little. We know that contrast matrices have <span class="math inline">\(k\)</span> rows and <span class="math inline">\(k-1\)</span> columns for our <span class="math inline">\(k-1\)</span> comparisons (derived from <span class="math inline">\(k-1\)</span> degrees of freedom). But models also give an intercept term: where does that come from? Moreover, why is it conveniently the grand mean for basically everything but treatment coding? What if I wanted a particular coding scheme for my level comparisons, but the intercept representing the mean of my highest level rather than the grand mean (which might not be meaningful)? Is this possible?</p>
 <p>First, recall that scaled sum coding puts the intercept at the grand mean and the comparisons are between the reference level and the level being compared.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(<span class="fu">scaled_sum_code</span>(<span class="dv">4</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3]</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  3/4 -1/4 -1/4</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/4  3/4 -1/4</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/4 -1/4  3/4</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/4 -1/4 -1/4</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(<span class="fu">scaled_sum_code</span>(<span class="dv">4</span>))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3]</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  3/4 -1/4 -1/4</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 -1/4  3/4 -1/4</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 -1/4 -1/4  3/4</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 -1/4 -1/4 -1/4</span></span></code></pre></div>
 <p>The intercept in this case is actually represented by an omitted column of 1s</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>),</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)),</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1  3/4 -1/4 -1/4</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    1 -1/4  3/4 -1/4</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    1 -1/4 -1/4  3/4</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    1 -1/4 -1/4 -1/4</span></span></code></pre></div>
-<p>Why are there fractions though? If I’m comparing level 1 to level 2, why aren’t the others 0? Why aren’t they just 0 compared to 1, like in treatment coding? This intuition is actually valid; not at the level of the contrasts but at the level of the hypotheses you want to test. Turns out those hypotheses actually underlie this matrix, and linear algebra transformations can be used to go between the two. For more details, see the paper on capitalizing on a priori contrasts. For now just know that we can take the inverse of the transpose of a matrix to go between the two (sometimes the transpose is ommitted depending on the author, which means you’d go back and forth between interpreting columns or rows as comparisons).</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>contrast_matrix <span class="ot">&lt;-</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>),</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)),</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">nrow =</span> <span class="dv">4</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(contrast_matrix))</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(hypothesis_matrix)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/4    1    0    0 </span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/4    0    1    0 </span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/4    0    0    1 </span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/4   -1   -1   -1</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>),</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">nrow =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> <span class="fu">fractions</span>()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1  3/4 -1/4 -1/4</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    1 -1/4  3/4 -1/4</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    1 -1/4 -1/4  3/4</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    1 -1/4 -1/4 -1/4</span></span></code></pre></div>
+<p>Why are there fractions though? If I’m comparing level 1 to level 2, why aren’t the others 0? Why aren’t they just 0 compared to 1, like in treatment coding? This intuition is actually valid; not at the level of the contrasts but at the level of the hypotheses you want to test. Turns out those hypotheses actually underlie this matrix, and linear algebra transformations can be used to go between the two. For more details, see the paper on capitalizing on a priori contrasts. For now just know that we can take the inverse of the transpose of a matrix to go between the two (sometimes the transpose is omitted depending on the author, which means you’d go back and forth between interpreting columns or rows as comparisons).</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>contrast_matrix <span class="ot">&lt;-</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">scaled_sum_code</span>(<span class="dv">4</span>)),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">nrow =</span> <span class="dv">4</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(contrast_matrix))</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(hypothesis_matrix)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/4    1    0    0 </span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/4    0    1    0 </span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/4    0    0    1 </span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/4   -1   -1   -1</span></span></code></pre></div>
 <p>This gives us our hypothesis matrix, and we can tell from the first column that the intercept is the grand mean because each level contributes to a single value. That is, the sum of the means of our 4 levels, divided by 4, is the grand mean; hence the weight of each mean is 1/4. Our comparisons show that we’re comparing the fourth level (all -1s) to the 1st, 2nd, and 3rd levels for our three comparisons. This is maybe more transparent than the 3/4 and -1/4s in the contrast matrix.</p>
 <p>However, consider if we didn’t want the grand mean. What if we wanted the intercept to be a particular level’s mean, say our reference level of 4? Rather than having each level contribute to the intercept, we just want 1. So we can use this matrix:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2 <span class="ot">&lt;-</span> hypothesis_matrix</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    0    1    0    0</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    0    1    0</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    0    1</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    1   -1   -1   -1</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2 <span class="ot">&lt;-</span> hypothesis_matrix</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>hypothesis_matrix2</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    0    1    0    0</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    0    1    0</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    0    1</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    1   -1   -1   -1</span></span></code></pre></div>
 <p>Think critically here: Our intercept is now the mean of level 4, the other levels don’t contribute to it. Each comparison is now the difference between a level and the reference level. If that’s the case, we should have just recreated treatment coding! But we need to convert from our hypothesis matrix to the contrast matrix. Remind yourself what the contrast matrix from treatment coding should look like before proceeding (hint: lots of 0s and 1s).</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inverse of the transpose, remove the first column to get contrasts</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>maybe_treatment_contrasts <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(hypothesis_matrix2))[,<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># I&#39;m manually reordering to make the reference level the 4th level here</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>definitely_treatment_contrasts <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">contr.treatment</span>(<span class="dv">4</span>)[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">1</span>),])</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>maybe_treatment_contrasts</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    0    0</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    0</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>definitely_treatment_contrasts</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    0    0</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    0</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0</span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Moment of truth: Are they the same?!</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(maybe_treatment_contrasts <span class="sc">==</span> definitely_treatment_contrasts)</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inverse of the transpose, remove the first column to get contrasts</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>maybe_treatment_contrasts <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(hypothesis_matrix2))[,<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># I&#39;m manually reordering to make the reference level the 4th level here</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>definitely_treatment_contrasts <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">contr.treatment</span>(<span class="dv">4</span>)[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">1</span>),])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>maybe_treatment_contrasts</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    0    0</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    0</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>definitely_treatment_contrasts</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    0    0</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    0</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Moment of truth: Are they the same?!</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(maybe_treatment_contrasts <span class="sc">==</span> definitely_treatment_contrasts)</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>And indeed we recreated treatment coding by changing the underlying hypothesis matrix. That was so much work to get something already available. Consider a harder case of forward difference coding with the intercept changed.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>forward_contrasts <span class="ot">&lt;-</span> <span class="fu">forward_difference_code</span>(<span class="dv">6</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>forward_hypotheses <span class="ot">&lt;-</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">6</span>), forward_contrasts), <span class="at">nrow =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>()</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(forward_contrasts)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  5/6  2/3  1/2  1/3  1/6</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -1/6  2/3  1/2  1/3  1/6</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] -1/6 -1/3  1/2  1/3  1/6</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] -1/6 -1/3 -1/2  1/3  1/6</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] -1/6 -1/3 -1/2 -2/3  1/6</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] -1/6 -1/3 -1/2 -2/3 -5/6</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(forward_hypotheses)</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/6    1    0    0    0    0 </span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/6   -1    1    0    0    0 </span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/6    0   -1    1    0    0 </span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/6    0    0   -1    1    0 </span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] 1/6    0    0    0   -1    1 </span></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] 1/6    0    0    0    0   -1</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>forward_contrasts <span class="ot">&lt;-</span> <span class="fu">forward_difference_code</span>(<span class="dv">6</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>forward_hypotheses <span class="ot">&lt;-</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">6</span>), forward_contrasts), <span class="at">nrow =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> <span class="fu">solve</span>()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(forward_contrasts)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  5/6  2/3  1/2  1/3  1/6</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -1/6  2/3  1/2  1/3  1/6</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] -1/6 -1/3  1/2  1/3  1/6</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] -1/6 -1/3 -1/2  1/3  1/6</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] -1/6 -1/3 -1/2 -2/3  1/6</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] -1/6 -1/3 -1/2 -2/3 -5/6</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">fractions</span>(forward_hypotheses)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1/6    1    0    0    0    0 </span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 1/6   -1    1    0    0    0 </span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 1/6    0   -1    1    0    0 </span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1/6    0    0   -1    1    0 </span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] 1/6    0    0    0   -1    1 </span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] 1/6    0    0    0    0   -1</span></span></code></pre></div>
 <p>Now we’ll change the intercept to level 6.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses <span class="ot">&lt;-</span> forward_hypotheses</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    0    1    0    0    0    0</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0   -1    1    0    0    0</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0   -1    1    0    0</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0   -1    1    0</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    0    0   -1    1</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]    1    0    0    0    0   -1</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>new_forward_contrasts <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(new_forward_hypotheses))[,<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>]</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>new_forward_contrasts</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    1    1    1    1</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    1    1    1</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1    1    1</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0    1    1</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    0    0    1</span></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]    0    0    0    0    0</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses <span class="ot">&lt;-</span> forward_hypotheses</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>new_forward_hypotheses</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    0    1    0    0    0    0</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0   -1    1    0    0    0</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0   -1    1    0    0</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0   -1    1    0</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    0    0   -1    1</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]    1    0    0    0    0   -1</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>new_forward_contrasts <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">t</span>(new_forward_hypotheses))[,<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>new_forward_contrasts</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    1    1    1    1</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]    0    1    1    1    1</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    1    1    1</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]    0    0    0    1    1</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    0    0    1</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]    0    0    0    0    0</span></span></code></pre></div>
 <p>The matrix changed pretty substantially compared to before, even though all we changed was the intercept. This still required quite a few steps to just change the level we want to be the intercept. Thankfully <code>enlist_contrasts</code> and related functions <code>set_contrasts</code>, <code>contrast_code</code>, and <code>functional_code</code> have an argument to change this more simply.</p>
 <p>The syntax for <code>enlist_contrasts</code> and <code>set_contrasts</code> requires putting a <code>*</code> before the name of the level you want to use. If you’re using a reference level, you can also specify that with <code>+</code> as usual. You can also use both, but specifying a reference level is only applicable to schemes where that’s meaningful, like in <code>contr.treatment</code>, <code>contr.sum</code>, and <code>scaled_sum_code</code>. Recall from our earlier derivation that scaled sum coding with the intercept specified as the reference level is equivalent to treatment coding, which should be evident here.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                 carb <span class="sc">~</span> forward_difference_code <span class="sc">*</span> <span class="dv">8</span>,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                 gear <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> <span class="dv">4</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl twolevel</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $carb</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   1-2 2-3 3-4 4-6 6-8</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   1   1   1   1   1</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   0   1   1   1   1</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   0   0   1   1   1</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   0   0   0   1   1</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   0   0   0   0   1</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   0   0   0   0   0</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gear</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3 5</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 1 0</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 0 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                 carb <span class="sc">~</span> forward_difference_code <span class="sc">*</span> <span class="dv">8</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                 gear <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> <span class="dv">4</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl twolevel</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $carb</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   1-2 2-3 3-4 4-6 6-8</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   1   1   1   1   1</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   0   1   1   1   1</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   0   0   1   1   1</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   0   0   0   1   1</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   0   0   0   0   1</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   0   0   0   0   0</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gear</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3 5</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 1 0</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 0 1</span></span></code></pre></div>
 <p>Using the singular <code>contrast_code</code> just requires specifying the <code>reference_level</code> and <code>set_intercept</code> arguments as needed.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>gear, </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>              scaled_sum_code, </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">reference_level =</span> <span class="dv">4</span>, </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">set_intercept =</span> <span class="dv">4</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3 5</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 1 0</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 0 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast_code</span>(mdl_data<span class="sc">$</span>gear, </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>              scaled_sum_code, </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">reference_level =</span> <span class="dv">4</span>, </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">set_intercept =</span> <span class="dv">4</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3 5</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 1 0</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0 0</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 0 1</span></span></code></pre></div>
 <p>This functionality should only be used when you’re using a function to generate contrasts. Currently, I don’t allow for multiple levels to be used as the intercept (e.g., only 2 of 4 levels). If you really think you need to do that, you probably have a good handle on contrasts and hypothesis matrices, so you should specify the matrix manually yourself and use that as an argument. If you think you need to do that but you <em>don’t</em> have a good handle on contrasts and hypothesis matrices, you should go back and read the paper cited at the top of this vignette again. Remember that when setting matrices yourself, you should specify the row names to be your factor levels and your column names to be informative comparison labels.</p>
 </div>
 <div id="dropping-trends-from-polynomials" class="section level2">
 <h2>Dropping trends from polynomials</h2>
 <p>When using polynomial contrasts you can drop higher level trends for the sake of parsimony. However, even when using orthogonal polynomials, your estimates for each trend can differ depending on whether higher trends are included. If you do want to remove higher level trends though, you can use the <code>-</code> operator in the contrast formula. Let’s use the <code>diamonds</code> data set as an example.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2,diamonds) <span class="co"># load just the diamonds dataset</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Clarity has 8 levels, so we&#39;ll remove anything higher than the cubic trend</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> <span class="fu">enlist_contrasts</span>(diamonds,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                 clarity <span class="sc">~</span> contr.poly <span class="sc">-</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">7</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; These factors are ordered, you may lose contr.poly: clarity</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cut color</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Higher trends removed</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds, <span class="at">contrasts =</span> my_contrasts) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 x 5</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic   p.value</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3796.       22.8   167.    0        </span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -2346.       85.7   -27.4   1.06e-163</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q      109.       71.9     1.52  1.29e-  1</span></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      -55.5      72.0    -0.770 4.41e-  1</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Higher trends retained</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 8 x 5</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic  p.value</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3677.       25.9    142.   0       </span></span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -1723.       98.7    -17.5  4.70e-68</span></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q     -428.       96.7     -4.43 9.45e- 6</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      648.       83.3      7.78 7.57e-15</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 clarity^4     -123.       66.7     -1.85 6.50e- 2</span></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 clarity^5      805.       54.6     14.7  4.91e-49</span></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 clarity^6     -274.       47.7     -5.74 9.55e- 9</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 clarity^7       81.2      42.0      1.93 5.33e- 2</span></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Trying to manually remove trends on the contrast in the data set doesn&#39;t work</span></span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>diamonds1 <span class="ot">&lt;-</span> diamonds</span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(diamonds1<span class="sc">$</span>clarity) <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>(<span class="dv">8</span>)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds1) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 8 x 5</span></span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic  p.value</span></span>
-<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3677.       25.9    142.   0       </span></span>
-<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -1723.       98.7    -17.5  4.70e-68</span></span>
-<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q     -428.       96.7     -4.43 9.45e- 6</span></span>
-<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      648.       83.3      7.78 7.57e-15</span></span>
-<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 clarity        594.       44.9     13.3  5.16e-40</span></span>
-<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 clarity        566.       53.7     10.5  5.70e-26</span></span>
-<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 clarity         76.3      68.5      1.11 2.65e- 1</span></span>
-<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 clarity        255.       43.6      5.85 4.81e- 9</span></span>
-<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Decomposing the contrasts to create new columns for the first three trends</span></span>
-<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a><span class="co"># also works well (decompose_contrasts is still experimental)</span></span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>diamonds2 <span class="ot">&lt;-</span> <span class="fu">decompose_contrasts</span>(diamonds, <span class="st">&quot;clarity&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity.L <span class="sc">+</span> clarity.Q <span class="sc">+</span> clarity.C, <span class="at">data =</span> diamonds2) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 x 5</span></span>
-<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic   p.value</span></span>
-<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3796.       22.8   167.    0        </span></span>
-<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -2346.       85.7   -27.4   1.06e-163</span></span>
-<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q      109.       71.9     1.52  1.29e-  1</span></span>
-<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      -55.5      72.0    -0.770 4.41e-  1</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2,diamonds) <span class="co"># load just the diamonds dataset</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ggplot2&#39; was built under R version 4.1.1</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Clarity has 8 levels, so we&#39;ll remove anything higher than the cubic trend</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> <span class="fu">enlist_contrasts</span>(diamonds,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                                 clarity <span class="sc">~</span> contr.poly <span class="sc">-</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">7</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; These factors are ordered, you may lose contr.poly: clarity</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cut color</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Higher trends removed</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds, <span class="at">contrasts =</span> my_contrasts) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 x 5</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic   p.value</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3796.       22.8   167.    0        </span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -2346.       85.7   -27.4   1.06e-163</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q      109.       71.9     1.52  1.29e-  1</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      -55.5      72.0    -0.770 4.41e-  1</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Higher trends retained</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 8 x 5</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic  p.value</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3677.       25.9    142.   0       </span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -1723.       98.7    -17.5  4.70e-68</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q     -428.       96.7     -4.43 9.45e- 6</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      648.       83.3      7.78 7.57e-15</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 clarity^4     -123.       66.7     -1.85 6.50e- 2</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 clarity^5      805.       54.6     14.7  4.91e-49</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 clarity^6     -274.       47.7     -5.74 9.55e- 9</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 clarity^7       81.2      42.0      1.93 5.33e- 2</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Trying to manually remove trends on the contrast in the data set doesn&#39;t work</span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>diamonds1 <span class="ot">&lt;-</span> diamonds</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(diamonds1<span class="sc">$</span>clarity) <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>(<span class="dv">8</span>)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity, <span class="at">data =</span> diamonds1) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 8 x 5</span></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic  p.value</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3677.       25.9    142.   0       </span></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -1723.       98.7    -17.5  4.70e-68</span></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q     -428.       96.7     -4.43 9.45e- 6</span></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      648.       83.3      7.78 7.57e-15</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 clarity        594.       44.9     13.3  5.16e-40</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 clarity        566.       53.7     10.5  5.70e-26</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 clarity         76.3      68.5      1.11 2.65e- 1</span></span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 clarity        255.       43.6      5.85 4.81e- 9</span></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Decomposing the contrasts to create new columns for the first three trends</span></span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a><span class="co"># also works well (decompose_contrasts is still experimental)</span></span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>diamonds2 <span class="ot">&lt;-</span> <span class="fu">decompose_contrasts</span>(diamonds, <span class="st">&quot;clarity&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(price <span class="sc">~</span> clarity.L <span class="sc">+</span> clarity.Q <span class="sc">+</span> clarity.C, <span class="at">data =</span> diamonds2) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 x 5</span></span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   term        estimate std.error statistic   p.value</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 (Intercept)   3796.       22.8   167.    0        </span></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 clarity.L    -2346.       85.7   -27.4   1.06e-163</span></span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 clarity.Q      109.       71.9     1.52  1.29e-  1</span></span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 clarity.C      -55.5      72.0    -0.770 4.41e-  1</span></span></code></pre></div>
 <p>Note how when we tried to remove the trends on the factor column <code>diamonds1$clarity</code> it doesn’t work <em>and</em> it messes up the labels for the terms. This also means that you cannot drop trends with <code>set_contrasts</code>, and it will throw a warning that it will ignore that argument when it’s used:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Just show the messages, not the output</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">set_contrasts</span>(diamonds, clarity <span class="sc">~</span> contr.poly <span class="sc">-</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">7</span>))</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in .reinstate_dropped_trends(formulas): Cannot drop trends with</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; set_contrasts, ignoring in 1 formula. Use enlist_contrasts instead.</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; These factors are ordered, you may lose contr.poly: clarity</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cut color</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Just show the messages, not the output</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">set_contrasts</span>(diamonds, clarity <span class="sc">~</span> contr.poly <span class="sc">-</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">7</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in .reinstate_dropped_trends(formulas): Cannot drop trends with</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; set_contrasts, ignoring in 1 formula. Use enlist_contrasts instead.</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; These factors are ordered, you may lose contr.poly: clarity</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cut color</span></span></code></pre></div>
 </div>
 <div id="glimpse-contrasts" class="section level1">
 <h1>Glimpse Contrasts</h1>
 <p>This is some newer functionality to gain some quick insight into the factors used in your dataset. It uses the same syntax as <code>enlist_contrasts</code> and <code>set_contrasts</code> and provides a dataframe with some useful information.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tstdf <span class="ot">&lt;-</span> mtcars</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>tstdf<span class="sc">$</span>cyl <span class="ot">&lt;-</span> <span class="fu">factor</span>(tstdf<span class="sc">$</span>cyl)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, </span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                   vs <span class="sc">~</span> contr.treatment,</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                                   am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                   gear <span class="sc">~</span> helmert_code,</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                                   carb <span class="sc">~</span> contr.poly,</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">all.factors =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Converting these to factors: vs am gear carb</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>contrast_info</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 9</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme          reference intercept  orthogonal</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;           &lt;chr&gt;     &lt;chr&gt;      &lt;lgl&gt;     </span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   contr.treatment 0         mean(0)    TRUE      </span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_sum_code 1         grand mean TRUE      </span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert_code    5         grand mean TRUE      </span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   contr.poly      &lt;NA&gt;      grand mean TRUE      </span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   contr.treatment 4         mean(4)    FALSE     </span></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>tstdf <span class="ot">&lt;-</span> mtcars</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>tstdf<span class="sc">$</span>cyl <span class="ot">&lt;-</span> <span class="fu">factor</span>(tstdf<span class="sc">$</span>cyl)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                                   vs <span class="sc">~</span> contr.treatment,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                                   am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                                   gear <span class="sc">~</span> helmert_code,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                                   carb <span class="sc">~</span> contr.poly,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">all.factors =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>contrast_info</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 10</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme     reference intercept orthogonal centered</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;     &lt;lgl&gt;      &lt;lgl&gt;   </span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   contr.tre~ 0         mean(0)   NA         FALSE   </span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_su~ 1         grand me~ NA         TRUE    </span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert_c~ 5         grand me~ TRUE       TRUE    </span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   contr.poly &lt;NA&gt;      grand me~ TRUE       TRUE    </span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   contr.tre~ 4         mean(4)   FALSE      FALSE   </span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span></code></pre></div>
 <p>In this table we can easily reference what contrast scheme we used, what its reference level is when applicable, and how it may affect the interpretation of the intercept. Here, the intercept is to be interpreted as the average unit (whatever that is for your model) at level <code>0</code> of <code>vs</code> and level <code>4</code> of <code>cyl</code>, while it’s marginalized across the other predictors. Note that while helmert and reverse helmert schemes don’t have a reference level per se, the reference level shown in the table helps to show what the starting point is in case you forget which direction it’s going. Here, the levels are <code>3, 4, 5</code> and comparisons start at <code>5</code>, which means they’ll be going down: <code>4-5</code> then <code>3-(4,5)</code>.</p>
 <p>We can also see if any are orthogonal or not and whether we explicitly set them or if R used the system defaults. Note that you shouldn’t call <code>glimpse_contrasts</code> on a dataframe you’ve already constructed with <code>set_contrasts</code>. You might think that using this would require you to copy and paste all the formulas twice, once to <code>enlist/set_contrasts</code> and again to <code>glimpse_contrasts</code>, but you can invoke <code>enlist_contrasts</code> from <code>glimpse_contrasts</code> using the <code>return.list</code> argument if you want to do it in one go. Doing so will return a list where the first item is the glimpse dataframe and the second is the list of named contrast matrices that can be passed to a model fitting function.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                                   vs <span class="sc">~</span> contr.treatment,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                                   am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                                   gear <span class="sc">~</span> helmert_code,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                                   carb <span class="sc">~</span> contr.poly,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">all.factors =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">return.list =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Converting these to factors: vs am gear carb</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> contrast_info<span class="sc">$</span>contrasts</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="ot">&lt;-</span> contrast_info<span class="sc">$</span>glimpse</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                                   vs <span class="sc">~</span> contr.treatment,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                                   am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                                   gear <span class="sc">~</span> helmert_code,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                                   carb <span class="sc">~</span> contr.poly,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">all.factors =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">return.list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> contrast_info<span class="sc">$</span>contrasts</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="ot">&lt;-</span> contrast_info<span class="sc">$</span>glimpse</span></code></pre></div>
 <p>Alternatively, you can specify the contrast formulas in a list and save that to a variable, then pass that around to the different functions.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>schemes <span class="ot">&lt;-</span> <span class="fu">list</span>(vs <span class="sc">~</span> contr.treatment,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                gear <span class="sc">~</span> helmert_code,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                carb <span class="sc">~</span> contr.poly)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, schemes)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Converting these to factors: vs am gear carb</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="co"># Review if needed</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 9</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme          reference intercept  orthogonal</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;           &lt;chr&gt;     &lt;chr&gt;      &lt;lgl&gt;     </span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   contr.treatment 0         mean(0)    TRUE      </span></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_sum_code 1         grand mean TRUE      </span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert_code    5         grand mean TRUE      </span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   contr.poly      &lt;NA&gt;      grand mean TRUE      </span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   contr.treatment 4         mean(4)    FALSE     </span></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>tstdf <span class="ot">&lt;-</span> <span class="fu">set_contrasts</span>(tstdf, schemes, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<p>We can also clean up the scheme names if we want to remove the “contr.” and “_code” parts.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, schemes, <span class="at">clean.schemes =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You didn&#39;t set these factors, expect contr.treatment or contr.poly: cyl</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>contrast_info</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 9</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme          reference intercept  orthogonal</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;           &lt;chr&gt;     &lt;chr&gt;      &lt;lgl&gt;     </span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   treatment       0         mean(0)    TRUE      </span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_sum      1         grand mean TRUE      </span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert         5         grand mean TRUE      </span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   orth_polynomial &lt;NA&gt;      grand mean TRUE      </span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   treatment       4         mean(4)    FALSE     </span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>schemes <span class="ot">&lt;-</span> <span class="fu">list</span>(vs <span class="sc">~</span> contr.treatment,</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                am <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                gear <span class="sc">~</span> helmert_code,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                carb <span class="sc">~</span> contr.poly)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, schemes)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>contrast_glimpse <span class="co"># Review if needed</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 10</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme     reference intercept orthogonal centered</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;     &lt;lgl&gt;      &lt;lgl&gt;   </span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   contr.tre~ 0         mean(0)   NA         FALSE   </span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_su~ 1         grand me~ NA         TRUE    </span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert_c~ 5         grand me~ TRUE       TRUE    </span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   contr.poly &lt;NA&gt;      grand me~ TRUE       TRUE    </span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   contr.tre~ 4         mean(4)   FALSE      FALSE   </span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>tstdf <span class="ot">&lt;-</span> <span class="fu">set_contrasts</span>(tstdf, schemes, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p>We can also clean up the scheme names if we want to remove the “contr.” and &quot;_code&quot; parts.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>contrast_info <span class="ot">&lt;-</span> <span class="fu">glimpse_contrasts</span>(tstdf, schemes, <span class="at">clean.schemes =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>contrast_info</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 5 x 10</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   factor n_levels level_names scheme     reference intercept orthogonal centered</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;int&gt; &lt;list&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;     &lt;lgl&gt;      &lt;lgl&gt;   </span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 vs            2 &lt;chr [2]&gt;   treatment  0         mean(0)   NA         FALSE   </span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 am            2 &lt;chr [2]&gt;   scaled_sum 1         grand me~ NA         TRUE    </span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 gear          3 &lt;chr [3]&gt;   helmert    5         grand me~ TRUE       TRUE    </span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 carb          6 &lt;chr [6]&gt;   orth_poly~ &lt;NA&gt;      grand me~ TRUE       TRUE    </span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 cyl           3 &lt;chr [3]&gt;   treatment  4         mean(4)   FALSE      FALSE   </span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 2 more variables: dropped_trends &lt;chr&gt;, explicitly_set &lt;lgl&gt;</span></span></code></pre></div>
 <p>Note that <code>contr.poly</code> will be changed to <code>orth_polynomial</code> when you do this to denote that you’re using <em>orthogonal</em> polynomials and not raw polynomials, since just <code>poly</code> could be confusing.</p>
+</div>
+<div id="setting-comparison-names-manually" class="section level1">
+<h1>Setting comparison names manually</h1>
+<p>This functionality has been mentioned before in this vignette but this section will focus on it explicitly.</p>
+<p>Consider a factor with the following levels: s, sh, n, t. With four levels there are of course three degrees of freedom for three comparisons. One comparison that could be made is comparing each level with the plosive t using the following matrix:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>phone_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">phone =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">&#39;S&#39;</span>, <span class="st">&#39;SH&#39;</span>,<span class="st">&#39;N&#39;</span>, <span class="st">&#39;T&#39;</span>),</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&#39;S&#39;</span>, <span class="st">&#39;SH&#39;</span>,<span class="st">&#39;N&#39;</span>, <span class="st">&#39;T&#39;</span>)))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(phone_df, </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                 phone <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">&quot;T&quot;</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $phone</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        S    SH     N</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; S   0.75 -0.25 -0.25</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SH -0.25  0.75 -0.25</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N  -0.25 -0.25  0.75</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; T  -0.25 -0.25 -0.25</span></span></code></pre></div>
+<p>The column names automatically created here make sense for these and are easy to interpret in model summary coefficients of the form <code>phoneN</code>, <code>phoneS</code>, <code>phoneSH</code> However, another option would be to use reverse helmert coding, yielding this matrix:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(phone_df, </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                 phone <span class="sc">~</span> reverse_helmert_code)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $phone</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     &lt;SH         &lt;N    &lt;T</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; S  -0.5 -0.3333333 -0.25</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SH  0.5 -0.3333333 -0.25</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N   0.0  0.6666667 -0.25</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; T   0.0  0.0000000  0.75</span></span></code></pre></div>
+<p>This scheme tests the difference between s vs sh (Compact vs Diffuse sibilants), then between s &amp; sh vs n (Sibilants vs Nasals), then s &amp; sh &amp; n vs t (Alveolar Continuants vs Stops, or non-stops vs stops). However, the labels aren’t entirely transparent for those comparisons and are read literally as “values less than sh”, “values less than n” when this variable isn’t technically ordinal in nature. It would be more useful easier to interpret if we set more informative labels to get coefficients like <code>phoneCompactvsDiffuse</code>, <code>phoneSibvsNas</code>, <code>phoneStopvsCont</code>. We can do this with using <code>set_contrasts</code> and its related functions using the <code>|</code> operator when setting contrast schemes.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note you can add a line break after (or before, really) the | for readability</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(phone_df, </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                 phone <span class="sc">~</span> reverse_helmert_code <span class="sc">|</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">c</span>(<span class="st">&quot;CompactvsDiffuse&quot;</span>,<span class="st">&quot;SibvsNas&quot;</span>, <span class="st">&quot;StopvsCont&quot;</span>))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $phone</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    CompactvsDiffuse   SibvsNas StopvsCont</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; S              -0.5 -0.3333333      -0.25</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SH              0.5 -0.3333333      -0.25</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N               0.0  0.6666667      -0.25</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; T               0.0  0.0000000       0.75</span></span></code></pre></div>
+<p>One thing to note is that some model fitting functions will shorten parameter names in certain settings. For example, if you use <code>lmer</code> and do something like this:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not run to avoid loading lme4</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(contrastable)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>mdl_data <span class="ot">&lt;-</span> <span class="fu">set_contrasts</span>(mtcars, cyl <span class="sc">~</span> sum_code <span class="sc">|</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">c</span>(<span class="st">&quot;longlonglonglonglongname&quot;</span>,<span class="st">&#39;shortname&#39;</span>))</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>gear), <span class="at">data =</span> mdl_data) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
+<p>While not run here, the output of the fixed effects table in the summary will show the full names of the parameters. In the variance-covariance matrix, the row names get shortened to <code>cyllnglngln</code> and <code>cylshortnam</code>. The column names become <code>(Intr)</code> and <code>cyllng</code>.</p>
 </div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>

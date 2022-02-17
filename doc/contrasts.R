@@ -44,6 +44,9 @@ contrast_code(mdl_data$carb, contr.sum)
 contrast_code(mdl_data$carb, contr.sum, reference_level = 4)
 
 ## -----------------------------------------------------------------------------
+options('contrasts')
+
+## -----------------------------------------------------------------------------
 contrast_code(mdl_data$carb, contr.poly)
 
 ## -----------------------------------------------------------------------------
@@ -71,7 +74,7 @@ mdl_data2 <-
                 gear ~ forward_difference_code,
                 carb ~ helmert_code)
 
-# Compare
+# Compare treatment coding to helmert coding (note these are different dfs)
 contrasts(mdl_data$carb)
 contrasts(mdl_data2$carb) %>% fractions()
 
@@ -226,4 +229,29 @@ tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
 ## -----------------------------------------------------------------------------
 contrast_info <- glimpse_contrasts(tstdf, schemes, clean.schemes = TRUE)
 contrast_info
+
+## -----------------------------------------------------------------------------
+phone_df <- data.frame(phone = factor(c('S', 'SH','N', 'T'),
+                                      levels = c('S', 'SH','N', 'T')))
+
+enlist_contrasts(phone_df, 
+                 phone ~ scaled_sum_code + "T")
+
+## -----------------------------------------------------------------------------
+enlist_contrasts(phone_df, 
+                 phone ~ reverse_helmert_code)
+
+## -----------------------------------------------------------------------------
+# Note you can add a line break after (or before, really) the | for readability
+enlist_contrasts(phone_df, 
+                 phone ~ reverse_helmert_code | 
+                   c("CompactvsDiffuse","SibvsNas", "StopvsCont"))
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  # Not run to avoid loading lme4
+#  library(lme4)
+#  library(contrastable)
+#  mdl_data <- set_contrasts(mtcars, cyl ~ sum_code |
+#                              c("longlonglonglonglongname",'shortname'))
+#  lmer(mpg ~ cyl + (1|gear), data = mdl_data) %>% summary()
 
