@@ -17,9 +17,10 @@ functional_code <- function(factor_col, coding_fx, reference_level=NA, set_inter
   labels <- .get_dimnames(factor_col)
   reference_i <- .get_reference_index(labels, reference_level, coding_fx)
 
+  # Compile any user-provided arguments from the function call
   n_levels <- length(labels[[1L]])
   other_args <- rlang::dots_splice(...)
-  params <- list(n=n_levels)
+  params <- list(n = n_levels)
   if (length(other_args) != 0)
     params <- c(params, other_args)
 
