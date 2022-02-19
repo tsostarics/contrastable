@@ -34,7 +34,7 @@
     stop("You may only use +, *, -, and | once")
   if (any(stringr::str_detect(no_matrix_string, c("%in%", "\\^"))))
     stop("You cannot use the ^ or %in% operators in this formula")
-  if (grepl("[^-] [^ ]+:[^ ]+", no_matrix_string))
+  if (grepl("[^-=] [^ ]+:[^ ]+", no_matrix_string))
     stop("Sequences of the form a:b may only be used to drop trends with the - operator")
   if (grepl(" ~ ([+-]|\\d)", char_formula))
     stop("First term in right hand side must be a contrast matrix or contrast function")
