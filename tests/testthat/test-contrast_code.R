@@ -130,5 +130,26 @@ test_that("Labelling parsing works", {
   expect_equal(colnames(test_contrasts[['three']]), c('test1', 'test2'))
   expect_equal(colnames(test_contrasts[['four']]), c('t1', 't2', 't3'))
 
-  expect_error(suppressMessages(set_contrasts(tst_data, three ~ treamtent_code | my_labels + "a" )), regexp = "must be the last operator")
+  expect_error(suppressMessages(set_contrasts(tst_data, three ~ treatment_code | my_labels + "a" )), regexp = "must be the last operator")
+})
+
+test_that("Argument handling in parentheses & empty parentheses work", {
+
+  tst_data <-
+    data.frame(two = factor(c('a','b','a','b')),
+               three = factor(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
+
+
+  test_contrasts <-
+    enlist_contrasts(tst_data,
+                     two ~ contr.poly,
+                     three ~ contr.poly(),
+                     four ~ contr.poly(scores = c(.1, .2, .5, .9)))
+
+  expect_equal(test_contrasts[['two']], contr.poly(2), ignore_attr = TRUE)
+  expect_equal(test_contrasts[['three']], contr.poly(3), ignore_attr = TRUE)
+  expect_equal(test_contrasts[['four']], contr.poly(4, scores = c(.1, .2, .5, .9)), ignore_attr = TRUE)
+
+  expect_error(suppressMessages(set_contrasts(tst_data, three ~ treatment_code(bogus = 1))), regexp = "unused argument")
 })
