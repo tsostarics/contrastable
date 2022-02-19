@@ -1,13 +1,8 @@
 test_that("backward difference labels work", {
   tst_data <-
-    tibble::tribble(
-      ~two, ~three, ~four,
-      "a",    "a",   "a",
-      "b",    "b",   "b",
-      "a",    "c",   "c",
-      "b",    "a",   "d"
-    ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
+    data.frame(two = factor(c('a','b','a','b')),
+               three = factor(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
 
   expect_equal(dimnames(contrast_code(tst_data$four, backward_difference_code(4))),
                list(c('a', 'b', 'c', 'd'),
@@ -16,14 +11,9 @@ test_that("backward difference labels work", {
 
 test_that("forward difference labels work", {
   tst_data <-
-    tibble::tribble(
-      ~two, ~three, ~four,
-      "a",    "a",   "a",
-      "b",    "b",   "b",
-      "a",    "c",   "c",
-      "b",    "a",   "d"
-    ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
+    data.frame(two = factor(c('a','b','a','b')),
+               three = factor(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
 
   expect_equal(dimnames(contrast_code(tst_data$four, forward_difference_code(4))),
                list(c('a', 'b', 'c', 'd'),

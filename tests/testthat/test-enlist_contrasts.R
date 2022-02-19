@@ -1,13 +1,8 @@
 test_that("Names of resulting list of contrasts correct", {
   tst_data <-
-    tibble::tribble(
-      ~two, ~three, ~four,
-      "a",    "a",   "a",
-      "b",    "b",   "b",
-      "a",    "c",   "c",
-      "b",    "a",   "d"
-    ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
+    data.frame(two = factor(c('a','b','a','b')),
+               three = factor(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
 
   expect_equal(names(enlist_contrasts(tst_data, two~contr.sum, three~scaled_sum_code, four~contr.poly)),
                c("two", "three", "four"))
@@ -15,17 +10,12 @@ test_that("Names of resulting list of contrasts correct", {
 
 test_that("Throw error when factor column not found in model data frame", {
   tst_data <-
-    tibble::tribble(
-      ~two, ~three, ~four,
-      "a",    "a",   "a",
-      "b",    "b",   "b",
-      "a",    "c",   "c",
-      "b",    "a",   "d"
-    ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
+    data.frame(two = factor(c('a','b','a','b')),
+               three = factor(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
 
   # Default error message works fine, no need to specify it to something else
-  expect_error(enlist_contrasts(tst_data, foo~contr.sum),regexp = "Can't subset columns")
+  expect_error(enlist_contrasts(tst_data, foo~contr.sum),regexp = "undefined columns selected")
 })
 
 test_that("Setting both reference and intercept simultaneously with + and * works", {

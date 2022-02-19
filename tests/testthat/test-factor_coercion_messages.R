@@ -1,14 +1,9 @@
 test_that("Messaging when there are remaining factors works", {
   tst_data <-
-    tibble::tribble(
-      ~two, ~three, ~four,
-      "a",    "a",   "a",
-      "b",    "b",   "b",
-      "a",    "c",   "c",
-      "b",    "a",   "d"
-    ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), factor))
-  tst_data$three <- ordered(tst_data$three)
+    data.frame(two = factor(c('a','b','a','b')),
+               three = ordered(c('a','b','c','a')),
+               four = factor(c('a','b','c','d')))
+
   re <- paste("unset factors:", crayon::blue("two"), crayon::red("three"), crayon::blue("four"))
   expect_message(.msg_if_remaining_factors(tst_data, "a"),
                  regexp = gsub("\\[", "\\\\[", re))
