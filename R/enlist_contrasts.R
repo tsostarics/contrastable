@@ -53,7 +53,8 @@
 #'
 enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   # Get the formulas from the dots into list and character formats to work with
-  formulas <- suppressWarnings(rlang::dots_splice(...)) # outer names warning?
+  formulas <- rlang::dots_list(...) # outer names warning?
+  formulas2 <- rlang::dots_splice(...) # outer names warning?
   char_formulas <- .formula_to_char(formulas) # as.character with a better error msg
 
   # Extract which factor columns are attempting to be set
@@ -67,8 +68,8 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 
   # Ignore factors with only 1 level to avoid undefined contrasts
   is_onelevel_factor <-  vapply(names(vars_in_model),
-                             function(x) nlevels(model_data[[x]]) == 1L,
-                             TRUE)
+                                function(x) nlevels(model_data[[x]]) == 1L,
+                                TRUE)
 
   formulas <- formulas[!is_onelevel_factor]
   char_formulas <- char_formulas[!is_onelevel_factor]
@@ -103,16 +104,52 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 .process_contrasts <- function(model_data, char_formula, raw_formula) {
   var_envir <- rlang::get_env(raw_formula)
 
-  params <- .parse_formula(raw_formula)
+  params <- .split_if_language(.parse_formula(raw_formula), var_envir)
 
-  # get("columnname", model_data) works the same as model_data$columnname
   contrast_code(
     factor_col = get(params[["factor_col"]], model_data),
     code_by = eval(params[["code_by"]], var_envir),
     use_labels = eval(params[['labels']], var_envir),
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
-    drop_trends = eval(params[["drop_trends"]], var_envir)
+    drop_trends = eval(params[["drop_trends"]], var_envir),
+    params[['other_args']]
   )
 
+}
+
+#' Split contrast function using parens
+#'
+#' If something like `set_contrasts(df, var ~ sum_code())` then what's
+#' extracted from the formula isn't the symbol for the function `sum_code` but
+#' a language object. This can be converted to a list to extract the function
+#' symbol and then any arguments provided in the parens. The latter needs to
+#' be evaluated in the original environment, for example if
+#' `set_contrasts(df, var ~ sum_code(scores=c(.1,.5,.6))` is called, the scores
+#' list would not evaluate the `c(...)` call, yielding an error that the scores
+#' argument isn't the right length (because it would be length 1, not 3).
+#'
+#' @param params Parameters extracted from formula parsing
+#' @param var_envir Environment to evaluate expressions in
+#'
+#' @return Parameter list with `code_by` set to the correct symbol & an
+#' additional list entry for other arguments, which will be empty if no
+#' arguments are provided.
+.split_if_language <- function(params, var_envir) {
+  params[['other_args']] <- list()
+
+  if (!is.symbol(params[['code_by']]) & is.language(params[['code_by']])) {
+    params[['other_args']] <- as.list(params[['code_by']])[-1]
+    params[['code_by']] <- params[['code_by']][[1]]
+
+    if (length(params[['other_args']]) > 0) {
+      for (arg_i in seq_along(params['other_args'])) {
+
+        params[['other_args']][arg_i] <- list(eval(params[['other_args']][[arg_i]],
+                                                   var_envir)
+                                              )
+      }
+    }
+  }
+  params
 }

@@ -9,7 +9,8 @@ functional_code(
   coding_fx,
   reference_level = NA,
   set_intercept = NA,
-  drop_trends = NA
+  drop_trends = NA,
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ the reference level)}
 
 \item{drop_trends}{Which trends to drop from the final matrix, should only
 be used with \code{contr.poly} to remove higher order trends}
+
+\item{...}{}
 }
 \description{
 Set contrast coding with function

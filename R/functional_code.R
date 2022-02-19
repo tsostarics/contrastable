@@ -9,15 +9,21 @@
 #' the reference level)
 #' @param drop_trends Which trends to drop from the final matrix, should only
 #' be used with `contr.poly` to remove higher order trends
+#' @param ...
 #'
 #' @export
 #' @importFrom stats contr.helmert contr.poly contr.treatment
-functional_code <- function(factor_col, coding_fx, reference_level=NA, set_intercept = NA, drop_trends = NA) {
+functional_code <- function(factor_col, coding_fx, reference_level=NA, set_intercept = NA, drop_trends = NA, ...) {
   labels <- .get_dimnames(factor_col)
   reference_i <- .get_reference_index(labels, reference_level, coding_fx)
 
   n_levels <- length(labels[[1L]])
-  new_contrasts <- coding_fx(n_levels)
+  other_args <- rlang::dots_splice(...)
+  params <- list(n=n_levels)
+  if (length(other_args) != 0)
+    params <- c(params, other_args)
+
+  new_contrasts <- do.call(coding_fx, params)
   new_contrasts <- .switch_reference_level(new_contrasts,
                                            coding_fx,
                                            n_levels,
