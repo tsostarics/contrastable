@@ -9,7 +9,7 @@
 #' the reference level)
 #' @param drop_trends Which trends to drop from the final matrix, should only
 #' be used with `contr.poly` to remove higher order trends
-#' @param ...
+#' @param ... Other arguments to pass to `coding_fx`
 #'
 #' @export
 #' @importFrom stats contr.helmert contr.poly contr.treatment

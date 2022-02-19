@@ -28,7 +28,7 @@ the reference level)}
 \item{drop_trends}{Which trends to drop from the final matrix, should only
 be used with \code{contr.poly} to remove higher order trends}
 
-\item{...}{}
+\item{...}{Other arguments to pass to \code{coding_fx}}
 }
 \description{
 Set contrast coding with function
