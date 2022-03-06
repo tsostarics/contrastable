@@ -17,3 +17,15 @@ test_that("helmert coding labels correct", {
 test_that("reverse helmert coding labels correct", {
   expect_equal(2 * 2, 4)
 })
+
+test_that("contr.helmert works", {
+  tstdata <- mtcars
+  tstdata$carb <- factor(tstdata$carb)
+  tstdata2 <- tstdata
+
+  contrasts(tstdata$carb) <- contr.helmert(6)
+
+  carb_contrasts <- enlist_contrasts(tstdata2, carb ~ contr.helmert)[[1]]
+
+  expect_equal(contrasts(tstdata$carb), carb_contrasts, ignore_attr = TRUE)
+})
