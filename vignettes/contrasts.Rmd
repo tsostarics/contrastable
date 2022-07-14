@@ -337,20 +337,7 @@ referring specifically to coding factors with 2 levels, sometimes just the numbe
 are used as in 0/1 coding, -1/1 coding, -.5/+.5 coding. I recommend that you
 choose a term from your discipline and stick to it, but also provide the exact
 contrast or hypothesis matrices in an appendix, preregistration, or
-supplementary material. Some examples:
-
- - Not useful: Group is a categorical predictor. (I'm assuming you're using treatment
- coding if you didn't manually set anything.)
- - Not useful: Our categorical predictors are contrast coded (to what??)
- - Not useful: We use sum coding (how are *you* using this term?)
- - Better: Our group predictor is scaled sum coded, centering the
- intercept while encoding a null hypothesis that the pairwise differences between
- each level (B) and the reference level (A) is 0. (more verbose but explicit about
- what the interpretation reflects)
- - Better: The group predictor tests the difference between Group A 
- (the reference, coded with -.5) and Group B (+.5). (less verbose, gives values explicitly)
- - Bonus: The specific contrast matrices used for each predictor is available in
- the appendix/supplementary material.
+supplementary material.
 
 ## Changing Underlying Intercept
 
