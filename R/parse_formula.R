@@ -28,6 +28,9 @@
 .check_if_valid_formula <- function(formula, char_formula, no_matrix_string) {
   if (length(formula) != 3L)
     stop("Formula must be two sided.")
+  if (grepl("[|]", no_matrix_string) && length(formula[[3]][[3]]) > 1 && .is_operator(formula[[3L]][[3L]][[1L]]))
+      stop("If using labels, | must be the last operator in the formula")
+  no_matrix_string <- gsub("[|].+$", "", no_matrix_string)
   if (grepl("[*+-][^~]+~",no_matrix_string))
     stop("Formula must have 1 variable name on left hand side.")
   if (any(stringr::str_count(no_matrix_string, c("\\+", "\\*", "\\-", "\\|")) > 1))
@@ -38,7 +41,5 @@
     stop("Sequences of the form a:b may only be used to drop trends with the - operator")
   if (grepl(" ~ ([+-]|\\d)", char_formula))
     stop("First term in right hand side must be a contrast matrix or contrast function")
-  if (!grepl("[|]$|(^[^|]{0,3}$)", gsub("[^+*|-]", "", no_matrix_string), perl = TRUE))
-    stop("If using labels, | must be the last operator in the formula")
   return(invisible(TRUE))
 }

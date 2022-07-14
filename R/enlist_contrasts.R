@@ -112,7 +112,7 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir),
-    params[['other_args']]
+    other = params[['other_args']]
   )
 
 }

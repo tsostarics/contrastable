@@ -19,7 +19,7 @@ functional_code <- function(factor_col, coding_fx, reference_level=NA, set_inter
 
   # Compile any user-provided arguments from the function call
   n_levels <- length(labels[[1L]])
-  other_args <- rlang::dots_splice(...)
+  other_args <- rlang::dots_list(...)[['other']]
   params <- list(n = n_levels)
   if (length(other_args) != 0)
     params <- c(params, other_args)

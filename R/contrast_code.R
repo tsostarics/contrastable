@@ -15,6 +15,11 @@
 #' @return A contrast coding matrix with labels and proper reference level
 #' @export
 contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, ...) {
+  if (identical(matrix, code_by)) {
+    matrix_args <- rlang::dots_list(...)[['other']]
+    names(matrix_args)[1] <- 'data'
+    code_by <- do.call(code_by, args = matrix_args)
+  }
   if (is.matrix(code_by)) {
     contrast_matrix <- manual_code(factor_col, code_by)
   } else if (is.function(code_by)) {
