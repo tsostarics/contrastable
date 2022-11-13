@@ -1,11 +1,12 @@
 Package: contrastable
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Tidy contrast coding utilities
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Thomas Sostarics
+Maintainer: Thomas Sostarics <tsostarics@gmail.com>
+Description: A package to easily set contrasts for factor variables
+    in regression analyses. Provide common and consistent scheme
+    names to use for contrast coding that "just works."
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,7 +24,7 @@ Imports:
     tibble,
     tidyr,
     tidyselect
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     scales,
     knitr,
