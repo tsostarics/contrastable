@@ -12,17 +12,18 @@
 )
 }
 \arguments{
-\item{contrast_matrix}{Contrast matrix, unlabeled}
+\item{contrast_matrix}{An unlabeled contrast matrix}
 
-\item{coding_fx}{function used to generate contrasts, used to check for treatment coding}
+\item{coding_fx}{The function used to generate the contrasts, used to check for treatment coding}
 
-\item{old_reference}{Usually number of levels in the factor}
+\item{old_reference}{The previously specified reference level, usually the default
+for the scheme found by \code{.get_reference_level}}
 
-\item{new_reference}{Which row to use as the reference level}
+\item{new_reference}{The index of the row to use as the new reference level}
 }
 \value{
-A matrix with the correct values for the reference level
+A matrix with the reordered rows and correct values for the reference level
 }
 \description{
-Switch rows to set the reference level properly
+Reorders the rows of a contrast matrix to properly set the reference level
 }
