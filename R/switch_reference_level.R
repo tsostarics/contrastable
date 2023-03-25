@@ -35,26 +35,9 @@
   as.matrix(contrast_matrix[,comparison_order])
 }
 
-
-
-
 .get_reference_level <- function(cmat) {
   # Inverse matrix
   inv_matrix <- solve(.contrasts_to_hypotheses(cmat))
 
-  .find_same_col(inv_matrix)
-}
-
-.find_same_col <- function(A) {
-  A <- A[-1,]
-
-  if (!is.matrix(A))
-    A <- t(as.matrix(A))
-
-  for (j in 1:ncol(A)) {
-    if ((abs(min(A[, j]) - max(A[, j])) < 1e-15) && all(A[,j] <= 0)) {
-      return(j)
-    }
-  }
-  return(NA)
+  find_same_col(inv_matrix)
 }
