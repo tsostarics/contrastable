@@ -3,6 +3,8 @@ using namespace Rcpp;
 
 //'  Find column with same non-positive values
 //'
+//' @param invmatrix Inverse of the hypothesis matrix
+//'
 // [[Rcpp::export]]
 int find_same_col(NumericMatrix invmatrix) {
   int nrow = invmatrix.nrow();
@@ -10,12 +12,6 @@ int find_same_col(NumericMatrix invmatrix) {
 
   // Remove the first row
   NumericMatrix B = invmatrix(Range(1, nrow - 1), _);
-
-  // Transpose if invmatrix is not a matrix
-  // if (ncol == 1) {
-  //   B = transpose(B);
-  //   ncol = nrow - 1;
-  // }
 
   for (int j = 0; j < ncol; j++) {
     NumericVector col = B(_, j);

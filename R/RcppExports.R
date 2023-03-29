@@ -3,6 +3,8 @@
 
 #'  Find column with same non-positive values
 #'
+#' @param invmatrix Inverse of the hypothesis matrix
+#'
 find_same_col <- function(invmatrix) {
     .Call(`_contrastable_find_same_col`, invmatrix)
 }

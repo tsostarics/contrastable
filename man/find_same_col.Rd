@@ -6,6 +6,9 @@
 \usage{
 find_same_col(invmatrix)
 }
+\arguments{
+\item{invmatrix}{Inverse of the hypothesis matrix}
+}
 \description{
 Find column with same non-positive values
 }
