@@ -13,7 +13,7 @@
 .switch_reference_level <- function(contrast_matrix, coding_fx, old_reference, new_reference){
 
   # If the new reference is invalid or equal to the old reference, return the original matrix
-  if (is.na(new_reference) | new_reference == old_reference | identical(coding_fx, contr.helmert))
+  if (is.na(new_reference) | new_reference == old_reference | identical(coding_fx, stats::contr.helmert))
     return(contrast_matrix)
 
   # Swap the old reference row with the new reference row
@@ -39,5 +39,19 @@
   # Inverse matrix
   inv_matrix <- solve(.contrasts_to_hypotheses(cmat))
 
-  find_same_col(inv_matrix)
+  if (all((cmat - contr.helmert(nrow(cmat)) < 1e-10)))
+      return(NA_integer_)
+
+  inverse_matrix_result <- find_same_col(inv_matrix)
+  inverse_matrix_result
+}
+
+.is_unscaled <- function(cmat) {
+  determinant_value <-
+    cmat |>
+    .contrasts_to_hypotheses() |>
+    base::solve() |>
+    base::determinant(logarithm = FALSE)
+
+  (abs(determinant_value[['modulus']]) - factorial(nrow(cmat))) < 1e-10
 }
