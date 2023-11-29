@@ -66,6 +66,6 @@ test_that("Different combinations of formula operations work", {
 
 
 test_that("Operator checking works", {
-  expect_true(.is_operator(sym('+')))
-  expect_false(.is_operator(sym('a')))
+  expect_true(.is_reserved_operator(sym('+')))
+  expect_false(.is_reserved_operator(sym('a')))
 })

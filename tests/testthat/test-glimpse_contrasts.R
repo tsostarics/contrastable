@@ -49,9 +49,9 @@ test_that("Glimpse with variables works", {
   expect_equal(tst$dropped_trends, c('3,4,5',NA,NA))
 })
 
-test_that("Clean scheme labels works", {
-  expect_equal(.clean_schemes(c("contr.poly", "contr.sum", "scaled_sum_code")),
-               c("orth_polynomial", "sum", "scaled_sum"))
+test_that("Append namespace to scheme names", {
+  expect_equal(.add_namespace(c("contr.helmert", "contr.sum", "scaled_sum_code")),
+               c("stats::contr.helmert", "stats::contr.sum", "contrastable::scaled_sum_code"))
 })
 
 test_that("Warning with non default contrasts works", {
@@ -70,14 +70,6 @@ test_that("Grouping columns aren't detected as ordered", {
   expect_warning(glimpse_contrasts(tst, verbose = FALSE), NA)
 })
 
-test_that("Clean schemes works", {
-  tst <- mtcars %>%
-    dplyr::mutate(cyl = factor(cyl), carb = ordered(carb), gear = factor(gear))
-
-  scheme_names <- glimpse_contrasts(tst, clean.schemes = TRUE, verbose = FALSE)$scheme
-  # Avoid message from .warn_if_nondefault
-  expect_equal(scheme_names, c('treatment','treatment','orth_polynomial'))
-})
 
 test_that("List output works", {
   schemes <- list(cyl ~ helmert_code,
