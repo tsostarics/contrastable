@@ -9,8 +9,7 @@
 #' @return A list of parameters to use for a contrast_code call
 .parse_formula <- function(raw_formula) {
   char_formula <-  deparse1(raw_formula)
-  no_matrix_string <- gsub(r"(matrix\((.+\(.+\)?)(, .+)*\) ?)","",char_formula)
-  .check_if_valid_formula(raw_formula, char_formula, no_matrix_string)
+  .check_if_valid_formula(raw_formula, char_formula)
 
   .make_parameters(raw_formula)
 }
@@ -22,24 +21,22 @@
 #'
 #' @param formula Raw formula
 #' @param char_formula Character string of the formula from deparse
-#' @param no_matrix_string String without any matrix calls
 #'
 #' @return Nothing, throws an error if any are found
-.check_if_valid_formula <- function(formula, char_formula, no_matrix_string) {
-  if (length(formula) != 3L)
-    stop("Formula must be two sided.")
-  if (grepl("[|]", no_matrix_string) && length(formula[[3]][[3]]) > 1 && .is_operator(formula[[3L]][[3L]][[1L]]))
+.check_if_valid_formula <- function(formula, char_formula) {
+  simplified_formula_string <- deparse1(.simplify_formula(formula))
+
+  if (grepl("[|][^*+-]+[*+-]", simplified_formula_string))
       stop("If using labels, | must be the last operator in the formula")
-  no_matrix_string <- gsub("[|].+$", "", no_matrix_string)
-  if (grepl("[*+-][^~]+~",no_matrix_string))
+
+  if (grepl("[*+-][^~]+~",simplified_formula_string))
     stop("Formula must have 1 variable name on left hand side.")
-  if (any(stringr::str_count(no_matrix_string, c("\\+", "\\*", "\\-", "\\|")) > 1))
+
+  if (.any_dominated_by_identity(formula[[3L]]))
     stop("You may only use +, *, -, and | once")
-  if (any(stringr::str_detect(no_matrix_string, c("%in%", "\\^"))))
-    stop("You cannot use the ^ or %in% operators in this formula")
-  if (grepl("[^-=] [^ ]+:[^ ]+", no_matrix_string))
-    stop("Sequences of the form a:b may only be used to drop trends with the - operator")
+
   if (grepl(" ~ ([+-]|\\d)", char_formula))
-    stop("First term in right hand side must be a contrast matrix or contrast function")
+    stop("First term in right hand side must be a symbol or function call")
+
   return(invisible(TRUE))
 }
