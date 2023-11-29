@@ -607,17 +607,12 @@ tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
 ```
 
 
-We can also clean up the scheme names if we want to remove the "contr." and 
-"_code" parts.
+We can also explicitly add the namespace for the function we used.
 
 ```{r}
-contrast_info <- glimpse_contrasts(tstdf, schemes, clean.schemes = TRUE)
+contrast_info <- glimpse_contrasts(tstdf, schemes, add_namespace = TRUE)
 contrast_info
 ```
-
-Note that `contr.poly` will be changed to `orth_polynomial` when you do this
-to denote that you're using *orthogonal* polynomials and not raw polynomials,
-since just `poly` could be confusing.
 
 # Setting comparison names manually
 
