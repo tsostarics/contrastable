@@ -10,7 +10,7 @@ glimpse_contrasts(
   return.list = FALSE,
   verbose = FALSE,
   all.factors = TRUE,
-  clean.schemes = FALSE,
+  add_namespace = FALSE,
   incl.one.levels = FALSE
 )
 }
@@ -27,9 +27,8 @@ returned}
 \item{all.factors}{Logical, defaults to TRUE, whether the factors not
 explicitly set with formulas should be included}
 
-\item{clean.schemes}{Logical, defaults to FALSE, whether the contrast schemes
-should remove "contr." and "_code" from the names ("sum" and not "contr.sum"
-or "sum_code")}
+\item{add_namespace}{Logical, defaults to FALSE, whether to append the
+namespace of the contrast scheme to the scheme name}
 
 \item{incl.one.levels}{Logical, should factors with only one level be included
 in the output? Default is FALSE to omit}

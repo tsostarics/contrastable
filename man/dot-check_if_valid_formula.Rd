@@ -4,14 +4,12 @@
 \alias{.check_if_valid_formula}
 \title{Formula validator}
 \usage{
-.check_if_valid_formula(formula, char_formula, no_matrix_string)
+.check_if_valid_formula(formula, char_formula)
 }
 \arguments{
 \item{formula}{Raw formula}
 
 \item{char_formula}{Character string of the formula from deparse}
-
-\item{no_matrix_string}{String without any matrix calls}
 }
 \value{
 Nothing, throws an error if any are found
