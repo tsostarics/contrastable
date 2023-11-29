@@ -59,7 +59,7 @@ contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
 # Get information about our contrasts, even those we didn't explicitly set
 glimpse_contrasts(my_data, 
                   contrast_schemes, 
-                  clean.schemes = TRUE,
+                  add_namespace = TRUE,
                   all.factors = TRUE) |> 
   knitr::kable()
 ```

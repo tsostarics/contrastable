@@ -20,8 +20,6 @@ schemes for use with regression models.
 You can install the development version from
 [GitHub](https://github.com/) with:
 
-Note that this package requires R version `>=4.1`
-
 ``` r
 # install.packages("devtools")
 devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
@@ -51,19 +49,17 @@ contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
 # Get information about our contrasts, even those we didn't explicitly set
 glimpse_contrasts(my_data, 
                   contrast_schemes, 
-                  clean.schemes = TRUE,
+                  add_namespace = TRUE,
                   all.factors = TRUE) |> 
   knitr::kable()
-#> Converting to factors: cyl carb vs
-#> Expect contr.treatment or contr.poly for unset factors: gear
 ```
 
-| factor | n_levels | level_names      | scheme          | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
-|:-------|---------:|:-----------------|:----------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
-| cyl    |        3 | 4, 6, 8          | scaled_sum      | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| carb   |        6 | 1, 2, 3, 4, 6, 8 | helmert         | 8         | grand mean | TRUE       | TRUE     | NA             | TRUE           |
-| vs     |        2 | 0, 1             | sum             | 1         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| gear   |        3 | 3, 4, 5          | orth_polynomial | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
+| factor | n_levels | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
+|:-------|---------:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
+| cyl    |        3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
+| carb   |        6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | 8         | grand mean | TRUE       | TRUE     | NA             | TRUE           |
+| vs     |        2 | 0, 1             | contrastable::sum_code        | 1         | grand mean | NA         | TRUE     | NA             | TRUE           |
+| gear   |        3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
@@ -115,11 +111,11 @@ MASS::fractions(contrasts(my_data$carb))
 
 Functions will give various messages and warnings such as:
 
--   When non-factor columns are coerced to factors
--   When ordered factors are set to non-polynomial contrasts
--   When a factor with only one level is detected
--   When a factor is not explicitly set
--   and more
+- When non-factor columns are coerced to factors
+- When ordered factors are set to non-polynomial contrasts
+- When a factor with only one level is detected
+- When a factor is not explicitly set
+- and more
 
 Detailed usage is available in the `contrasts` vignette with
 `vignette('contrasts', 'contrastable')`.
