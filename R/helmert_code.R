@@ -37,7 +37,7 @@
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ reverse_helmert_code)))
 reverse_helmert_code <- function(n_levels){
-  apply(unname(contr.helmert(n_levels)), 2L, function(x) x / sum(x != 0))
+  apply(unname(stats::contr.helmert(n_levels)), 2L, function(x) x / sum(x != 0))
 }
 
 #' Helmert code

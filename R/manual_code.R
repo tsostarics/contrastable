@@ -8,7 +8,7 @@
 #' @return A matrix for contrast coding schemes
 #' @export
 #'
-#' @importFrom stats contr.sum contrasts
+#' @importFrom stats contrasts
 manual_code <- function(factor_col, coding_matrix = NA) {
   if (any(is.na(coding_matrix)) & length(levels(factor_col)) > 2) {
     stop("This factor has more than 2 levels, please provide a matrix.")
@@ -25,7 +25,7 @@ manual_code <- function(factor_col, coding_matrix = NA) {
   if (!any(is.na(coding_matrix))) {
     new_contrasts <- coding_matrix
   } else {
-    new_contrasts <- -contr.sum(2) / 2
+    new_contrasts <- -stats::contr.sum(2) / 2
   }
 
   dimnames(new_contrasts) <- labels
@@ -40,7 +40,7 @@ manual_code <- function(factor_col, coding_matrix = NA) {
   n_levels <- nrow(contr_mat)
 
   if (!missing(coding_fx) && .is_polynomial_scheme(coding_fx))
-    colnames(contr_mat) <- colnames(contr.poly(n_levels))
+    colnames(contr_mat) <- colnames(stats::contr.poly(n_levels))
   else if (n_levels != 2 & .check_backward_difference(contr_mat))
       colnames(contr_mat) <- paste(rownames(contr_mat)[-1], rownames(contr_mat)[-n_levels], sep = "-")
   else if (n_levels != 2 & .check_forward_difference(contr_mat))

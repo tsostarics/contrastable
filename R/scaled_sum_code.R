@@ -56,10 +56,17 @@
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
 scaled_sum_code <- function(n_levels) {
-  contrast_matrix <- contr.sum(n_levels)
+  contrast_matrix <- stats::contr.sum(n_levels)
   contrast_matrix[contrast_matrix == 1] <- (n_levels - 1) / n_levels
   contrast_matrix[contrast_matrix == 0] <- -1/n_levels
   contrast_matrix[contrast_matrix == -1] <- -1/n_levels
 
   contrast_matrix
 }
+
+my_formula <-
+  varname ~
+  matrix(c(1,2,3),
+         nrow = 3,
+         ncol = 1) + 1 * get_whatever(asd = 2) |
+  c('one', 'two', 'three')

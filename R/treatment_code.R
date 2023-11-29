@@ -11,5 +11,5 @@
 #' @return A matrix of treatment coded contrasts, unlabeled
 #' @export
 treatment_code <- function(n_levels) {
-  contr.treatment(n_levels)
+  stats::contr.treatment(n_levels)
 }

@@ -12,7 +12,6 @@
 #' @param ... Other arguments to pass to `coding_fx`
 #'
 #' @export
-#' @importFrom stats contr.helmert contr.poly contr.treatment
 functional_code <- function(factor_col, coding_fx, reference_level=NA, set_intercept = NA, drop_trends = NA, ...) {
   # Extract labels to use for contrast matrix
   labels <- .get_dimnames(factor_col)

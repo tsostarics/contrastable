@@ -11,7 +11,7 @@
 #' @return A matrix of orthogonal polynomial contrasts
 #' @export
 orth_polynomial_code <- function(n_levels) {
-  contr.poly(n_levels)
+  stats::contr.poly(n_levels)
 }
 
 #' Raw Polynomial code
@@ -32,7 +32,7 @@ orth_polynomial_code <- function(n_levels) {
 #'
 #' @importFrom stats poly
 raw_polynomial_code <- function(n_levels) {
-  contrmat <- poly(seq_len(n_levels), n_levels - 1, raw = TRUE)
+  contrmat <- stats::poly(seq_len(n_levels), n_levels - 1, raw = TRUE)
   attr(contrmat, "degree") <- NULL
   contrmat
 }
@@ -40,7 +40,7 @@ raw_polynomial_code <- function(n_levels) {
 
 .is_polynomial_scheme <- function(scheme) {
   # maybe include a check on the numbers to handle raw passed matrices
-  checks <- list(contr.poly, orth_polynomial_code, raw_polynomial_code,
+  checks <- list(stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
                  'contr.poly', 'orth_polynomial_code', 'raw_polynomial_code')
 
   any(vapply(checks, function(x) identical(x, scheme), FUN.VALUE = TRUE))
