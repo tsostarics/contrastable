@@ -194,15 +194,15 @@ glimpse_contrasts <- function(model_data,
                         function(x) levels(model_data[[x]]))
 
   tibble::tibble("factor"         = one_level_factors,
-                "n_levels"       = 1L,
-                "level_names"    = level_names,
-                "scheme"         = NA_character_,
-                "reference"      = NA_character_,
-                "intercept"      = NA_character_,
-                "orthogonal"     = NA,
-                "centered"       = NA,
-                "dropped_trends" = NA_character_,
-                "explicitly_set" = NA)
+                 "n_levels"       = 1L,
+                 "level_names"    = level_names,
+                 "scheme"         = NA_character_,
+                 "reference"      = NA_character_,
+                 "intercept"      = NA_character_,
+                 "orthogonal"     = NA,
+                 "centered"       = NA,
+                 "dropped_trends" = NA_character_,
+                 "explicitly_set" = NA)
 }
 
 .get_factor_info <- function(model_data, set_factors = NULL, verbose = TRUE){
@@ -331,9 +331,9 @@ glimpse_contrasts <- function(model_data,
 
   # If a reference level wasn't specified, try to figure it out from the matrix
   for (i in seq_along(reference_levels)) {
-    if (is.na(reference_levels[i])) {
-      intuition <- .intuit_reference_level(contrast_list[[i]],
-                                           rownames(contrast_list[[i]]))
+    is_contrast_matrix <- diff(dim(contrast_list[[i]])) == -1 # Dont bother with contr.poly - x:y
+    if (is.na(reference_levels[i]) &&  is_contrast_matrix) {
+      intuition <- .get_reference_level(contrast_list[[i]])
       if (!is.na(intuition))
         reference_levels[[i]] <- intuition
     }
@@ -341,23 +341,4 @@ glimpse_contrasts <- function(model_data,
   reference_levels
 }
 
-.intuit_reference_level <- function(contr_mat, factor_levels) {
-  # Dropped factors entails polynomials, which dont have a reference level
-  if (ncol(contr_mat) < (length(factor_levels) - 1))
-    return(NA)
-
-  hyp_mat <- .contrasts_to_hypotheses(contr_mat, nrow(contr_mat))
-
-  # Matrix[,-1] gets converted to a vector if there are only two levels
-  level_matrix <- hyp_mat[,-1]
-  if (length(level_matrix) == 2)
-    level_matrix <- matrix(level_matrix, nrow = 2)
-
-  # Reference level should be the one with an all negative row
-  which_is_ref <- apply(level_matrix, 1, function(x) all(x < 0))
-  if (sum(which_is_ref) != 1)
-    return(NA)
-
-  factor_levels[which_is_ref]
-}
 

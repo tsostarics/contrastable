@@ -1,12 +1,12 @@
-test_that("Intuit reference level works", {
-  expect_equal(.intuit_reference_level(contr.poly(6), 1:6), NA)
-  expect_equal(.intuit_reference_level(contr.treatment(2), 1:2), 1)
-  expect_equal(.intuit_reference_level(contr.SAS(6), 1:6), 6)
-  expect_equal(.intuit_reference_level(scaled_sum_code(6), 1:6), 6)
-  expect_equal(.intuit_reference_level(helmert_code(6), 1:6), 6)
-  expect_equal(.intuit_reference_level(reverse_helmert_code(6), 1:6), 1)
-  expect_equal(.intuit_reference_level(contr.sum(6), 1:6), 6)
-})
+# test_that("Intuit reference level works", {
+#   expect_equal(.intuit_reference_level(contr.poly(6), 1:6), NA)
+#   expect_equal(.intuit_reference_level(contr.treatment(2), 1:2), 1)
+#   expect_equal(.intuit_reference_level(contr.SAS(6), 1:6), 6)
+#   expect_equal(.intuit_reference_level(scaled_sum_code(6), 1:6), 6)
+#   expect_equal(.intuit_reference_level(helmert_code(6), 1:6), 6)
+#   expect_equal(.intuit_reference_level(reverse_helmert_code(6), 1:6), 1)
+#   expect_equal(.intuit_reference_level(contr.sum(6), 1:6), 6)
+# })
 
 test_that("Intercept interpretation works", {
   expect_equal(interpret_intercept(contr.treatment(5)), "mean(1)", ignore_attr = TRUE)
@@ -90,3 +90,4 @@ test_that("One level factor glimpse works", {
   expect_equal(glimpse$factor, c("twolevel","onelevel"))
 
 })
+
