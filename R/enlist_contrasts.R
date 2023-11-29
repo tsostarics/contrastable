@@ -53,7 +53,7 @@
 #'
 enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   # Get the formulas from the dots into list and character formats to work with
-  formulas <- rlang::dots_splice(...) # outer names warning?
+  formulas <- purrr::list_flatten(rlang::dots_list(...))
   char_formulas <- .formula_to_char(formulas) # as.character with a better error msg
 
   # Extract which factor columns are attempting to be set

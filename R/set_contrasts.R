@@ -23,9 +23,9 @@
 #' @return the model_data dataframe, but with updated contrasts.
 #' @export
 set_contrasts <- function(model_data, ..., verbose = TRUE) {
-  formulas <- rlang::dots_splice(...)
+  formulas <- rlang::dots_list(...)
   formulas <- .reinstate_dropped_trends(formulas)
-  contrast_list <- enlist_contrasts(model_data, formulas, verbose = verbose)
+  contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose)
   factor_vars <- names(contrast_list)
 
   # Always FALSE to avoid printing message twice

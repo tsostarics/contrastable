@@ -13,23 +13,24 @@
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #' @param all.factors Logical, defaults to TRUE, whether the factors not
 #' explicitly set with formulas should be included
-#' @param clean.schemes Logical, defaults to FALSE, whether the contrast schemes
-#' should remove "contr." and "_code" from the names ("sum" and not "contr.sum"
-#' or "sum_code")
+#' @param add_namespace Logical, defaults to FALSE, whether to append the
+#' namespace of the contrast scheme to the scheme name
 #' @param incl.one.levels Logical, should factors with only one level be included
 #' in the output? Default is FALSE to omit
 #'
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
 #' of named contrasts if TRUE.
 #' @export
+#'
+#' @importFrom tibble tibble
 glimpse_contrasts <- function(model_data,
                               ...,
                               return.list = FALSE,
                               verbose = FALSE,
                               all.factors = TRUE,
-                              clean.schemes = FALSE,
+                              add_namespace = FALSE,
                               incl.one.levels = FALSE) {
-  formulas <- rlang::dots_splice(...) # outer names warning?
+  formulas <- purrr::list_flatten(rlang::dots_list(...)) # outer names warning?
   contrast_list <- enlist_contrasts(model_data, ..., 'verbose' = verbose)
   params <- lapply(formulas, .make_parameters)
 
@@ -73,8 +74,8 @@ glimpse_contrasts <- function(model_data,
   if (all.factors)
     glimpse <- rbind(glimpse, .glimpse_default_factors(model_data, set_factors, incl.one.levels, verbose))
 
-  if (clean.schemes)
-    glimpse$scheme <- .clean_schemes(glimpse$scheme)
+  if (add_namespace)
+    glimpse$scheme <- .add_namespace(glimpse$scheme)
 
   # The default factors don't need to be specified in the contrast list,
   # they'll just use their respective defaults by the model fitting function
@@ -83,6 +84,20 @@ glimpse_contrasts <- function(model_data,
 
 
   glimpse
+}
+
+.add_namespace <- function(scheme_names) {
+  vapply(scheme_names,
+         \(n) {
+           namespace <- gsub("package:", "", utils::find(n), perl = TRUE)
+           separator <- "::"
+           if (identical(namespace, character(0))){
+             namespace <- ""
+             separator <- ""
+           }
+
+           paste0(namespace, separator, n)
+         }, "char", USE.NAMES = FALSE)
 }
 
 .clean_schemes <- function(scheme_labels) {
