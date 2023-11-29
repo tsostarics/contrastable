@@ -39,7 +39,7 @@
   # Inverse matrix
   inv_matrix <- solve(.contrasts_to_hypotheses(cmat))
 
-  if (all((cmat - contr.helmert(nrow(cmat)) < 1e-10)))
+  if (all((cmat - stats::contr.helmert(nrow(cmat)) < 1e-10)))
       return(NA_integer_)
 
   inverse_matrix_result <- find_same_col(inv_matrix)
