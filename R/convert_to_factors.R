@@ -21,5 +21,9 @@
   which_to_factors <- names(which_not_factors)[which_not_factors]
   if (verbose) .msg_if_coerced_to_factors(which_to_factors)
 
-  dplyr::mutate(model_data, dplyr::across(dplyr::all_of(which_to_factors), factor))
+  for (col in which_to_factors) {
+    model_data[[col]] <- factor(model_data[[col]])
+  }
+
+  model_data
 }
