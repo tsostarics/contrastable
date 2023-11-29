@@ -29,14 +29,14 @@
     params <- .make_parameters(cur_expr[[3L]], params)
 
 
-  } else if (.is_operator(node, "+")) {
+  } else if (.is_reserved_operator(node, "+")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
     r_has_child <- length(RHS) == 3
     params <- .make_parameters(LHS, params)
 
     # Must check if rhs has children before subsetting with +
-    if (r_has_child && .is_operator(RHS[[1L]], "*")){
+    if (r_has_child && .is_reserved_operator(RHS[[1L]], "*")){
       params[["reference_level"]] <- RHS[[2L]]
       params <- .make_parameters(RHS, params, TRUE)
     } else {
@@ -44,10 +44,10 @@
     }
 
 
-  } else if (.is_operator(node, "-")) {
+  } else if (.is_reserved_operator(node, "-")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
-    if (.is_operator(RHS[[1L]], "*")){
+    if (.is_reserved_operator(RHS[[1L]], "*")){
       params[["drop_trends"]] <- RHS[[2L]]
       params <- .make_parameters(RHS, params, TRUE)
       params <- .make_parameters(LHS, params)
@@ -57,7 +57,7 @@
     }
 
 
-  } else if (.is_operator(node, "*")) {
+  } else if (.is_reserved_operator(node, "*")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
     params[["intercept_level"]] <- RHS
@@ -67,7 +67,7 @@
       params <- .make_parameters(LHS, params)
 
 
-  } else if (.is_operator(node, "|")) {
+  } else if (.is_reserved_operator(node, "|")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
     params[["labels"]] <- RHS
@@ -79,11 +79,11 @@
   return(params)
 }
 
-.is_operator <- function(node, check.sym = NULL) {
+.is_reserved_operator <- function(node, check.sym = NULL) {
   if (!missing(check.sym))
     ops <- syms(check.sym)
   else
-    ops <- syms(c("+","-","*","|"))
+    ops <- syms(c("+","-","*","|"))#"^","%in%",":"))
 
   any(vapply(ops, function(x) identical(node, x), FUN.VALUE = TRUE))
 }
