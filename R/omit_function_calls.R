@@ -82,16 +82,17 @@
 }
 
 
-.is_dominated_by_identity <- function(rhs, mother = `~`) {
+.is_dominated_by_identity <- function(rhs, mothers = list(`~`)) {
   if (length(rhs) == 1) {
-    node_status <- identical(rhs, mother)
+    node_status <- any(vapply(mothers, \(mother) identical(rhs, mother), TRUE))
     # return(node_status)
   } else {
     current_node <- tryCatch(rhs[[1]], error = function(e) rhs)
-    node_status <- identical(current_node, mother)
+    node_status <- any(vapply(mothers, \(mother) identical(current_node, mother), TRUE))
     if (!node_status) {
     for (i in seq_along(rhs)[-1]) {
-      node_status <- .is_dominated_by_identity(rhs[[i]], mother = current_node)
+      mothers[[length(mothers) + 1L]] <- current_node
+      node_status <- .is_dominated_by_identity(rhs[[i]], mothers)
       if (node_status)
         break
     }
