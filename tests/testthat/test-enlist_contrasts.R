@@ -100,3 +100,13 @@ test_that("Passing matrix in variable name works", {
 
 })
 
+
+test_that("Providing namespace with contrast function works", {
+  newdata <- mtcars
+  newdata$carb <- factor(newdata$carb)
+  df1 <- enlist_contrasts(newdata, carb ~ contrastable::sum_code)
+  df2 <- enlist_contrasts(newdata, carb ~ sum_code)
+
+  expect_equal(df1, df2)
+
+})
