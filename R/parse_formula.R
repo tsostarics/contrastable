@@ -8,8 +8,6 @@
 #'
 #' @return A list of parameters to use for a contrast_code call
 .parse_formula <- function(raw_formula) {
-  # char_formula <-  deparse1(raw_formula)
-  # .check_if_valid_formula(raw_formula, char_formula)
   .check_if_valid_formula(raw_formula)
   .make_parameters(raw_formula)
 }
