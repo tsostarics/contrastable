@@ -137,7 +137,12 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 .split_if_language <- function(params, var_envir) {
   params[['other_args']] <- list()
 
-  if (!is.symbol(params[['code_by']]) & is.language(params[['code_by']])) {
+  if (!is.symbol(params[['code_by']]) &&
+      is.language(params[['code_by']]) &&
+      # If the namespace is passed with the function, it will be a language
+      # but we don't want to split it from the function name in that case
+      !identical(params[['code_by']][[1]], quote(`::`)) &&
+      !identical(params[['code_by']][[1]], quote(`:::`))){
     params[['other_args']] <- as.list(params[['code_by']])[-1]
     params[['code_by']] <- params[['code_by']][[1]]
 
