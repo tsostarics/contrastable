@@ -80,28 +80,3 @@
 
   rlang::new_formula(lhs, rhs, env = environment(f))
 }
-
-
-.is_dominated_by_identity <- function(rhs, mothers = list(`~`)) {
-  if (length(rhs) == 1) {
-    node_status <- any(vapply(mothers, \(mother) identical(rhs, mother), TRUE))
-    # return(node_status)
-  } else {
-    current_node <- tryCatch(rhs[[1]], error = function(e) rhs)
-    node_status <- any(vapply(mothers, \(mother) identical(current_node, mother), TRUE))
-    if (!node_status) {
-    for (i in seq_along(rhs)[-1]) {
-      mothers[[length(mothers) + 1L]] <- current_node
-      node_status <- .is_dominated_by_identity(rhs[[i]], mothers)
-      if (node_status)
-        break
-    }
-    }
-  }
-  return(node_status)
-}
-
-.any_dominated_by_identity <- function(rhs) {
-  recursed_tests <- .is_dominated_by_identity(rhs)
-  any(unlist(recursed_tests, recursive = TRUE))
-}
