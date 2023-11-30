@@ -4,12 +4,10 @@
 \alias{.check_if_valid_formula}
 \title{Formula validator}
 \usage{
-.check_if_valid_formula(formula, char_formula)
+.check_if_valid_formula(formula)
 }
 \arguments{
 \item{formula}{Raw formula}
-
-\item{char_formula}{Character string of the formula from deparse}
 }
 \value{
 Nothing, throws an error if any are found

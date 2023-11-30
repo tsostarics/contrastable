@@ -8,9 +8,9 @@
 #'
 #' @return A list of parameters to use for a contrast_code call
 .parse_formula <- function(raw_formula) {
-  char_formula <-  deparse1(raw_formula)
-  .check_if_valid_formula(raw_formula, char_formula)
-
+  # char_formula <-  deparse1(raw_formula)
+  # .check_if_valid_formula(raw_formula, char_formula)
+  .check_if_valid_formula(raw_formula)
   .make_parameters(raw_formula)
 }
 
@@ -20,23 +20,22 @@
 #' to ensure that it's a valid formula.
 #'
 #' @param formula Raw formula
-#' @param char_formula Character string of the formula from deparse
 #'
 #' @return Nothing, throws an error if any are found
-.check_if_valid_formula <- function(formula, char_formula) {
+.check_if_valid_formula <- function(formula) {
   simplified_formula <- .simplify_formula(formula)
   simplified_formula_string <- deparse1(simplified_formula)
 
   if (grepl("[|][^*+-]+[*+-]", simplified_formula_string))
-      stop("If using labels, | must be the last operator in the formula")
+    stop("If using labels, | must be the last operator in the formula")
 
   if (grepl("[*+-][^~]+~",simplified_formula_string))
     stop("Formula must have 1 variable name on left hand side.")
 
-  if (.any_dominated_by_identity(simplified_formula[[3L]]))
+  if (grepl("([|+*-]).+(\\1)", simplified_formula_string))
     stop("You may only use +, *, -, and | once")
 
-  if (grepl(" ~ ([+-]|\\d)", char_formula))
+  if (grepl(" ~ ([|+*-]|\\d)", simplified_formula_string))
     stop("First term in right hand side must be a symbol or function call")
 
   return(invisible(TRUE))
