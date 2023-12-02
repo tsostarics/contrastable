@@ -29,7 +29,7 @@
 .omit_function_calls <- function(rhs_node, mothers = list(`~`)) {
   # If the node is a function call then we're going to need
   # to do some pruning or recursion on the arguments
-  if(class(rhs_node) == "call" && typeof(rhs_node) == "language") {
+  if(is.call(rhs_node) && is.language(rhs_node)) {
 
     # If the function call is an operator and we've already encountered one
     # before, then we can throw an error that we can only use the operator once

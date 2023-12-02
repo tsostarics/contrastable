@@ -4,11 +4,14 @@
 \alias{.omit_function_calls}
 \title{Recursively remove function calls from formula}
 \usage{
-.omit_function_calls(rhs_node)
+.omit_function_calls(rhs_node, mothers = list(`~`))
 }
 \arguments{
 \item{rhs_node}{The right hand side of the formula, either \code{formula[[3]]} or
 \code{rlang::f_rhs(formula)}. This is the node that will be recursed on.}
+
+\item{mothers}{List of operators that have been encountered so far. This is
+used to check that the user is not using the same operator more than once.}
 }
 \value{
 Returns the right hand side of the formula with function calls removed
