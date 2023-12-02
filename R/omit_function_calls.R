@@ -10,6 +10,8 @@
 #'
 #' @param rhs_node The right hand side of the formula, either `formula[[3]]` or
 #' `rlang::f_rhs(formula)`. This is the node that will be recursed on.
+#' @param mothers List of operators that have been encountered so far. This is
+#' used to check that the user is not using the same operator more than once.
 #'
 #' @return Returns the right hand side of the formula with function calls removed
 #' @export
@@ -24,15 +26,23 @@
 #'
 #' # Returns `CALL() + 1 * CALL() | CALL()`
 #' .omit_function_calls(rlang::f_rhs(my_formula))
-.omit_function_calls <- function(rhs_node) {
+.omit_function_calls <- function(rhs_node, mothers = list(`~`)) {
   # If the node is a function call then we're going to need
   # to do some pruning or recursion on the arguments
   if(class(rhs_node) == "call" && typeof(rhs_node) == "language") {
-    # If the function call is an operator
+
+    # If the function call is an operator and we've already encountered one
+    # before, then we can throw an error that we can only use the operator once
     if(.is_reserved_operator(rhs_node[[1]])) {
-      # Recursively call omit_function_calls on the arguments to the operator
+      for (mother in mothers){
+        if (identical(rhs_node[[1]], mother))
+          stop("You may only use +, -, and * once")
+      }
+
+      # If we haven't encountered this operator before, we need to recurse
+      # through the arguments
       for (i in seq_along(rhs_node)[-1]) {
-        rhs_node[[i]] <- .omit_function_calls(rhs_node[[i]])
+        rhs_node[[i]] <- .omit_function_calls(rhs_node[[i]], c(mothers, rhs_node[[1]]))
       }
     } else {
       # If the function call is not an operator, replace it with the string "CALL"
@@ -46,7 +56,6 @@
   # handling is done & the current node has been changed, return the current node
   return(rhs_node)
 }
-
 
 #' Simplify formula by reducing the right hand side
 #'
