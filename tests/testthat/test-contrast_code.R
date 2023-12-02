@@ -95,7 +95,7 @@ test_that("default 2 level factor works", {
 
 test_that("Non matrix or function error works", {
   expect_error(contrast_code(factor(c(1,2,3)), c(0,1,0,0,0,1)),
-               regexp = "Invalid value for code_by")
+               regexp = "applied to non-array")
 })
 
 

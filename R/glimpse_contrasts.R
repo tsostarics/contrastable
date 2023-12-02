@@ -59,7 +59,7 @@ glimpse_contrasts <- function(model_data,
   dropped_trends[!which_are_polynomials] <- NA
 
   glimpse <- tibble::tibble("factor" = set_factors,
-                            "n_levels" = factor_sizes,
+                            "n" = factor_sizes,
                             "level_names" = level_names,
                             "scheme" = scheme_labels,
                             "reference" = reference_levels,
@@ -162,7 +162,7 @@ glimpse_contrasts <- function(model_data,
   .warn_if_nondefault(new_contrasts, unset_factors, factor_sizes, is_ordered_factor)
 
   glimpse <- tibble::tibble("factor"         = unset_factors,
-                            "n_levels"       = factor_sizes,
+                            "n"       = factor_sizes,
                             "level_names"    = level_names,
                             "scheme"         = scheme_labels,
                             "reference"      = reference_levels,
@@ -194,7 +194,7 @@ glimpse_contrasts <- function(model_data,
                         function(x) levels(model_data[[x]]))
 
   tibble::tibble("factor"         = one_level_factors,
-                 "n_levels"       = 1L,
+                 "n"       = 1L,
                  "level_names"    = level_names,
                  "scheme"         = NA_character_,
                  "reference"      = NA_character_,

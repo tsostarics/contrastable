@@ -23,7 +23,7 @@ test_that("Glimpse works", {
                            gear ~ scaled_sum_code + 5,
                            verbose = FALSE)
   expect_equal(tst$factor, c('carb','gear','cyl'))
-  expect_equal(tst$n_levels, c(6, 3, 3), ignore_attr = TRUE) # need unname
+  expect_equal(tst$n, c(6, 3, 3), ignore_attr = TRUE) # need unname
   expect_equal(tst$scheme, c('contr.poly','scaled_sum_code','contr.treatment'), ignore_attr = TRUE) # need unname
   expect_equal(tst$reference, c(NA, '5', '4'), ignore_attr = TRUE) # need unname
   expect_equal(tst$intercept, c('grand mean', 'grand mean', 'mean(4)'), ignore_attr = TRUE)

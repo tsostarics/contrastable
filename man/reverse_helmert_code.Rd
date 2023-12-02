@@ -4,10 +4,10 @@
 \alias{reverse_helmert_code}
 \title{Reverse helmert code}
 \usage{
-reverse_helmert_code(n_levels)
+reverse_helmert_code(n)
 }
 \arguments{
-\item{n_levels}{Number of levels in the factor}
+\item{n}{Number of levels in the factor}
 }
 \value{
 Contrast matrix

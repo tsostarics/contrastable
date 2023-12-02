@@ -4,10 +4,10 @@
 \alias{forward_difference_code}
 \title{Forward difference code}
 \usage{
-forward_difference_code(n_levels)
+forward_difference_code(n)
 }
 \arguments{
-\item{n_levels}{Number of factor levels}
+\item{n}{Number of factor levels}
 }
 \value{
 Forward difference contrast matrix

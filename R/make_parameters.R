@@ -19,7 +19,8 @@
                                            "reference_level" = NA,
                                            "intercept_level" = NA,
                                            "drop_trends" = NA,
-                                           "labels" = NULL),
+                                           "labels" = NULL,
+                                           "as_is" = FALSE),
                              EMBEDDED = FALSE){
   cur_expr <- as.list(formula)
   node <- cur_expr[[1]]
@@ -73,7 +74,13 @@
     params[["labels"]] <- RHS
     params <- .make_parameters(LHS, params)
   } else {
-    params[["code_by"]] <- formula
+    if (length(formula) > 1L && identical(formula[[1]], as_is)){
+      params[["as_is"]] <- TRUE
+      formula <- formula[[2L]]
+    }
+    if (is.call(formula) && length(formula) == 1L)
+      formula <- formula[[1]] # Remove parentheses to treat as symbol
+      params[["code_by"]] <- formula
   }
 
   return(params)

@@ -4,12 +4,16 @@
 \alias{manual_code}
 \title{Manual code factors}
 \usage{
-manual_code(factor_col, coding_matrix = NA)
+manual_code(factor_col, code_by = NA, as_is = FALSE, ...)
 }
 \arguments{
 \item{factor_col}{The factor column to use, eg data$gender}
 
-\item{coding_matrix}{The matrix you want to use, obligatory if n factors > 2}
+\item{code_by}{The matrix you want to use, obligatory if n factors > 2}
+
+\item{as_is}{Whether to use the factor levels as labels}
+
+\item{...}{Not used}
 }
 \value{
 A matrix for contrast coding schemes

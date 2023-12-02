@@ -11,24 +11,24 @@
 #' @param use_labels Labels to use in the contrast matrix, must equal number of contrasts
 #' @param ... Additional arguments to be passed to functional_code, specifically,
 #' which level you want the reference level to be
+#' @param as_is Logical, default FALSE, whether to suppress auto switching of
+#' the reference level to the first level if not specified
 #'
 #' @return A contrast coding matrix with labels and proper reference level
 #' @export
-contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, ...) {
-  if (identical(matrix, code_by)) {
-    matrix_args <- rlang::dots_list(...)[['other']]
-    names(matrix_args)[1] <- 'data'
-    code_by <- do.call(code_by, args = matrix_args)
-  }
-  if (is.matrix(code_by)) {
-    contrast_matrix <- manual_code(factor_col, code_by)
-  } else if (is.function(code_by)) {
-    contrast_matrix <- functional_code(factor_col, code_by, ...)
-  } else if (length(contrasts(factor_col)) == 2) {
-    contrast_matrix <- manual_code(factor_col)
+contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, as_is = FALSE, ...) {
+  # If code_by is a matrix, use manual_code
+  if (is.symbol(code_by))
+    code_by <- get(code_by)
+
+  if (is.function(code_by)) {
+    specify_with <- functional_code
   } else {
-  stop("Invalid value for code_by, must be a matrix or coding function")
+    specify_with <- manual_code
   }
+  # specify_with <- ifelse(is.function(code_by), functional_code, manual_code)
+  contrast_matrix <- specify_with(factor_col=factor_col, code_by=code_by, as_is=as_is, ...)
+
 
   if (!is.null(use_labels)) {
     stopifnot("Provided labels must be same length as number of columns in contrast matrix." = ncol(contrast_matrix) == length(use_labels))

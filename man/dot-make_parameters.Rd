@@ -7,7 +7,7 @@
 .make_parameters(
   formula,
   params = list(factor_col = NA, code_by = NA, reference_level = NA, intercept_level =
-    NA, drop_trends = NA, labels = NULL),
+    NA, drop_trends = NA, labels = NULL, as_is = FALSE),
   EMBEDDED = FALSE
 )
 }

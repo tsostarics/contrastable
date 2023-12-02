@@ -4,7 +4,7 @@
 \alias{contrast_code}
 \title{Contrast code factors}
 \usage{
-contrast_code(factor_col, code_by = NA, use_labels = NULL, ...)
+contrast_code(factor_col, code_by = NA, use_labels = NULL, as_is = FALSE, ...)
 }
 \arguments{
 \item{factor_col}{The factor column to use, eg data$gender}
@@ -12,6 +12,9 @@ contrast_code(factor_col, code_by = NA, use_labels = NULL, ...)
 \item{code_by}{Either a matrix or a function}
 
 \item{use_labels}{Labels to use in the contrast matrix, must equal number of contrasts}
+
+\item{as_is}{Logical, default FALSE, whether to suppress auto switching of
+the reference level to the first level if not specified}
 
 \item{...}{Additional arguments to be passed to functional_code, specifically,
 which level you want the reference level to be}

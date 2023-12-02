@@ -11,7 +11,7 @@
 #' \item grp3 = mean(grp3) - mean(grp4)
 #'}
 #'
-#' @param n_levels Number of factor levels
+#' @param n Number of factor levels
 #'
 #' @return Forward difference contrast matrix
 #' @export
@@ -32,13 +32,13 @@
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
-forward_difference_code <- function(n_levels) {
+forward_difference_code <- function(n) {
   contrasts <-
-    lapply(seq_len(n_levels),
+    lapply(seq_len(n),
            function(i)
-             c(rep(n_levels-i, i), rep(-i, n_levels-i)) / rep(n_levels, n_levels))
-  matrix(unlist(contrasts[seq_len(n_levels-1L)]),
-         nrow = n_levels)
+             c(rep(n-i, i), rep(-i, n-i)) / rep(n, n))
+  matrix(unlist(contrasts[seq_len(n-1L)]),
+         nrow = n)
 }
 
 #' Backward difference code
@@ -54,7 +54,7 @@ forward_difference_code <- function(n_levels) {
 #' \item grp2 = mean(grp3) - mean(grp2)
 #' \item grp3 = mean(grp4) - mean(grp3)
 #'}
-#' @param n_levels Number of factor levels
+#' @param n Number of factor levels
 #'
 #' @return Backward difference contrast matrix
 #' @export
@@ -74,6 +74,6 @@ forward_difference_code <- function(n_levels) {
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ backward_difference_code)))
-backward_difference_code <- function(n_levels) {
-  -forward_difference_code(n_levels)
+backward_difference_code <- function(n) {
+  -forward_difference_code(n)
 }

@@ -35,13 +35,13 @@ test_that("Setting both reference and intercept simultaneously with + and * work
 }
 )
 
-test_that("Passing a raw matrix call to set contrasts works", {
+test_that("Raw matrix call with automatic handling of switching a detected reference level", {
   my_df <- mtcars
   my_df$gear <-  factor(my_df$gear)
   my_df$carb <-  factor(my_df$carb)
 
   reference <- enlist_contrasts(my_df,
-                                gear ~ contr.sum + 4,
+                                gear ~ contr.sum + 3,
                                 carb ~ forward_difference_code)[[1L]]
   # Raw matrix
   expect_equal(
@@ -108,5 +108,25 @@ test_that("Providing namespace with contrast function works", {
   df2 <- enlist_contrasts(newdata, carb ~ sum_code)
 
   expect_equal(df1, df2)
+
+})
+
+test_that("as_is functionality works as expected", {
+  newdata <- mtcars
+  newdata$carb <- factor(newdata$carb)
+  df1 <- enlist_contrasts(newdata, carb ~ as_is(contrastable::sum_code))
+  df2 <- enlist_contrasts(newdata, carb ~ contrastable::sum_code + 8)
+
+  expect_equal(df1, df2, ignore_attr = TRUE)
+
+})
+
+test_that("nested as_is works", {
+  newdata <- mtcars
+  newdata$carb <- factor(newdata$carb)
+  df1 <- enlist_contrasts(newdata, carb ~ as_is(as_is(as_is((contrastable::sum_code)))))
+  df2 <- enlist_contrasts(newdata, carb ~ sum_code + 8)
+
+  expect_equal(df1, df2, ignore_attr = TRUE)
 
 })

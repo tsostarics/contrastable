@@ -6,12 +6,12 @@
 #' comparison looks for a polynomial trend of degree k where each polynomial
 #' is independent of the others.
 #'
-#' @param n_levels number of levels for this factor
+#' @param n number of levels for this factor
 #'
 #' @return A matrix of orthogonal polynomial contrasts
 #' @export
-orth_polynomial_code <- function(n_levels) {
-  stats::contr.poly(n_levels)
+orth_polynomial_code <- function(n) {
+  stats::contr.poly(n)
 }
 
 #' Raw Polynomial code
@@ -25,14 +25,14 @@ orth_polynomial_code <- function(n_levels) {
 #' comparison looks for a polynomial trend of degree k where each polynomial
 #' may be correlated with the others. Normally you would use orthogonal polynomials.
 #'
-#' @param n_levels number of levels for this factor
+#' @param n number of levels for this factor
 #'
 #' @return A matrix of raw polynomial contrasts
 #' @export
 #'
 #' @importFrom stats poly
-raw_polynomial_code <- function(n_levels) {
-  contrmat <- stats::poly(seq_len(n_levels), n_levels - 1, raw = TRUE)
+raw_polynomial_code <- function(n) {
+  contrmat <- stats::poly(seq_len(n), n - 1, raw = TRUE)
   attr(contrmat, "degree") <- NULL
   contrmat
 }

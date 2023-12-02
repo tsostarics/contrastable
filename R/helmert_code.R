@@ -15,7 +15,7 @@
 #' \item grp3 = mean(grp3) - mean(grp1, grp2)
 #' \item grp4 = mean(grp4) - mean(grp1, grp2, grp3)
 #'}
-#' @param n_levels Number of levels in the factor
+#' @param n Number of levels in the factor
 #'
 #' @return Contrast matrix
 #' @export
@@ -36,8 +36,8 @@
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ reverse_helmert_code)))
-reverse_helmert_code <- function(n_levels){
-  apply(unname(stats::contr.helmert(n_levels)), 2L, function(x) x / sum(x != 0))
+reverse_helmert_code <- function(n){
+  apply(unname(stats::contr.helmert(n)), 2L, function(x) x / sum(x != 0))
 }
 
 #' Helmert code
@@ -57,7 +57,7 @@ reverse_helmert_code <- function(n_levels){
 #' \item grp3 = mean(grp3) - mean(grp4)
 #'}
 #'
-#' @param n_levels Number of levels in the factor
+#' @param n Number of levels in the factor
 #'
 #' @return Contrast matrix
 #' @export
@@ -77,6 +77,6 @@ reverse_helmert_code <- function(n_levels){
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ helmert_code)))
-helmert_code <- function(n_levels){
-  matrix(rev(reverse_helmert_code(n_levels)), nrow = n_levels)
+helmert_code <- function(n){
+  matrix(rev(reverse_helmert_code(n)), nrow = n)
 }

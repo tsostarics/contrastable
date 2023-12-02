@@ -28,7 +28,7 @@
 #' of a level is equal to half the sum of the means of the other levels, i.e.,
 #' 1.5mu1 - .5mu2 - .5mu3 - .5mu4 = 0. I'm not sure when this would be useful.
 #'
-#' @param n_levels number of levels for this factor
+#' @param n number of levels for this factor
 #'
 #' @return A matrix of scaled sum coded contrasts, unlabeled
 #' @export
@@ -55,11 +55,11 @@
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
-scaled_sum_code <- function(n_levels) {
-  contrast_matrix <- stats::contr.sum(n_levels)
-  contrast_matrix[contrast_matrix == 1] <- (n_levels - 1) / n_levels
-  contrast_matrix[contrast_matrix == 0] <- -1/n_levels
-  contrast_matrix[contrast_matrix == -1] <- -1/n_levels
+scaled_sum_code <- function(n) {
+  contrast_matrix <- stats::contr.sum(n)
+  contrast_matrix[contrast_matrix == 1] <- (n - 1) / n
+  contrast_matrix[contrast_matrix == 0] <- -1/n
+  contrast_matrix[contrast_matrix == -1] <- -1/n
 
   contrast_matrix
 }

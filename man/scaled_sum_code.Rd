@@ -4,10 +4,10 @@
 \alias{scaled_sum_code}
 \title{Scaled sum coding}
 \usage{
-scaled_sum_code(n_levels)
+scaled_sum_code(n)
 }
 \arguments{
-\item{n_levels}{number of levels for this factor}
+\item{n}{number of levels for this factor}
 }
 \value{
 A matrix of scaled sum coded contrasts, unlabeled

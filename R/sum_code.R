@@ -7,10 +7,10 @@
 #' Comparison level = 1
 #' All others = 0
 #'
-#' @param n_levels number of levels for this factor
+#' @param n number of levels for this factor
 #'
 #' @return A matrix of sum coded contrasts, unlabeled
 #' @export
-sum_code <- function(n_levels) {
-  stats::contr.sum(n_levels)
+sum_code <- function(n) {
+  stats::contr.sum(n)
 }

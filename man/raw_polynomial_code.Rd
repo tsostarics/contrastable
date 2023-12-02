@@ -4,10 +4,10 @@
 \alias{raw_polynomial_code}
 \title{Raw Polynomial code}
 \usage{
-raw_polynomial_code(n_levels)
+raw_polynomial_code(n)
 }
 \arguments{
-\item{n_levels}{number of levels for this factor}
+\item{n}{number of levels for this factor}
 }
 \value{
 A matrix of raw polynomial contrasts

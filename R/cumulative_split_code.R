@@ -16,7 +16,7 @@
 #'  Each of these comparisons uses the cumulative mean of all the levels in
 #'  each group. The intercept is the grand mean.
 #'
-#' @param n_levels Number of levels in the factor
+#' @param n Number of levels in the factor
 #'
 #' @return Contrast matrix
 #' @export
@@ -35,15 +35,15 @@
 #' lm(val ~ grp, data = df)
 #'
 #'
-cumulative_split_code <- function(n_levels) {
-  contrast_matrix <- matrix(0, nrow = n_levels, ncol = n_levels - 1)
+cumulative_split_code <- function(n) {
+  contrast_matrix <- matrix(0, nrow = n, ncol = n - 1)
 
-  for (i in seq_len(n_levels-1)) {
+  for (i in seq_len(n-1)) {
     n_up <- seq(1, i)
-    n_down <- seq(i+1, n_levels)
+    n_down <- seq(i+1, n)
     contrast_matrix[n_up, i] <- 1 / length(n_up)
     contrast_matrix[n_down, i] <- -1 / length(n_down)
   }
 
-  .hypotheses_to_contrasts(cbind(rep(1/n_levels, n_levels), contrast_matrix))
+  .hypotheses_to_contrasts(cbind(rep(1/n, n), contrast_matrix))
 }

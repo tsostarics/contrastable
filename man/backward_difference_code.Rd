@@ -4,10 +4,10 @@
 \alias{backward_difference_code}
 \title{Backward difference code}
 \usage{
-backward_difference_code(n_levels)
+backward_difference_code(n)
 }
 \arguments{
-\item{n_levels}{Number of factor levels}
+\item{n}{Number of factor levels}
 }
 \value{
 Backward difference contrast matrix

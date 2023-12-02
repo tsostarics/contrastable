@@ -4,10 +4,10 @@
 \alias{helmert_code}
 \title{Helmert code}
 \usage{
-helmert_code(n_levels)
+helmert_code(n)
 }
 \arguments{
-\item{n_levels}{Number of levels in the factor}
+\item{n}{Number of levels in the factor}
 }
 \value{
 Contrast matrix

@@ -4,10 +4,10 @@
 \alias{cumulative_split_code}
 \title{Cumulative split contrasts}
 \usage{
-cumulative_split_code(n_levels)
+cumulative_split_code(n)
 }
 \arguments{
-\item{n_levels}{Number of levels in the factor}
+\item{n}{Number of levels in the factor}
 }
 \value{
 Contrast matrix

@@ -112,6 +112,7 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir),
+    as_is = params[['as_is']],
     other = params[['other_args']]
   )
 
@@ -135,6 +136,12 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' additional list entry for other arguments, which will be empty if no
 #' arguments are provided.
 .split_if_language <- function(params, var_envir) {
+  # In the event someone tries to do v ~ as_is(as_is(as_is(foo)))
+    while(length(params[['code_by']]) > 1L && identical(params[['code_by']][[1]], quote(as_is))){
+      params[['as_is']] <- TRUE
+      params[['code_by']][1] <- NULL
+    }
+
   params[['other_args']] <- list()
 
   if (!is.symbol(params[['code_by']]) &&
@@ -151,9 +158,50 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 
         params[['other_args']][arg_i] <- list(eval(params[['other_args']][[arg_i]],
                                                    var_envir)
-                                              )
+        )
       }
     }
   }
   params
+}
+
+
+
+#' Use contrast matrix as-is
+#'
+#' The default behavior for setting contrasts with a reference level is to move
+#' the reference level to be the first level. However, there are some functions
+#' that do not natively specify that already. Consider `contr.treatment` and
+#' `contr.SAS`, which provide the same treatment-coded matrices BUT the former
+#' moves the reference level to the first level while the latter sets the
+#' reference level to the last level. The contrast between the two functions
+#' is thus neutralized in this package. If we have reason to avoid this behavior,
+#' especially for manually created matrices for niche situations, we can
+#' suppress the behavior by wrapping the matrix/contrast function in `as_is`.
+#'
+#' By itself, this function does nothing more than return its input.
+#' For the purposes of this package though, some functions will check to see if
+#' a contrast matrix is wrapped in `as_is`.
+#'
+#' @param x Contrast matrix or contrast function
+#'
+#' @return x
+#' @export
+#'
+#' @examples
+#'
+#' # These will return the same thing
+#' enlist_contrasts(mtcars, carb ~ contr.treatment)
+#' enlist_contrasts(mtcars, carb ~ contr.SAS)
+#'
+#' # This will suppress moving the reference level
+#' enlist_contrasts(mtcars, carb ~ as_is(contr.SAS))
+#'
+#' # Particularly helpful for external matrices
+#' my_contrasts <- contr.SAS(6) # Imagine this is some other more complicated matrix
+#'
+#' # This is the same as as_is(contr.SAS)
+#' enlist_contrasts(mtcars, carb ~ as_is(my_contrasts))
+as_is <- function(x) {
+  x
 }

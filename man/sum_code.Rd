@@ -4,10 +4,10 @@
 \alias{sum_code}
 \title{Sum code}
 \usage{
-sum_code(n_levels)
+sum_code(n)
 }
 \arguments{
-\item{n_levels}{number of levels for this factor}
+\item{n}{number of levels for this factor}
 }
 \value{
 A matrix of sum coded contrasts, unlabeled

@@ -4,10 +4,10 @@
 \alias{treatment_code}
 \title{Treatment code}
 \usage{
-treatment_code(n_levels)
+treatment_code(n)
 }
 \arguments{
-\item{n_levels}{number of levels for this factor}
+\item{n}{number of levels for this factor}
 }
 \value{
 A matrix of treatment coded contrasts, unlabeled

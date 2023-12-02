@@ -6,10 +6,10 @@
 #' Reference level = 0
 #' Comparison level = 1
 #'
-#' @param n_levels number of levels for this factor
+#' @param n number of levels for this factor
 #'
 #' @return A matrix of treatment coded contrasts, unlabeled
 #' @export
-treatment_code <- function(n_levels) {
-  stats::contr.treatment(n_levels)
+treatment_code <- function(n) {
+  stats::contr.treatment(n)
 }

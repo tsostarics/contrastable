@@ -60,7 +60,8 @@ test_that("Formula parsing with matrix call works", {
          "reference_level" = 4,
          "intercept_level" = 2,
          "drop_trends" = str2lang("3:5"),
-         "labels" = NULL)
+         "labels" = NULL,
+         "as_is" = FALSE)
 
   expect_equal(params, reference, ignore_attr = TRUE)
 })
@@ -74,7 +75,8 @@ test_that("Formula parsing with functions works", {
          "reference_level" = "a",
          "intercept_level" = "b",
          "drop_trends" = str2lang("a:b"),
-         "labels" = NULL)
+         "labels" = NULL,
+         "as_is" = FALSE)
 
   f_noops <- gear ~ contr.poly
   params_noops <- .parse_formula(f_noops)
@@ -84,7 +86,8 @@ test_that("Formula parsing with functions works", {
          "reference_level" = NA,
          "intercept_level" = NA,
          "drop_trends" = NA,
-         "labels" = NULL)
+         "labels" = NULL,
+         "as_is" = FALSE)
 
   expect_equal(params_allops, reference_allops)
   expect_equal(params_noops, reference_noops)

@@ -1,6 +1,6 @@
-.contrasts_to_hypotheses <- function(contrast_matrix, n_levels) {
-  n_levels <- nrow(contrast_matrix)
-  intercept_matrix <- matrix(c(rep(1,n_levels), contrast_matrix), n_levels)
+.contrasts_to_hypotheses <- function(contrast_matrix, n) {
+  n <- nrow(contrast_matrix)
+  intercept_matrix <- matrix(c(rep(1,n), contrast_matrix), n)
   solve(t(intercept_matrix))
 }
 

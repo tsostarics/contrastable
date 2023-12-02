@@ -49,6 +49,6 @@ interpret_intercept <- function(contr_mat) {
   if (!same_weights)
     return("custom weights")
 
-  mean_levels <- paste(level_names[contributing_levels], collapse = ",")
-  paste0("mean(",mean_levels,")")
+  mean <- paste(level_names[contributing_levels], collapse = ",")
+  paste0("mean(",mean,")")
 }

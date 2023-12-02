@@ -6,17 +6,18 @@
 \usage{
 functional_code(
   factor_col,
-  coding_fx,
+  code_by,
   reference_level = NA,
   set_intercept = NA,
   drop_trends = NA,
+  as_is = FALSE,
   ...
 )
 }
 \arguments{
 \item{factor_col}{Factor column}
 
-\item{coding_fx}{A function that generates contrast matrices}
+\item{code_by}{A function that generates contrast matrices}
 
 \item{reference_level}{Label of the desired reference level, will default to
 the first label in dimnames of the original contrasts}
@@ -27,6 +28,9 @@ the reference level)}
 
 \item{drop_trends}{Which trends to drop from the final matrix, should only
 be used with \code{contr.poly} to remove higher order trends}
+
+\item{as_is}{Logical, default FALSE, whether to suppress auto switching of
+the reference level to the first level if not specified}
 
 \item{...}{Other arguments to pass to \code{coding_fx}}
 }

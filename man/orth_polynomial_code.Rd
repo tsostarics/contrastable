@@ -4,10 +4,10 @@
 \alias{orth_polynomial_code}
 \title{Orthogonal Polynomial code}
 \usage{
-orth_polynomial_code(n_levels)
+orth_polynomial_code(n)
 }
 \arguments{
-\item{n_levels}{number of levels for this factor}
+\item{n}{number of levels for this factor}
 }
 \value{
 A matrix of orthogonal polynomial contrasts
