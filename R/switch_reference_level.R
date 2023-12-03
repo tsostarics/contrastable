@@ -24,12 +24,22 @@
   contrast_matrix[new_reference,] <- reference_row
 
   # Determine the order of the comparison rows
-  comparison_order <- seq_len(nrow(contrast_matrix))
-  if (old_reference != 2 && new_reference != 2) {
-  comparison_order[old_reference] <- new_reference
-  comparison_order[new_reference] <- old_reference
+  comparison_order <- seq_len(ncol(contrast_matrix))
+  if (abs(old_reference - new_reference) != 1) {
+    if (new_reference == 1) {
+      comparison_order <- c(seq(2, old_reference - 1L),
+                            1L,
+                            comparison_order[comparison_order >= old_reference])
+    } else if (new_reference > old_reference) {
+      comparison_order <- c(comparison_order[comparison_order < old_reference],
+                            new_reference - 1,
+                            comparison_order[comparison_order >= old_reference & comparison_order != (new_reference-1)])
+    } else if (new_reference < old_reference) {
+      comparison_order <- c(new_reference,
+                            comparison_order[comparison_order != new_reference])
+    }
   }
-  comparison_order <- comparison_order[(comparison_order - nrow(contrast_matrix)) < 0]
+
 
   # Return the modified matrix with the rows reordered
   as.matrix(contrast_matrix[,comparison_order])
@@ -40,7 +50,7 @@
   inv_matrix <- solve(.contrasts_to_hypotheses(cmat))
 
   if (all((cmat - stats::contr.helmert(nrow(cmat)) < 1e-10)))
-      return(NA_integer_)
+    return(NA_integer_)
 
   inverse_matrix_result <- find_same_col(inv_matrix)
   inverse_matrix_result

@@ -115,8 +115,7 @@ test_that("as_is functionality works as expected", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
   df1 <- enlist_contrasts(newdata, carb ~ as_is(contr.sum))
-  df2 <- enlist_contrasts(newdata, carb ~ contr.sum + 8)
-
+  df2 <- enlist_contrasts(newdata, carb ~ sum_code + 8)
   expect_equal(df1, df2, ignore_attr = TRUE)
 
 })
