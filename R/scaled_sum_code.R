@@ -56,12 +56,7 @@
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
 scaled_sum_code <- function(n) {
-  contrast_matrix <- stats::contr.sum(n)
-  contrast_matrix[contrast_matrix == 1] <- (n - 1) / n
-  contrast_matrix[contrast_matrix == 0] <- -1/n
-  contrast_matrix[contrast_matrix == -1] <- -1/n
-
-  contrast_matrix
+  contr.treatment(n) - 1/n
 }
 
 my_formula <-

@@ -12,5 +12,5 @@
 #' @return A matrix of sum coded contrasts, unlabeled
 #' @export
 sum_code <- function(n) {
-  stats::contr.sum(n)
-}
+  stats::contr.sum(n)[c(n, seq_len(n-1)),]
+  }
