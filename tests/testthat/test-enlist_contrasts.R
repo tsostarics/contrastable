@@ -114,8 +114,8 @@ test_that("Providing namespace with contrast function works", {
 test_that("as_is functionality works as expected", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
-  df1 <- enlist_contrasts(newdata, carb ~ as_is(contrastable::sum_code))
-  df2 <- enlist_contrasts(newdata, carb ~ contrastable::sum_code + 8)
+  df1 <- enlist_contrasts(newdata, carb ~ as_is(contr.sum))
+  df2 <- enlist_contrasts(newdata, carb ~ contr.sum + 8)
 
   expect_equal(df1, df2, ignore_attr = TRUE)
 
@@ -124,9 +124,8 @@ test_that("as_is functionality works as expected", {
 test_that("nested as_is works", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
-  df1 <- enlist_contrasts(newdata, carb ~ as_is(as_is(as_is((contrastable::sum_code)))))
-  df2 <- enlist_contrasts(newdata, carb ~ sum_code + 8)
+  df1 <- enlist_contrasts(newdata, carb ~ as_is(as_is(as_is((contr.sum)))))
 
-  expect_equal(df1, df2, ignore_attr = TRUE)
+  expect_equal(df1[[1]], contr.sum(6), ignore_attr = TRUE)
 
 })
