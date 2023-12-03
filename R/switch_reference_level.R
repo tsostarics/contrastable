@@ -30,16 +30,6 @@
   comparison_order[new_reference] <- old_reference
   }
   comparison_order <- comparison_order[(comparison_order - nrow(contrast_matrix)) < 0]
-  # comparison_order <- seq_len(ncol(contrast_matrix))
-    # seq_len(ifelse(old_reference == 1,
-    #                                  ncol(contrast_matrix),
-    #                                  old_reference - 1))
-
-  # if (old_reference != 2) # Avoid dimension length issues with n=2
-  #   comparison_order <- rev(seq_len(ncol(contrast_matrix)))# c(comparison_order[comparison_order != new_reference], new_reference)
-  #
-  # if (length(comparison_order) > 2)
-  #   comparison_order <- c(comparison_order[-old_reference], new_reference)
 
   # Return the modified matrix with the rows reordered
   as.matrix(contrast_matrix[,comparison_order])

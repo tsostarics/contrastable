@@ -26,7 +26,7 @@ contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, as_is = FAL
   } else {
     specify_with <- manual_code
   }
-  # specify_with <- ifelse(is.function(code_by), functional_code, manual_code)
+
   contrast_matrix <- specify_with(factor_col=factor_col, code_by=code_by, as_is=as_is, ...)
 
 
