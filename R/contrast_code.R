@@ -35,5 +35,9 @@ contrast_code <- function(factor_col, code_by=NA, use_labels = NULL, as_is = FAL
     colnames(contrast_matrix) <- use_labels
   }
 
+  if (as_is && is.null(colnames(contrast_matrix))) {
+    warning("No comparison labels set and as_is=TRUE, contrast labels will be column indices.")
+  }
+
   contrast_matrix
 }
