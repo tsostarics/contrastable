@@ -56,12 +56,5 @@
 #'            data = mydf,
 #'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
 scaled_sum_code <- function(n) {
-  contr.treatment(n) - 1/n
+  stats::contr.treatment(n) - 1/n
 }
-
-my_formula <-
-  varname ~
-  matrix(c(1,2,3),
-         nrow = 3,
-         ncol = 1) + 1 * get_whatever(asd = 2) |
-  c('one', 'two', 'three')
