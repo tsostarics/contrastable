@@ -135,3 +135,15 @@ test_that("nested as_is works", {
   expect_equal(df1[[1]], contr.sum(6), ignore_attr = TRUE)
 
 })
+
+test_that("moving reference level to earlier level works", {
+  newdata <- mtcars
+  newdata$carb <- factor(newdata$carb)
+  df1 <- enlist_contrasts(newdata, carb ~ contr.sum + 4)[[1]]
+  df2 <- structure(c(0, 0, 0, -1, 0, 1, 1, 0, 0, -1, 0, 0, 0, 1, 0, -1,
+                     0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, -1, 1, 0), dim = 6:5, dimnames = list(
+                       c("1", "2", "3", "4", "6", "8"), c("8", "1", "2", "3", "6"
+                       )))
+  expect_equal(df1, df2)
+
+})
