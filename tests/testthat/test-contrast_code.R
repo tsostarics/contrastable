@@ -86,16 +86,20 @@ test_that("four level functional coding work", {
 })
 
 test_that("default 2 level factor works", {
-  test_matrix <- matrix(c(-.5,.5), nrow = 2)
-  colnames(test_matrix) <- 2
-  rownames(test_matrix) <- c(1,2)
+  # expect_warning(use_contrasts(factor(1:2)), regexp = "Using unordered default")
+  # expect_warning(use_contrasts(ordered(factor(1:2))), regexp = "Using ordered default")
 
-  expect_equal(test_matrix, use_contrasts(factor(1:2)))
+  unordered_result <- suppressWarnings(use_contrasts(factor(1:2)))
+  ordered_result <- suppressWarnings(use_contrasts(ordered(factor(1:2))))
+
+  expect_equal(unordered_result, structure(c(0, 1), dim = 2:1, dimnames = list(c("1", "2"), "2")))
+  expect_equal(round(ordered_result, 6),structure(c(-0.707107, 0.707107), dim = 2:1, dimnames = list(
+    NULL, ".L")))
 })
 
-test_that("Non matrix or function error works", {
-  expect_error(use_contrasts(factor(c(1,2,3)), c(0,1,0,0,0,1)),
-               regexp = "applied to non-array")
+test_that("Non matrix or function default handling works", {
+  expect_warning(use_contrasts(factor(c(1,2,3)), c(0,1,0,0,0,1)),
+               regexp = "Using unordered default")
 })
 
 
@@ -156,3 +160,4 @@ test_that("Argument handling in parentheses & empty parentheses work", {
     regexp = "unused argument"
   )
 })
+

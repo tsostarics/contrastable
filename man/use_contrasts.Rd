@@ -4,12 +4,27 @@
 \alias{use_contrasts}
 \title{Contrast code factors}
 \usage{
-use_contrasts(factor_col, code_by = NA, labels = NULL, as_is = FALSE, ...)
+use_contrasts(
+  factor_col,
+  code_by = NA,
+  reference_level = NA,
+  set_intercept = NA,
+  drop_trends = NA,
+  labels = NULL,
+  as_is = FALSE,
+  ...
+)
 }
 \arguments{
 \item{factor_col}{The factor column to use, eg data$gender}
 
 \item{code_by}{Either a matrix or a function}
+
+\item{reference_level}{The level to use as the reference level, default NA}
+
+\item{set_intercept}{The intercept to use, default NA}
+
+\item{drop_trends}{Whether to drop trends, default NA}
 
 \item{labels}{Labels to use in the contrast matrix, must equal number of contrasts}
 
