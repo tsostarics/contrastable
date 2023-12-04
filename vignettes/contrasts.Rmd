@@ -106,7 +106,7 @@ mdl_data <-
 
 ## Contrast coding 
 
-The basis for this package is the `contrast_code()` function, which takes
+The basis for this package is the `use_contrasts()` function, which takes
 a factor vector (i.e., a factor column in a dataframe) and a desired contrast 
 scheme and returns a new contrast matrix.
 The contrast scheme can be passed as either a function that generates contrast
@@ -118,7 +118,7 @@ what the general output you can get would look like.
 Here we use `contr.sum` to get a contrast matrix using the `carb` column.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.sum)
+use_contrasts(mdl_data$carb, contr.sum)
 ```
 
 There are two things to note here. First, the comparison labels have been retained.
@@ -128,7 +128,7 @@ the default behavior, inherited from R's normal alphabetical ordering, but can
 be set to whatever you want.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.sum, reference_level = 4)
+use_contrasts(mdl_data$carb, contr.sum, reference_level = 4)
 ```
 
 Note how the comparison labels have also changed appropriately.
@@ -167,7 +167,7 @@ so the "comparison" labels are different. But this isn't
 an issue, and will still work as expected.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.poly)
+use_contrasts(mdl_data$carb, contr.poly)
 ```
 
 ## Setting contrasts en masse
@@ -454,7 +454,7 @@ new_forward_contrasts
 The matrix changed pretty substantially compared to before, even though all
 we changed was the intercept. This still required quite a few steps to just
 change the level we want to be the intercept. Thankfully `enlist_contrasts`
-and related functions `set_contrasts`, `contrast_code`, and `functional_code`
+and related functions `set_contrasts`, `use_contrasts`, and `use_contrast_function`
 have an argument to change this more simply. 
 
 The syntax for `enlist_contrasts` and `set_contrasts` requires putting a `*`
@@ -471,11 +471,11 @@ enlist_contrasts(mdl_data,
                  gear ~ scaled_sum_code + 4 * 4)
 ```
 
-Using the singular `contrast_code` just requires specifying the `reference_level`
+Using the singular `use_contrast` just requires specifying the `reference_level`
 and `set_intercept` arguments as needed.
 
 ```{r}
-contrast_code(mdl_data$gear, 
+use_contrasts(mdl_data$gear, 
               scaled_sum_code, 
               reference_level = 4, 
               set_intercept = 4)
