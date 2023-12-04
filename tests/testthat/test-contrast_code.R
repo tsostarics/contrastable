@@ -77,10 +77,12 @@ test_that("four level functional coding work", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(use_contrast_function(tst_data$four, contr.poly),
-               use_contrasts(tst_data$four, contr.poly))
-  expect_equal(use_contrasts(tst_data$four, contr.poly(4)),
-               use_contrast_matrix(tst_data$four, contr.poly(4)))
+  expect_equal(contr.poly(4),
+               use_contrasts(tst_data$four, contr.poly),
+               ignore_attr = TRUE)
+  expect_equal(contr.poly(4),
+               use_contrasts(tst_data$four, contr.poly(4)),
+               ignore_attr = TRUE)
   expect_equal(use_contrast_function(tst_data$four, scaled_sum_code),
                use_contrasts(tst_data$four, scaled_sum_code))
 })

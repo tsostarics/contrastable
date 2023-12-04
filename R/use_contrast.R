@@ -46,6 +46,25 @@ use_contrasts.symbol <- function(factor_col, code_by= NA, reference_level=NA, se
 }
 
 
+#' Matrix handler for use_contrasts
+#' Passing a matrix uses the implicit array class, so just pass it off to the
+#' matrix method
+#'
+#' @param factor_col A factor vector, eg from df$factorVarName
+#' @param code_by A matrix to be used as the contrast matrix
+#' @param reference_level The level to use as the reference level, default NA
+#' @param set_intercept The intercept to use, default NA
+#' @param drop_trends The trends to drop, default NA
+#' @param labels A vector of labels to apply to the matrix column names, default
+#' @param as_is Logical, default FALSE, whether to leave the resulting matrix
+#' @param ... Additional arguments to be passed to `code_by()`
+#'
+#' @return A contrast coding matrix with labels and proper reference level
+#' @export
+use_contrasts.array <- function(factor_col, code_by= NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
+  use_contrasts.matrix(factor_col, code_by, reference_level, set_intercept, drop_trends, labels, as_is, ...)
+}
+
 #' Function handler for use_contrasts
 #'
 #' If the user provides a function, use the function and supplied arguments to
@@ -140,14 +159,14 @@ use_contrasts.matrix <- function(factor_col, code_by = NA, reference_level=NA, s
   }
 
   preset_comparisons <- colnames(code_by)
-  matrix_labels <- dimnames(contrasts(factor_col))
+  matrix_labels <- dimnames(stats::contrasts(factor_col))
 
   # Handling if the given matrix has prespecified comparison labels
   if (!is.null(preset_comparisons))
     matrix_labels[[2]] <- preset_comparisons
 
   given_matrix_size <- dim(code_by)
-  factor_size <- dim(contrasts(factor_col))
+  factor_size <- dim(stats::contrasts(factor_col))
   if (given_matrix_size[1] != factor_size[1] && given_matrix_size[2] != factor_size[2]) {
     stop("Matrix given to code_by is size", paste(given_matrix_size, collapse = "x"), "but factor_col contrast matrix is size", paste(factor_size, collapse = "x"), ".")
   }

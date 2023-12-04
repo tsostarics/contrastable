@@ -101,7 +101,7 @@ use_contrast_function <- function(factor_col, code_by, reference_level=NA, set_i
 }
 
 .get_dimnames <- function(factor_col) {
-  labels <- dimnames(contrasts(factor_col))
+  labels <- dimnames(stats::contrasts(factor_col))
   if (is.null(labels[[1L]]))
     labels[[1L]] <- levels(factor_col)
   if (is.null(labels[[2L]]))

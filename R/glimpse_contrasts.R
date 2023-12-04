@@ -135,7 +135,7 @@ glimpse_contrasts <- function(model_data,
   is_ordered_factor <- fct_info[["is_ordered_factor"]]
   unset_factors <- unset_factors[!unset_factors %in% fct_info[["one_level_factors"]]]
   # Extract contrasts from the factor columns
-  new_contrasts <- lapply(unset_factors, function(x) contrasts(model_data[[x]]))
+  new_contrasts <- lapply(unset_factors, function(x) stats::contrasts(model_data[[x]]))
 
   factor_sizes <- vapply(unset_factors,
                          function(x) nlevels(model_data[[x]]),
