@@ -14,7 +14,7 @@
 #' @param ... Other arguments to pass to `coding_fx`
 #'
 #' @export
-functional_code <- function(factor_col, code_by, reference_level=NA, set_intercept = NA, drop_trends = NA, as_is=FALSE, ...) {
+use_contrast_function <- function(factor_col, code_by, reference_level=NA, set_intercept = NA, drop_trends = NA, as_is=FALSE, ...) {
   # Extract labels to use for contrast matrix
   labels <- .get_dimnames(factor_col)
   params <- .bundle_params(factor_col, ...)

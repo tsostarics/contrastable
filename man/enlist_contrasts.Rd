@@ -49,7 +49,7 @@ enlist_contrasts(my_df,
 
 # User matrices can be assigned to a variable first, but this may make the
 # comparison labels confusing. You should rename them manually to something
-# that makes sense. This will invoke manual_code, so reference levels
+# that makes sense. This will invoke use_contrast_matrix, so reference levels
 # specified with + will be ignored.
 my_gear_contrasts <- matrix(c(1,-1,0,0,-1,1), nrow = 3)
 colnames(my_gear_contrasts) <- c("CMP1", "CMP2")

@@ -10,10 +10,10 @@
 \item{raw_formula}{Raw formula passed by user}
 }
 \value{
-A list of parameters to use for a contrast_code call
+A list of parameters to use for a use_contrasts call
 }
 \description{
-Takes a formula and extracts the parameters for \code{contrast_code} if it is
+Takes a formula and extracts the parameters for \code{use_contrasts} if it is
 a valid formula. Validity checked via regexes, parameters extracted via
 recursively parsing the abstract syntax tree.
 }

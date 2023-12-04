@@ -4,10 +4,10 @@ test_that("two level factor coding works", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(contrasts(tst_data$two), contrast_code(tst_data$two, matrix(c(0,1))))
-  expect_equal(colnames(contrast_code(tst_data$two, matrix(c(.5, -.5)))), "a")
-  expect_equal(colnames(contrast_code(tst_data$two, matrix(c(1,0)))),"a")
-  expect_equal(colnames(contrast_code(tst_data$two, matrix(c(0,1)))),"b")
+  expect_equal(contrasts(tst_data$two), use_contrasts(tst_data$two, matrix(c(0,1))))
+  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(.5, -.5)))), "a")
+  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(1,0)))),"a")
+  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(0,1)))),"b")
 })
 
 test_that("three level factor coding works", {
@@ -18,7 +18,7 @@ test_that("three level factor coding works", {
 
   expect_equal(
     colnames(
-      contrast_code(
+      use_contrasts(
         tst_data$three,
         matrix(c(-1/3, -1/3, 2/3, 2/3, -1/3, -1/3),
                nrow=3)
@@ -27,7 +27,7 @@ test_that("three level factor coding works", {
     c("c","a")
   )
   expect_equal(matrix(c(-1/3, -1/3, 2/3, 2/3, -1/3, -1/3),nrow=3),
-               contrast_code(
+               use_contrasts(
                  tst_data$three,
                  matrix(c(-1/3, -1/3, 2/3, 2/3, -1/3, -1/3),
                         nrow=3)
@@ -43,13 +43,13 @@ test_that("four level helmert coding works", {
                four = factor(c('a','b','c','d')))
 
   expect_equal(
-    colnames(contrast_code(tst_data$four, matrix(c(-1/4, -1/4, -1/4, 3/4,
+    colnames(use_contrasts(tst_data$four, matrix(c(-1/4, -1/4, -1/4, 3/4,
                                                    -1/3, -1/3, 2/3, 0,
                                                    -1/2, 1/2, 0, 0),
                                                  nrow = 4))),
     c("d","c","b")
   )
-  expect_equal(contrast_code(tst_data$four, matrix(c(-1/4, -1/4, -1/4, 3/4,
+  expect_equal(use_contrasts(tst_data$four, matrix(c(-1/4, -1/4, -1/4, 3/4,
                                                      -1/3, -1/3, 2/3, 0,
                                                      -1/2, 1/2, 0, 0),
                                                    nrow = 4)),
@@ -66,7 +66,7 @@ test_that("polynomial coding works", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(colnames(contrast_code(tst_data$four, contr.poly(4))),
+  expect_equal(colnames(use_contrasts(tst_data$four, contr.poly(4))),
                c(".L",".Q",".C")
   )
 })
@@ -77,12 +77,12 @@ test_that("four level functional coding work", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(functional_code(tst_data$four, contr.poly),
-               contrast_code(tst_data$four, contr.poly))
-  expect_equal(contrast_code(tst_data$four, contr.poly(4)),
-               manual_code(tst_data$four, contr.poly(4)))
-  expect_equal(functional_code(tst_data$four, scaled_sum_code),
-               contrast_code(tst_data$four, scaled_sum_code))
+  expect_equal(use_contrast_function(tst_data$four, contr.poly),
+               use_contrasts(tst_data$four, contr.poly))
+  expect_equal(use_contrasts(tst_data$four, contr.poly(4)),
+               use_contrast_matrix(tst_data$four, contr.poly(4)))
+  expect_equal(use_contrast_function(tst_data$four, scaled_sum_code),
+               use_contrasts(tst_data$four, scaled_sum_code))
 })
 
 test_that("default 2 level factor works", {
@@ -90,11 +90,11 @@ test_that("default 2 level factor works", {
   colnames(test_matrix) <- 2
   rownames(test_matrix) <- c(1,2)
 
-  expect_equal(test_matrix, contrast_code(factor(1:2)))
+  expect_equal(test_matrix, use_contrasts(factor(1:2)))
 })
 
 test_that("Non matrix or function error works", {
-  expect_error(contrast_code(factor(c(1,2,3)), c(0,1,0,0,0,1)),
+  expect_error(use_contrasts(factor(c(1,2,3)), c(0,1,0,0,0,1)),
                regexp = "applied to non-array")
 })
 

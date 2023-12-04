@@ -1,12 +1,12 @@
 #' Parse contrast formula
 #'
-#' Takes a formula and extracts the parameters for `contrast_code` if it is
+#' Takes a formula and extracts the parameters for `use_contrasts` if it is
 #' a valid formula. Validity checked via regexes, parameters extracted via
 #' recursively parsing the abstract syntax tree.
 #'
 #' @param raw_formula Raw formula passed by user
 #'
-#' @return A list of parameters to use for a contrast_code call
+#' @return A list of parameters to use for a use_contrasts call
 .parse_formula <- function(raw_formula) {
   .check_if_valid_formula(raw_formula)
   .make_parameters(raw_formula)

@@ -62,7 +62,7 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
 
   num_ignoring <- sum(which_to_ignore)
 
-  # The ignoring part actually happens at the contrast_code level, where
+  # The ignoring part actually happens at the use_contrasts level, where
   # drop trends is simply not used if polynomial contrasts are not detected
   if (any(which_used_incorrectly)){
     # Note: there's no check to see if a passed matrix is actually equivalent

@@ -39,7 +39,7 @@
 #'
 #' # User matrices can be assigned to a variable first, but this may make the
 #' # comparison labels confusing. You should rename them manually to something
-#' # that makes sense. This will invoke manual_code, so reference levels
+#' # that makes sense. This will invoke use_contrast_matrix, so reference levels
 #' # specified with + will be ignored.
 #' my_gear_contrasts <- matrix(c(1,-1,0,0,-1,1), nrow = 3)
 #' colnames(my_gear_contrasts) <- c("CMP1", "CMP2")
@@ -93,7 +93,7 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' Pass arguments to contrast code
 #'
 #' Processes a formula and any arguments for the contrast matrix and sets up
-#' the contrast_code call
+#' the use_contrasts call
 #'
 #' @param model_data Data frame with factor column
 #' @param raw_formula Raw formula
@@ -105,10 +105,10 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 
   params <- .split_if_language(.parse_formula(raw_formula), var_envir)
 
-  contrast_code(
+  use_contrasts(
     factor_col = get(params[["factor_col"]], model_data),
     code_by = eval(params[["code_by"]], var_envir),
-    use_labels = eval(params[['labels']], var_envir),
+    labels = eval(params[['labels']], var_envir),
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir),

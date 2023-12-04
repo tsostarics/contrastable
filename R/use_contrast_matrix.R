@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @importFrom stats contrasts
-manual_code <- function(factor_col, code_by = NA, as_is = FALSE, ...) {
+use_contrast_matrix <- function(factor_col, code_by = NA, as_is = FALSE, ...) {
   if (any(is.na(code_by)) & length(levels(factor_col)) > 2) {
     stop("This factor has more than 2 levels, please provide a matrix.")
   }

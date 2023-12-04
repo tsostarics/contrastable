@@ -2,7 +2,7 @@
 #' Make parameters for contrast code call
 #'
 #' Given a formula, recursively go through the abstract syntax tree and
-#' extract the necessary parameters for `contrast_code`. While this method is
+#' extract the necessary parameters for `use_contrasts`. While this method is
 #' more involved than extracting from a parsed string representation, I think
 #' it handles matrix calls better since it plucks the call right out of
 #' the syntax tree.

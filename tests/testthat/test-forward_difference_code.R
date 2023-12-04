@@ -4,7 +4,7 @@ test_that("backward difference labels work", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(dimnames(contrast_code(tst_data$four, backward_difference_code(4))),
+  expect_equal(dimnames(use_contrasts(tst_data$four, backward_difference_code(4))),
                list(c('a', 'b', 'c', 'd'),
                     c('b-a', 'c-b', 'd-c')))
 })
@@ -15,7 +15,7 @@ test_that("forward difference labels work", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  expect_equal(dimnames(contrast_code(tst_data$four, forward_difference_code(4))),
+  expect_equal(dimnames(use_contrasts(tst_data$four, forward_difference_code(4))),
                list(c('a', 'b', 'c', 'd'),
                     c('a-b', 'b-c', 'c-d')))
 })

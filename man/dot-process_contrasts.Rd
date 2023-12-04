@@ -18,5 +18,5 @@ A contrast matrix
 }
 \description{
 Processes a formula and any arguments for the contrast matrix and sets up
-the contrast_code call
+the use_contrasts call
 }
