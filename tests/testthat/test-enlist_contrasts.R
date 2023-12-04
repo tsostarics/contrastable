@@ -147,3 +147,7 @@ test_that("moving reference level to earlier level works", {
   expect_equal(df1, df2)
 
 })
+
+test_that("warn when n does not match", {
+  expect_warning(suppressMessages(enlist_contrasts(mtcars, gear ~ contr.poly(n=4))), regex = "using number of factor levels")
+})

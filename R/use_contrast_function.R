@@ -93,6 +93,12 @@ use_contrast_function <- function(factor_col, code_by, reference_level=NA, set_i
 .bundle_params <- function(factor_col, ...) {
   n <- nlevels(factor_col)
   other_args <- rlang::dots_list(...)[['other']]
+  if ('n' %in% names(other_args)) {
+    if (n != other_args[['n']])
+      warning("Number of factor levels does not match `n` specified in function call, using number of factor levels")
+    other_args[['n']] <- NULL
+  }
+
   params <- list(n = n)
   if (length(other_args) != 0)
     params <- c(params, other_args)
