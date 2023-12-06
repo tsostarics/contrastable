@@ -15,7 +15,7 @@ test_that("Throw error when factor column not found in model data frame", {
                four = factor(c('a','b','c','d')))
 
   # Default error message works fine, no need to specify it to something else
-  expect_error(enlist_contrasts(tst_data, foo~contr.sum),regexp = "undefined columns selected")
+  expect_error(enlist_contrasts(tst_data, foo~contr.sum),regexp = "Columns not found in tst_data")
 })
 
 test_that("Setting both reference and intercept simultaneously with + and * works", {

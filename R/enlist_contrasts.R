@@ -54,38 +54,62 @@
 enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   # Get the formulas from the dots into list and character formats to work with
   formulas <- purrr::list_flatten(rlang::dots_list(...))
-  char_formulas <- .formula_to_char(formulas) # as.character with a better error msg
+  if (identical(formulas, list())) {
+    stop("No contrast formulas provided")
+  }
+  df_symbol <- rlang::as_label(rlang::enquo(model_data))
+
 
   # Extract which factor columns are attempting to be set
-  vars_in_model <- vapply(char_formulas, function(x) x[[2L]] %in% names(model_data), TRUE)
-  names(vars_in_model) <- vapply(char_formulas, function(x) x[[2L]], "char")
+  lhs_variables <-
+    tryCatch(vapply(formulas,
+                    function(x) as.character(rlang::f_lhs(x)),
+                    "char",
+                    USE.NAMES = FALSE),
+             error = function(c) {
+               err <- conditionMessage(c)
+               if (!grepl("must be a formula", err))
+                 stop(c)
+               stop(paste(err, "Did you use = instead of ~ when setting the contrast?",sep="\n"))
+             })
 
-  model_data <- .convert_to_factors(model_data, names(vars_in_model), verbose)
+  ## TODO: add tidyselect functionality for variable names on the left hand side
+  stopifnot("Only one variable on the left hand side currently supported" = length(lhs_variables) == length(formulas))
+
+  vars_in_model <- lhs_variables %in% names(model_data)
+
+  if (any(!vars_in_model)){
+    variables <- paste(lhs_variables[!vars_in_model], collapse = ", ")
+    stop(paste0("Columns not found in ", df_symbol, ": ", variables))
+  }
+
+  model_data <- .convert_to_factors(model_data, lhs_variables, verbose)
 
   if (verbose)
-    .msg_if_remaining_factors(model_data, names(vars_in_model))
+    .msg_if_remaining_factors(model_data, lhs_variables)
 
   # Ignore factors with only 1 level to avoid undefined contrasts
-  is_onelevel_factor <-  vapply(names(vars_in_model),
+  is_onelevel_factor <-  vapply(lhs_variables,
                                 function(x) nlevels(model_data[[x]]) == 1L,
                                 TRUE)
 
+  .warn_if_onelevel(lhs_variables[is_onelevel_factor])
+
   formulas <- formulas[!is_onelevel_factor]
-  char_formulas <- char_formulas[!is_onelevel_factor]
   vars_in_model <- vars_in_model[!is_onelevel_factor]
+  lhs_variables <- lhs_variables[!is_onelevel_factor]
 
-  .warn_if_onelevel(names(is_onelevel_factor)[is_onelevel_factor])
+  if (length(formulas) == 0)
+    stop("No factors with more than 1 level found")
 
-  formula_indices <- seq_along(char_formulas)
   stats::setNames(
-    lapply(formula_indices,
-           function(x)
+    lapply(seq_along(formulas),
+           function(i)
              .process_contrasts(model_data,
-                                char_formula = char_formulas[[x]],
-                                raw_formula = formulas[[x]] # Reference value bindings
+                                raw_formula = formulas[[i]] # Reference value bindings
              )
     ),
-    names(vars_in_model)
+    lhs_variables
   )
 }
 
@@ -97,10 +121,9 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #'
 #' @param model_data Data frame with factor column
 #' @param raw_formula Raw formula
-#' @param char_formula character conversion of formula
 #'
 #' @return A contrast matrix
-.process_contrasts <- function(model_data, char_formula, raw_formula) {
+.process_contrasts <- function(model_data, raw_formula) {
   var_envir <- rlang::get_env(raw_formula)
 
   params <- .split_if_language(.parse_formula(raw_formula), var_envir)
@@ -137,10 +160,10 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' arguments are provided.
 .split_if_language <- function(params, var_envir) {
   # In the event someone tries to do v ~ as_is(as_is(as_is(foo)))
-    while(length(params[['code_by']]) > 1L && identical(params[['code_by']][[1]], quote(as_is))){
-      params[['as_is']] <- TRUE
-      params[['code_by']][1] <- NULL
-    }
+  while(length(params[['code_by']]) > 1L && identical(params[['code_by']][[1]], quote(as_is))){
+    params[['as_is']] <- TRUE
+    params[['code_by']][1] <- NULL
+  }
 
   params[['other_args']] <- list()
 

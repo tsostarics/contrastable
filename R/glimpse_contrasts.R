@@ -31,6 +31,26 @@ glimpse_contrasts <- function(model_data,
                               add_namespace = FALSE,
                               incl.one.levels = FALSE) {
   formulas <- purrr::list_flatten(rlang::dots_list(...)) # outer names warning?
+
+  # If no formulas are provided but we want to glimpse all factors, use
+  # glimpse_default_factors and return early. If all.factors is FALSE, then
+  # we're going to get an error from enlist_contrasts anyways
+  if (identical(formulas, list()) && all.factors) {
+    glimpse <- .glimpse_default_factors(model_data, set_factors = c(), incl.one.levels, verbose)
+
+    if (add_namespace)
+      glimpse$scheme <- .add_namespace(glimpse$scheme)
+
+    # The default factors don't need to be specified in the contrast list,
+    # they'll just use their respective defaults by the model fitting function
+    if (return.list)
+      return(list("glimpse" = glimpse, "contrasts" = list()))
+
+    return(glimpse)
+  }
+
+  # We do need to compute the contrast matrices so we can get information
+  # about orthogonality, centering, etc.
   contrast_list <- enlist_contrasts(model_data, ..., 'verbose' = verbose)
   params <- lapply(formulas, .make_parameters)
 
@@ -75,7 +95,7 @@ glimpse_contrasts <- function(model_data,
     glimpse <- rbind(glimpse, .glimpse_default_factors(model_data, set_factors, incl.one.levels, verbose))
 
   if (add_namespace)
-    glimpse$scheme <- .add_namespace(glimpse$scheme)
+    glimpse[['scheme']] <- .add_namespace(glimpse[['scheme']])
 
   # The default factors don't need to be specified in the contrast list,
   # they'll just use their respective defaults by the model fitting function
@@ -153,6 +173,7 @@ glimpse_contrasts <- function(model_data,
                                       NA_character_,
                                       as.character(levels(model_data[[x]])[[1L]])),
                              "char")
+
   intercept_interpretations <- vapply(new_contrasts, interpret_intercept, "char", USE.NAMES = FALSE)
   orthogonal_contrasts <-  is_orthogonal(new_contrasts)
   centered_contrasts <- is_centered(new_contrasts)
