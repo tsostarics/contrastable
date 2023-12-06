@@ -151,3 +151,18 @@ test_that("moving reference level to earlier level works", {
 test_that("warn when n does not match", {
   expect_warning(suppressMessages(enlist_contrasts(mtcars, gear ~ contr.poly(n=4))), regex = "using number of factor levels")
 })
+
+test_that("setting contrasts with external list works", {
+  my_contrasts <- list(carb ~ treatment_code)
+  expect_equal(suppressMessages(enlist_contrasts(mtcars, my_contrasts))[[1]], treatment_code(6),
+               ignore_attr = TRUE)
+
+  # Test for list length >1
+  my_contrasts <- list(carb ~ treatment_code, gear ~ helmert_code)
+  expect_equal(suppressMessages(enlist_contrasts(mtcars, my_contrasts))[[1]], treatment_code(6),
+               ignore_attr = TRUE)
+})
+
+test_that('error when no formula provided', {
+  expect_error(enlist_contrasts(mtcars), regexp = "No contrast formulas provided")
+})
