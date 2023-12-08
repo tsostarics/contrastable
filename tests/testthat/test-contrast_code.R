@@ -163,3 +163,52 @@ test_that("Argument handling in parentheses & empty parentheses work", {
   )
 })
 
+test_that("Setting contrast with hypr object works", {
+  tst_data <-
+    data.frame(three = factor(c('a','b','c','a')))
+
+  hypr_object <- hypr::hypr(b ~ a, c ~ a)
+
+  test_contrasts <-
+    enlist_contrasts(tst_data, three ~ hypr_object)
+
+  expect_equal(test_contrasts,
+               enlist_contrasts(tst_data, three ~ scaled_sum_code),
+               ignore_attr = TRUE)
+})
+
+
+test_that("Warning with missing level hypr object works", {
+  tst_data <-
+    data.frame(three = factor(c('a','b','c','a')))
+
+  hypr_object <- hypr::hypr(b ~ a, d ~ a)
+  hypr_object2 <- hypr::hypr(threeb ~ threea, threed ~ threea)
+
+  expect_warning(enlist_contrasts(tst_data, three ~ hypr_object),
+                 regexp = "not found in factor column `three`: d")
+
+  expect_warning(enlist_contrasts(tst_data, three ~ hypr_object2),
+                 regexp = "not found in factor column `three`: d")
+})
+
+test_that("No warning when factor passed to use_contrasts directly", {
+
+  hypr_object <- hypr::hypr(b ~ a, d ~ a)
+  expect_equal(use_contrasts(factor(c('a','b','c','a')), hypr_object),
+               scaled_sum_code(3),
+               ignore_attr = TRUE)
+
+})
+
+test_that("Warnings when trying to set values with hypr object", {
+
+  hypr_object <- hypr::hypr(b ~ a, d ~ a)
+  expect_warning(use_contrasts(factor(c('a','b','c','a')), hypr_object,reference_level = 'b'),
+               regexp = "reference_level ignored")
+  expect_warning(use_contrasts(factor(c('a','b','c','a')), hypr_object,set_intercept = 'b'),
+                 regexp = "set_intercept ignored")
+  expect_warning(use_contrasts(factor(c('a','b','c','a')), hypr_object,drop_trends = 'b'),
+                 regexp = "drop_trends ignored")
+
+})

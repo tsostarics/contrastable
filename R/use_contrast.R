@@ -225,3 +225,75 @@ use_contrasts.default <- function(factor_col, code_by = NA, reference_level=NA, 
   warning(paste0("Can't set contrasts with object of class ", class(code_by), contrast_string))
   get(contrast_function)(nlevels(factor_col))
 }
+
+#' Title
+#'
+#' @param factor_col A factor vector, eg from df$factorVarName
+#' @param code_by A hypr object created with `hypr::hypr()`
+#' @param labels A vector of labels to apply to the matrix column names, default
+#' @param as_is Logical, default FALSE, whether to leave the resulting matrix
+#' @param ... Additional arguments, not used
+#' @param reference_level Not used
+#' @param set_intercept Not used
+#' @param drop_trends Not used
+#'
+#' @return Contrast matrix specified by the hypr object
+#' @export
+use_contrasts.hypr <- function(factor_col, code_by = NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
+  requireNamespace('hypr', quietly = TRUE)
+
+
+  # If use_contrasts is being called from enlist_contrasts, then it's likely
+  # that we can extract a symbol for the factor column that the user is trying
+  # to set contrasts for. If we're successful, this should be a character vector
+  # of length 1 containing just the name of the factor column
+  potential_factor_name <-
+    as.character(eval(rlang::get_expr(rlang::enquo(factor_col))[[2L]],
+                      envir = rlang::caller_env()))
+
+  stopifnot(hypr::nlevels(code_by) == nlevels(factor_col))
+
+  contrast_matrix <-  hypr::cmat(code_by)
+
+  # If we were able to extract a factor column name previously, we'll do a small
+  # check to make sure that all the factor levels specified in the hypr object
+  # exist in the factor. The level names in the hypr object might be formatted
+  # like varnameA, varnameB, varnameC or just A, B, C. We'll let the user use
+  # the contrast matrix if there's a level in the hypr object that isn't in
+  # the factor column but warn them that the contrasts might be messed up.
+  # We already checked that the number of levels are equivalent, so this is
+  # solely about names not matching up
+  if (length(potential_factor_name) == 1L){
+    potential_level_names <- gsub(potential_factor_name, "", rownames(contrast_matrix))
+    is_present_in_factor_levels <- potential_level_names %in% levels(factor_col)
+    if (!all(is_present_in_factor_levels)) {
+      levels_not_present <- potential_level_names[!is_present_in_factor_levels]
+      warning(paste0("Levels in hypr object not found in factor column `" , potential_factor_name, "`: ",
+             paste0(levels_not_present, collapse = ", "),
+             "\nContrasts may be misspecified."))
+    }
+  }
+  if (as_is)
+    return(contrast_matrix)
+
+  # If the user is going through the trouble to use the hypr package then
+  # they should really be setting things explicitly in the hypr object itself
+  if (!is.na(reference_level))
+    warning("reference_level ignored when using hypr object")
+
+  if (!is.na(set_intercept))
+    warning("set_intercept ignored when using hypr object")
+
+  if (!is.na(drop_trends))
+    warning("drop_trends ignored when using hypr object")
+
+  # If the user specifies labels for the comparisons then use those, otherwise
+  # the column names from the hypr object's matrix will be used (either blank
+  # or named if the user passed named formulas to the hypr constructor)
+  if (!is.null(labels)) {
+    colnames(contrast_matrix) <- labels
+  }
+
+
+  contrast_matrix
+}

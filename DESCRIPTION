@@ -43,3 +43,5 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
     Rcpp
+Enhances: 
+    hypr
