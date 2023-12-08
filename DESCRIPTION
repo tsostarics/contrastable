@@ -35,7 +35,8 @@ Suggests:
     rmarkdown,
     brms,
     bayestestR,
-    covr
+    covr,
+    hypr
 Config/testthat/edition: 3
 URL: https://github.com/tsostarics/contrastable
 BugReports: https://github.com/tsostarics/contrastable/issues
@@ -43,5 +44,3 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
     Rcpp
-Enhances: 
-    hypr
