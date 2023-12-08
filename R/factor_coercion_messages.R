@@ -97,12 +97,15 @@
     uo_default <- crayon::blue(options("contrasts")[[1L]]['unordered'])
     or_default <- crayon::red(options("contrasts")[[1L]]['ordered'])
     default_contrasts <- paste(c(uo_default, or_default), collapse = " or ")
-    varnames <- vapply(names(remaining_factors),
-                       function(x)
-                         ifelse(which_are_ordered[x],
-                                crayon::red(x),
-                                crayon::blue(x)),
-                       "char") |> paste(collapse = " ")
+    varnames <-
+      paste(
+        vapply(names(remaining_factors),
+               function(x)
+                 ifelse(which_are_ordered[x],
+                        crayon::red(x),
+                        crayon::blue(x)),
+               "char"),
+        collapse = " ")
     message(glue::glue("Expect {default_contrasts} for unset factors: {varnames}"))
   }
 }
