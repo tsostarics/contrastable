@@ -54,12 +54,12 @@ glimpse_contrasts(my_data,
   knitr::kable()
 ```
 
-| factor | n_levels | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
-|:-------|---------:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
-| cyl    |        3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| carb   |        6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | 8         | grand mean | TRUE       | TRUE     | NA             | TRUE           |
-| vs     |        2 | 0, 1             | contrastable::sum_code        | 1         | grand mean | NA         | TRUE     | NA             | TRUE           |
-| gear   |        3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
+| factor |   n | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
+|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
+| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
+| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean | TRUE       | TRUE     | NA             | TRUE           |
+| vs     |   2 | 0, 1             | contrastable::sum_code        | 1         | grand mean | NA         | TRUE     | NA             | TRUE           |
+| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
@@ -76,13 +76,13 @@ enlist_contrasts(mtcars, contrast_schemes)
 #> 8 -0.3333333  0.6666667
 #> 
 #> $carb
-#>           >1   >2    >3         >4   >6
-#> 1  0.8333333  0.0  0.00  0.0000000  0.0
-#> 2 -0.1666667  0.8  0.00  0.0000000  0.0
-#> 3 -0.1666667 -0.2  0.75  0.0000000  0.0
-#> 4 -0.1666667 -0.2 -0.25  0.6666667  0.0
-#> 6 -0.1666667 -0.2 -0.25 -0.3333333  0.5
-#> 8 -0.1666667 -0.2 -0.25 -0.3333333 -0.5
+#>     >1         >2    >3   >4         >6
+#> 1 -0.5 -0.3333333 -0.25 -0.2 -0.1666667
+#> 2  0.5 -0.3333333 -0.25 -0.2 -0.1666667
+#> 3  0.0  0.6666667 -0.25 -0.2 -0.1666667
+#> 4  0.0  0.0000000  0.75 -0.2 -0.1666667
+#> 6  0.0  0.0000000  0.00  0.8 -0.1666667
+#> 8  0.0  0.0000000  0.00  0.0  0.8333333
 #> 
 #> $vs
 #>    0
@@ -101,12 +101,12 @@ my_data <- set_contrasts(my_data, contrast_schemes)
 #> Expect contr.treatment or contr.poly for unset factors: gear
 MASS::fractions(contrasts(my_data$carb))
 #>   >1   >2   >3   >4   >6  
-#> 1  5/6    0    0    0    0
-#> 2 -1/6  4/5    0    0    0
-#> 3 -1/6 -1/5  3/4    0    0
-#> 4 -1/6 -1/5 -1/4  2/3    0
-#> 6 -1/6 -1/5 -1/4 -1/3  1/2
-#> 8 -1/6 -1/5 -1/4 -1/3 -1/2
+#> 1 -1/2 -1/3 -1/4 -1/5 -1/6
+#> 2  1/2 -1/3 -1/4 -1/5 -1/6
+#> 3    0  2/3 -1/4 -1/5 -1/6
+#> 4    0    0  3/4 -1/5 -1/6
+#> 6    0    0    0  4/5 -1/6
+#> 8    0    0    0    0  5/6
 ```
 
 Functions will give various messages and warnings such as:

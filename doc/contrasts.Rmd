@@ -106,7 +106,7 @@ mdl_data <-
 
 ## Contrast coding 
 
-The basis for this package is the `contrast_code()` function, which takes
+The basis for this package is the `use_contrasts()` function, which takes
 a factor vector (i.e., a factor column in a dataframe) and a desired contrast 
 scheme and returns a new contrast matrix.
 The contrast scheme can be passed as either a function that generates contrast
@@ -118,7 +118,7 @@ what the general output you can get would look like.
 Here we use `contr.sum` to get a contrast matrix using the `carb` column.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.sum)
+use_contrasts(mdl_data$carb, contr.sum)
 ```
 
 There are two things to note here. First, the comparison labels have been retained.
@@ -128,7 +128,7 @@ the default behavior, inherited from R's normal alphabetical ordering, but can
 be set to whatever you want.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.sum, reference_level = 4)
+use_contrasts(mdl_data$carb, contr.sum, reference_level = 4)
 ```
 
 Note how the comparison labels have also changed appropriately.
@@ -147,8 +147,11 @@ change the ordering manually *before* applying contrast coding.
 
 - `forward_difference_code`: compare each level k to level k+1 (eg 1-2, 2-3)
 - `backward_difference_code`: compare each level k to level k-1 (eg 3-2, 2-1)
-- `helmert_code`: compare each level k to the mean of all levels above it (eg >1, >2)
-- `reverse_helmert_code` and `contr.helmert`: compare each level k to the mean of all levels below if (eg <2, <3)
+- `helmert_code` and `contr.helmert`: compare each level k to the mean of all levels below if (eg <2, <3). 
+However, note that `contr.helmert` uses an unscaled contrast matrix, returning values that need to be manually scaled.
+The statistical tests are exactly the same as `helmert_code`, but the magnitudes in the mean differences will be lower than they actually are. 
+- `reverse_helmert_code`: compare each level k to the mean of all levels above it (eg >1, >2)
+
 
 Orthogonal polynomial contrasts with `contr.poly`  and `orth_polynomial_code`
 are typically used to identify
@@ -167,7 +170,7 @@ so the "comparison" labels are different. But this isn't
 an issue, and will still work as expected.
 
 ```{r}
-contrast_code(mdl_data$carb, contr.poly)
+use_contrasts(mdl_data$carb, contr.poly)
 ```
 
 ## Setting contrasts en masse
@@ -337,20 +340,7 @@ referring specifically to coding factors with 2 levels, sometimes just the numbe
 are used as in 0/1 coding, -1/1 coding, -.5/+.5 coding. I recommend that you
 choose a term from your discipline and stick to it, but also provide the exact
 contrast or hypothesis matrices in an appendix, preregistration, or
-supplementary material. Some examples:
-
- - Not useful: Group is a categorical predictor. (I'm assuming you're using treatment
- coding if you didn't manually set anything.)
- - Not useful: Our categorical predictors are contrast coded (to what??)
- - Not useful: We use sum coding (how are *you* using this term?)
- - Better: Our group predictor is scaled sum coded, centering the
- intercept while encoding a null hypothesis that the pairwise differences between
- each level (B) and the reference level (A) is 0. (more verbose but explicit about
- what the interpretation reflects)
- - Better: The group predictor tests the difference between Group A 
- (the reference, coded with -.5) and Group B (+.5). (less verbose, gives values explicitly)
- - Bonus: The specific contrast matrices used for each predictor is available in
- the appendix/supplementary material.
+supplementary material.
 
 ## Changing Underlying Intercept
 
@@ -467,7 +457,7 @@ new_forward_contrasts
 The matrix changed pretty substantially compared to before, even though all
 we changed was the intercept. This still required quite a few steps to just
 change the level we want to be the intercept. Thankfully `enlist_contrasts`
-and related functions `set_contrasts`, `contrast_code`, and `functional_code`
+and related functions `set_contrasts`, `use_contrasts`, and `use_contrast_function`
 have an argument to change this more simply. 
 
 The syntax for `enlist_contrasts` and `set_contrasts` requires putting a `*`
@@ -484,11 +474,11 @@ enlist_contrasts(mdl_data,
                  gear ~ scaled_sum_code + 4 * 4)
 ```
 
-Using the singular `contrast_code` just requires specifying the `reference_level`
+Using the singular `use_contrast` just requires specifying the `reference_level`
 and `set_intercept` arguments as needed.
 
 ```{r}
-contrast_code(mdl_data$gear, 
+use_contrasts(mdl_data$gear, 
               scaled_sum_code, 
               reference_level = 4, 
               set_intercept = 4)
@@ -620,17 +610,12 @@ tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
 ```
 
 
-We can also clean up the scheme names if we want to remove the "contr." and 
-"_code" parts.
+We can also explicitly add the namespace for the function we used.
 
 ```{r}
-contrast_info <- glimpse_contrasts(tstdf, schemes, clean.schemes = TRUE)
+contrast_info <- glimpse_contrasts(tstdf, schemes, add_namespace = TRUE)
 contrast_info
 ```
-
-Note that `contr.poly` will be changed to `orth_polynomial` when you do this
-to denote that you're using *orthogonal* polynomials and not raw polynomials,
-since just `poly` could be confusing.
 
 # Setting comparison names manually
 
@@ -651,11 +636,11 @@ enlist_contrasts(phone_df,
 
 The column names automatically created here make sense for these and are easy to 
 interpret in model summary coefficients of the form `phoneN`, `phoneS`, `phoneSH` 
-However, another option would be to use reverse helmert coding, yielding this matrix:
+However, another option would be to use helmert coding, yielding this matrix:
 
 ```{r}
 enlist_contrasts(phone_df, 
-                 phone ~ reverse_helmert_code)
+                 phone ~ helmert_code)
 ```
 
 This scheme tests the difference between s vs sh (Compact vs Diffuse sibilants),
@@ -671,7 +656,7 @@ its related functions using the `|` operator when setting contrast schemes.
 ```{r}
 # Note you can add a line break after (or before, really) the | for readability
 enlist_contrasts(phone_df, 
-                 phone ~ reverse_helmert_code | 
+                 phone ~ helmert_code | 
                    c("CompactvsDiffuse","SibvsNas", "StopvsCont"))
 ```
 

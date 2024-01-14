@@ -38,16 +38,16 @@ mdl_data <-
          carb = factor(carb))
 
 ## -----------------------------------------------------------------------------
-contrast_code(mdl_data$carb, contr.sum)
+use_contrasts(mdl_data$carb, contr.sum)
 
 ## -----------------------------------------------------------------------------
-contrast_code(mdl_data$carb, contr.sum, reference_level = 4)
+use_contrasts(mdl_data$carb, contr.sum, reference_level = 4)
 
 ## -----------------------------------------------------------------------------
 options('contrasts')
 
 ## -----------------------------------------------------------------------------
-contrast_code(mdl_data$carb, contr.poly)
+use_contrasts(mdl_data$carb, contr.poly)
 
 ## -----------------------------------------------------------------------------
 my_contrasts <- 
@@ -156,7 +156,7 @@ enlist_contrasts(mdl_data,
                  gear ~ scaled_sum_code + 4 * 4)
 
 ## -----------------------------------------------------------------------------
-contrast_code(mdl_data$gear, 
+use_contrasts(mdl_data$gear, 
               scaled_sum_code, 
               reference_level = 4, 
               set_intercept = 4)
@@ -227,7 +227,7 @@ contrast_glimpse # Review if needed
 tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
 
 ## -----------------------------------------------------------------------------
-contrast_info <- glimpse_contrasts(tstdf, schemes, clean.schemes = TRUE)
+contrast_info <- glimpse_contrasts(tstdf, schemes, add_namespace = TRUE)
 contrast_info
 
 ## -----------------------------------------------------------------------------
@@ -239,12 +239,12 @@ enlist_contrasts(phone_df,
 
 ## -----------------------------------------------------------------------------
 enlist_contrasts(phone_df, 
-                 phone ~ reverse_helmert_code)
+                 phone ~ helmert_code)
 
 ## -----------------------------------------------------------------------------
 # Note you can add a line break after (or before, really) the | for readability
 enlist_contrasts(phone_df, 
-                 phone ~ reverse_helmert_code | 
+                 phone ~ helmert_code | 
                    c("CompactvsDiffuse","SibvsNas", "StopvsCont"))
 
 ## ---- eval=FALSE--------------------------------------------------------------
