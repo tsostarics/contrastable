@@ -51,8 +51,7 @@
 #' # recommended in practice since you'll need to escape the column names with
 #' # backticks when using them.
 #' mtcars |>
-#'   set_contrasts(mtcars,
-#'                 carb ~ scaled_sum_code,
+#'   set_contrasts(carb ~ scaled_sum_code,
 #'                 gear ~ contr.sum) |>
 #'   decompose_contrasts(c('carb', 'gear'),
 #'                       extract_to = list(gear = c("4-mean", "5-mean")),

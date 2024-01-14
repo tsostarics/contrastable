@@ -2,7 +2,7 @@
 % Please edit documentation in R/helmert_code.R
 \name{reverse_helmert_code}
 \alias{reverse_helmert_code}
-\title{Reverse helmert code}
+\title{Helmert code}
 \usage{
 reverse_helmert_code(n)
 }
@@ -13,21 +13,20 @@ reverse_helmert_code(n)
 Contrast matrix
 }
 \description{
-R's contr.helmert function actually implements reverse helmert coding, this
-extension scales the matrix such that a 1 unit increase corresponds to a
-change in factor level.
+Reverse helmert coding is the same concept as helmert coding, but the order
+of the groupings is reversed.
 }
 \details{
 Reverse helmert coding compares each level to the total mean of all levels
-that have come before it. Differs from backward difference coding, which
-compares only pairs of levels (not a level to a cumulative mean of levels)
+that come after it. Differs from forward difference coding, which only
+compares pairs of levels (not a level to a cumulative mean of levels).
 
 Example interpretation for a 4 level factor:
 \itemize{
 \item Intercept = Grand mean (mean of the means of each level)
-\item grp2 = mean(grp2) - mean(grp1)
-\item grp3 = mean(grp3) - mean(grp1, grp2)
-\item grp4 = mean(grp4) - mean(grp1, grp2, grp3)
+\item grp1 = mean(grp4, grp3, grp2) - grp(1)
+\item grp2 = mean(grp4, grp3) - mean(grp2)
+\item grp3 = mean(grp3) - mean(grp4)
 }
 }
 \examples{
