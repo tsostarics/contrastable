@@ -1,10 +1,11 @@
 #' Reverse helmert code
 #'
-#' R's contr.helmert function actually implements reverse helmert coding, this
-#' extension scales the matrix such that a 1 unit increase corresponds to a
-#' change in factor level.
+#' R's contr.helmert function is unscaled, meaning that you need to scale the
+#' coefficients of a model fit to get the actual comparisons of interest. This
+#' version will automatically scale the contrast matrix such taht the coefficients
+#' are the expected scaled values.
 #'
-#' Reverse helmert coding compares each level to the total mean of all levels
+#' Helmert coding compares each level to the total mean of all levels
 #' that have come before it. Differs from backward difference coding, which
 #' compares only pairs of levels (not a level to a cumulative mean of levels)
 #'
@@ -35,19 +36,19 @@
 #'
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
-#'            contrasts = enlist_contrasts(mydf, grp ~ reverse_helmert_code)))
-reverse_helmert_code <- function(n){
+#'            contrasts = enlist_contrasts(mydf, grp ~ helmert_code)))
+helmert_code <- function(n){
   apply(unname(stats::contr.helmert(n)), 2L, function(x) x / sum(x != 0))
 }
 
 #' Helmert code
 #'
-#' Since R's contr.helmert implements reverse helmert coding, we can get
-#' regular helmert coding with reversing the reverse helmert matrix.
+#' Reverse helmert coding is the same concept as helmert coding, but the order
+#' of the groupings is reversed.
 #'
-#' Helmert coding compares each level to the total mean of all levels that come
-#' after it. Differs from forward difference coding, which only compares pairs
-#' of levels (not a level to a cumulative mean of levels).
+#' Reverse helmert coding compares each level to the total mean of all levels
+#' that come after it. Differs from forward difference coding, which only
+#' compares pairs of levels (not a level to a cumulative mean of levels).
 #'
 #' Example interpretation for a 4 level factor:
 #' \itemize{
@@ -76,7 +77,7 @@ reverse_helmert_code <- function(n){
 #'
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
-#'            contrasts = enlist_contrasts(mydf, grp ~ helmert_code)))
-helmert_code <- function(n){
-  matrix(rev(reverse_helmert_code(n)), nrow = n)
+#'            contrasts = enlist_contrasts(mydf, grp ~ reverse_helmert_code)))
+reverse_helmert_code <- function(n){
+  matrix(rev(helmert_code(n)), nrow = n)
 }
