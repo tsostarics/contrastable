@@ -30,7 +30,7 @@ my_formula <-
   varname ~
   matrix(c(1,2,3),
          nrow = 3,
-         ncol = 1) + 1 * get_whatever(asd = 2) |
+         ncol = 1) + 1 * get_whatever(param = 2) |
   c('one', 'two', 'three')
 
 # Returns `CALL() + 1 * CALL() | CALL()`

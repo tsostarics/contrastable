@@ -21,8 +21,8 @@ weights that the user provided, hence they should know how to interpret it.
 }
 \examples{
 interpret_intercept(contr.treatment(2))  # mean(1)
-interpret_intercept(contr.SAS(2))  # mean(2)
-interpret_intercept(contr.sum(2))  # grand mean
+interpret_intercept(contr.SAS(2))        # mean(2)
+interpret_intercept(contr.sum(2))        # grand mean
 
 # Here there's 3 levels but the intercept is either an unweighted
 # mean of 2 levels or a weighted mean of 2 levels

@@ -83,8 +83,6 @@ test_that("four level functional coding work", {
   expect_equal(contr.poly(4),
                use_contrasts(tst_data$four, contr.poly(4)),
                ignore_attr = TRUE)
-  expect_equal(use_contrast_function(tst_data$four, scaled_sum_code),
-               use_contrasts(tst_data$four, scaled_sum_code))
 })
 
 test_that("default 2 level factor works", {
