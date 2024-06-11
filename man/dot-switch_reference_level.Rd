@@ -9,13 +9,14 @@
 \arguments{
 \item{contrast_matrix}{An unlabeled contrast matrix}
 
-\item{old_reference}{The previously specified reference level, usually the default
-for the scheme found by \code{.get_reference_level}}
+\item{old_reference}{The previously specified reference level, usually the
+default for the scheme found by \code{.get_reference_level}}
 
 \item{new_reference}{The index of the row to use as the new reference level}
 }
 \value{
-A matrix with the reordered rows and correct values for the reference level
+A matrix with the reordered rows and correct values for the reference
+level
 }
 \description{
 Reorders the rows of a contrast matrix to properly set the reference level

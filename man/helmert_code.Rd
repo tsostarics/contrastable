@@ -15,8 +15,8 @@ Contrast matrix
 \description{
 R's contr.helmert function is unscaled, meaning that you need to scale the
 coefficients of a model fit to get the actual comparisons of interest. This
-version will automatically scale the contrast matrix such taht the coefficients
-are the expected scaled values.
+version will automatically scale the contrast matrix such taht the
+coefficients are the expected scaled values.
 }
 \details{
 Helmert coding compares each level to the total mean of all levels
@@ -34,8 +34,8 @@ Example interpretation for a 4 level factor:
 \examples{
 
 mydf <- data.frame(
-   grp = factor(c(rep("F1",5),rep("F2",5),rep("F3",5),rep("F4",5))),
-   resp = c(seq(1,5), seq(5,9), seq(10,14), seq(15,19))
+  grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+  resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 )
 
 mydf |>
@@ -45,6 +45,7 @@ mydf |>
   dplyr::mutate(grand_mean = mean(mu))
 
 summary(lm(resp ~ grp,
-           data = mydf,
-           contrasts = enlist_contrasts(mydf, grp ~ helmert_code)))
+  data = mydf,
+  contrasts = enlist_contrasts(mydf, grp ~ helmert_code)
+))
 }

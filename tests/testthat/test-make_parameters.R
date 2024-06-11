@@ -1,29 +1,23 @@
 test_that("Different combinations of formula operations work", {
   # Grouped by which should be equivalent
   formulae <-
-    list(f1  = 1 ~ 2,
-
-         f2  = 1 ~ 2 + 3,
-
-         f3  = 1 ~ 2 * 4,
-
-         f4  = 1 ~ 2 - 5:6,
-
-         f5  = 1 ~ 2 + 3 * 4,
-         f6  = 1 ~ 2 * 4 + 3,
-
-         f7  = 1 ~ 2 + 3 - 5:6,
-         f8  = 1 ~ 2 - 5:6 + 3,
-
-         f9  = 1 ~ 2 * 4 - 5:6,
-         f10 = 1 ~ 2 - 5:6 * 4,
-
-         f11 = 1 ~ 2 + 3 * 4 - 5:6,
-         f12 = 1 ~ 2 + 3 - 5:6 * 4,
-         f12 = 1 ~ 2 * 4 + 3 - 5:6,
-         f13 = 1 ~ 2 * 4 - 5:6 + 3,
-         f14 = 1 ~ 2 - 5:6 + 3 * 4,
-         f15 = 1 ~ 2 - 5:6 * 4 + 3
+    list(
+      f1 = 1 ~ 2,
+      f2 = 1 ~ 2 + 3,
+      f3 = 1 ~ 2 * 4,
+      f4 = 1 ~ 2 - 5:6,
+      f5 = 1 ~ 2 + 3 * 4,
+      f6 = 1 ~ 2 * 4 + 3,
+      f7 = 1 ~ 2 + 3 - 5:6,
+      f8 = 1 ~ 2 - 5:6 + 3,
+      f9 = 1 ~ 2 * 4 - 5:6,
+      f10 = 1 ~ 2 - 5:6 * 4,
+      f11 = 1 ~ 2 + 3 * 4 - 5:6,
+      f12 = 1 ~ 2 + 3 - 5:6 * 4,
+      f12 = 1 ~ 2 * 4 + 3 - 5:6,
+      f13 = 1 ~ 2 * 4 - 5:6 + 3,
+      f14 = 1 ~ 2 - 5:6 + 3 * 4,
+      f15 = 1 ~ 2 - 5:6 * 4 + 3
     )
 
   params <- lapply(formulae, .make_parameters)
@@ -59,13 +53,16 @@ test_that("Different combinations of formula operations work", {
                 params$f11$intercept_level == 4 &
                 identical(params$f11$drop_trends, expr(5:6)))
 
-  purrr::walk(params[12:16],
-              function(ps)
-              expect_equal(ps, params$f11))
+  purrr::walk(
+    params[12:16],
+    function(ps) {
+      expect_equal(ps, params$f11)
+    }
+  )
 })
 
 
 test_that("Operator checking works", {
-  expect_true(.is_reserved_operator(sym('+')))
-  expect_false(.is_reserved_operator(sym('a')))
+  expect_true(.is_reserved_operator(sym("+")))
+  expect_false(.is_reserved_operator(sym("a")))
 })

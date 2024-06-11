@@ -1,4 +1,3 @@
-
 #' Make parameters for contrast code call
 #'
 #' Given a formula, recursively go through the abstract syntax tree and
@@ -14,22 +13,22 @@
 #'
 #' @return Named list of parameters that can be evaluated in `enlist_contrasts`
 .make_parameters <- function(formula,
-                             params = list("factor_col" = NA,
-                                           "code_by" = NA,
-                                           "reference_level" = NA,
-                                           "intercept_level" = NA,
-                                           "drop_trends" = NA,
-                                           "labels" = NULL,
-                                           "as_is" = FALSE),
-                             EMBEDDED = FALSE){
+                             params = list(
+                               "factor_col" = NA,
+                               "code_by" = NA,
+                               "reference_level" = NA,
+                               "intercept_level" = NA,
+                               "drop_trends" = NA,
+                               "labels" = NULL,
+                               "as_is" = FALSE
+                             ),
+                             EMBEDDED = FALSE) {
   cur_expr <- as.list(formula)
   node <- cur_expr[[1]]
 
-  if (identical(node, sym("~"))){
+  if (identical(node, sym("~"))) {
     params[["factor_col"]] <- cur_expr[[2L]] # LHS is factor name
     params <- .make_parameters(cur_expr[[3L]], params)
-
-
   } else if (.is_reserved_operator(node, "+")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
@@ -37,18 +36,16 @@
     params <- .make_parameters(LHS, params)
 
     # Must check if rhs has children before subsetting with +
-    if (r_has_child && .is_reserved_operator(RHS[[1L]], "*")){
+    if (r_has_child && .is_reserved_operator(RHS[[1L]], "*")) {
       params[["reference_level"]] <- RHS[[2L]]
       params <- .make_parameters(RHS, params, TRUE)
     } else {
       params[["reference_level"]] <- RHS
     }
-
-
   } else if (.is_reserved_operator(node, "-")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
-    if (.is_reserved_operator(RHS[[1L]], "*")){
+    if (.is_reserved_operator(RHS[[1L]], "*")) {
       params[["drop_trends"]] <- RHS[[2L]]
       params <- .make_parameters(RHS, params, TRUE)
       params <- .make_parameters(LHS, params)
@@ -56,41 +53,40 @@
       params[["drop_trends"]] <- RHS
       params <- .make_parameters(LHS, params)
     }
-
-
   } else if (.is_reserved_operator(node, "*")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
     params[["intercept_level"]] <- RHS
     # If we don't check whether * is embedded in - or + before recursing
     # we will overwrite code_by on accident
-    if (!EMBEDDED)
+    if (!EMBEDDED) {
       params <- .make_parameters(LHS, params)
-
-
+    }
   } else if (.is_reserved_operator(node, "|")) {
     LHS <- cur_expr[[2L]]
     RHS <- cur_expr[[3L]]
     params[["labels"]] <- RHS
     params <- .make_parameters(LHS, params)
   } else {
-    if (length(formula) > 1L && identical(formula[[1]], as_is)){
+    if (length(formula) > 1L && identical(formula[[1]], as_is)) {
       params[["as_is"]] <- TRUE
       formula <- formula[[2L]]
     }
-    if (is.call(formula) && length(formula) == 1L)
-      formula <- formula[[1]] # Remove parentheses to treat as symbol
-      params[["code_by"]] <- formula
+    if (is.call(formula) && length(formula) == 1L) {
+      formula <- formula[[1]]
+    } # Remove parentheses to treat as symbol
+    params[["code_by"]] <- formula
   }
 
   return(params)
 }
 
 .is_reserved_operator <- function(node, check.sym = NULL) {
-  if (!missing(check.sym))
+  if (!missing(check.sym)) {
     ops <- syms(check.sym)
-  else
-    ops <- syms(c("+","-","*","|"))#"^","%in%",":"))
+  } else {
+    ops <- syms(c("+", "-", "*", "|"))
+  } # "^","%in%",":"))
 
   any(vapply(ops, function(x) identical(node, x), FUN.VALUE = TRUE))
 }

@@ -10,8 +10,9 @@
 #' @return Logical vector, will retain names of a passed list
 #' @export
 is_orthogonal <- function(.contrasts, USE.NAMES = FALSE) {
-  if (is.matrix(.contrasts))
+  if (is.matrix(.contrasts)) {
     .contrasts <- list(.contrasts)
+  }
 
   vapply(.contrasts,
          function(m) {
@@ -22,12 +23,13 @@ is_orthogonal <- function(.contrasts, USE.NAMES = FALSE) {
 
            # 2 level factor contrasts return logical(0)s
            if (identical(cor_upper, logical(0)) ||
-               identical(cor_lower, logical(0)))
+               identical(cor_lower, logical(0))) {
              return(NA)
+           }
 
            all(c(cor_upper, cor_lower))
          },
          TRUE,
-         USE.NAMES = USE.NAMES)
-
+         USE.NAMES = USE.NAMES
+  )
 }

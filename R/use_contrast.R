@@ -86,14 +86,16 @@ use_contrasts.array <- function(factor_col,
                                 as_is = FALSE,
                                 ...) {
   # TODO: change this to use parent frame
-  use_contrasts.matrix(factor_col,
-                       code_by,
-                       reference_level,
-                       set_intercept,
-                       drop_trends,
-                       labels,
-                       as_is,
-                       ...)
+  use_contrasts.matrix(
+    factor_col,
+    code_by,
+    reference_level,
+    set_intercept,
+    drop_trends,
+    labels,
+    as_is,
+    ...
+  )
 }
 
 #' Function handler for use_contrasts
@@ -218,17 +220,19 @@ use_contrasts.matrix <- function(factor_col,
   factor_size <- dim(stats::contrasts(factor_col))
   if (given_matrix_size[1] != factor_size[1] &&
       given_matrix_size[2] != factor_size[2]) {
-    stop("Matrix given to code_by is size",
-         paste(given_matrix_size, collapse = "x"),
-         "but factor_col contrast matrix is size",
-         paste(factor_size, collapse = "x"), ".")
+    stop(
+      "Matrix given to code_by is size",
+      paste(given_matrix_size, collapse = "x"),
+      "but factor_col contrast matrix is size",
+      paste(factor_size, collapse = "x"), "."
+    )
   }
 
   new_contrasts <- code_by
   dimnames(new_contrasts) <- matrix_labels
 
   # If we want to use the matrix as-is, return now
-  if (!is.null(preset_comparisons) | as_is) {
+  if (!is.null(preset_comparisons) || as_is) {
     return(new_contrasts)
   }
 
@@ -317,7 +321,7 @@ use_contrasts.hypr <- function(factor_col,
   # of length 1 containing just the name of the factor column
   potential_factor_name <-
     as.character(eval(rlang::get_expr(rlang::enquo(factor_col))[[2L]],
-      envir = rlang::caller_env()
+                      envir = rlang::caller_env()
     ))
 
   stopifnot(hypr::nlevels(code_by) == nlevels(factor_col))

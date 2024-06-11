@@ -18,8 +18,8 @@ the reference level to be the first level. However, there are some functions
 that do not natively specify that already. Consider \code{contr.treatment} and
 \code{contr.SAS}, which provide the same treatment-coded matrices BUT the former
 moves the reference level to the first level while the latter sets the
-reference level to the last level. The contrast between the two functions
-is thus neutralized in this package. If we have reason to avoid this behavior,
+reference level to the last level. The contrast between the two functions is
+thus neutralized in this package. If we have reason to avoid this behavior,
 especially for manually created matrices for niche situations, we can
 suppress the behavior by wrapping the matrix/contrast function in \code{as_is}.
 }
@@ -38,7 +38,8 @@ enlist_contrasts(mtcars, carb ~ contr.SAS)
 enlist_contrasts(mtcars, carb ~ as_is(contr.SAS))
 
 # Particularly helpful for external matrices
-my_contrasts <- contr.SAS(6) # Imagine this is some other more complicated matrix
+# Imagine this is some other more complicated matrix
+my_contrasts <- contr.SAS(6)
 
 # This is the same as as_is(contr.SAS)
 enlist_contrasts(mtcars, carb ~ as_is(my_contrasts))

@@ -27,12 +27,13 @@
 #' no reference level, NA is returned
 find_same_col <- function(invmatrix) {
   ncols <- ncol(invmatrix)
-  indices <- seq.int(2,nrow(invmatrix))
+  indices <- seq.int(2, nrow(invmatrix))
 
   for (i in seq_len(ncols)) {
-    col_i <- invmatrix[indices,i]
-    if ((abs(min(col_i) - max(col_i)) < 1e-15) && all(col_i <= 0))
-      return (i)
+    col_i <- invmatrix[indices, i]
+    if ((abs(min(col_i) - max(col_i)) < 1e-15) && all(col_i <= 0)) {
+      return(i)
+    }
   }
 
   NA_integer_

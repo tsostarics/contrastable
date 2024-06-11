@@ -10,13 +10,14 @@
 #' @return Logical vector, will retain names of a passed list
 #' @export
 is_centered <- function(.contrasts, USE.NAMES = FALSE) {
-  if (is.matrix(.contrasts))
+  if (is.matrix(.contrasts)) {
     .contrasts <- list(.contrasts)
+  }
 
   # Contrasts centered if column sums are all 0
   vapply(.contrasts,
-         function(m) all(round(colSums(m),10) == 0),
-         logical(1),
-         USE.NAMES = USE.NAMES)
-
+    function(m) all(round(colSums(m), 10) == 0),
+    logical(1),
+    USE.NAMES = USE.NAMES
+  )
 }

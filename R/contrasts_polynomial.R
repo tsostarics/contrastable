@@ -40,8 +40,10 @@ raw_polynomial_code <- function(n) {
 
 
 .is_polynomial_scheme <- function(scheme) {
-  checks <- list(stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
-                 'contr.poly', 'orth_polynomial_code', 'raw_polynomial_code')
+  checks <- list(
+    stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
+    "contr.poly", "orth_polynomial_code", "raw_polynomial_code"
+  )
 
   any(vapply(checks, function(x) identical(x, scheme), FUN.VALUE = TRUE))
 }

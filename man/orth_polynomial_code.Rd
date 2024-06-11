@@ -16,7 +16,7 @@ A matrix of orthogonal polynomial contrasts
 Wrapper around R's built in function
 }
 \details{
-For n levels of factors where k in 1:n, generate a matrix with n-1 comparisons where each
-comparison looks for a polynomial trend of degree k where each polynomial
-is independent of the others.
+For n levels of factors where k in 1:n, generate a matrix with n-1
+comparisons where each comparison looks for a polynomial trend of degree k
+where each polynomial is independent of the others.
 }

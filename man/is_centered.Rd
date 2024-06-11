@@ -15,6 +15,7 @@ is_centered(.contrasts, USE.NAMES = FALSE)
 Logical vector, will retain names of a passed list
 }
 \description{
-Given a contrast matrix or list of contrast matrices (eg from \code{enlist_contrasts}),
-return a logical vector of whether each contrast is centered or not.
+Given a contrast matrix or list of contrast matrices (eg from
+\code{enlist_contrasts}), return a logical vector of whether each contrast is
+centered or not.
 }

@@ -43,21 +43,25 @@
 #' # Decomose contrasts for carb and gear columns into new columns, using
 #' # the contrast labels used when setting the contrasts
 #' mtcars |>
-#' set_contrasts(carb ~ scaled_sum_code,
-#'               gear ~ contr.sum | c("4-mean", "5-mean")) |>
-#'   decompose_contrasts(c('carb', 'gear'))
+#'   set_contrasts(
+#'     carb ~ scaled_sum_code,
+#'     gear ~ contr.sum | c("4-mean", "5-mean")
+#'   ) |>
+#'   decompose_contrasts(c("carb", "gear"))
 #'
 #' # Decompose contrasts, but set new labels for gear using extract_to,
 #' # and don't prepend 'gear' to these new columns. Note that this isn't
 #' # recommended in practice since you'll need to escape the column names with
 #' # backticks when using them.
 #' mtcars |>
-#'   set_contrasts(carb ~ scaled_sum_code,
-#'                 gear ~ contr.sum) |>
-#'   decompose_contrasts(c('carb', 'gear'),
-#'                       extract_to = list(gear = c("4-mean", "5-mean")),
-#'                       retain_factor_name = FALSE)
-#'
+#'   set_contrasts(
+#'     carb ~ scaled_sum_code,
+#'     gear ~ contr.sum
+#'   ) |>
+#'   decompose_contrasts(c("carb", "gear"),
+#'     extract_to = list(gear = c("4-mean", "5-mean")),
+#'     retain_factor_name = FALSE
+#'   )
 #'
 decompose_contrasts <- function(model_data,
                                 extract_from,
@@ -66,11 +70,10 @@ decompose_contrasts <- function(model_data,
                                 extract_intercept = FALSE,
                                 remove_original = FALSE,
                                 retain_factor_name = TRUE) {
-
   if (length(retain_factor_name) == 1L) {
     if (retain_factor_name) {
       retain_factor_name <- extract_from
-    } else{
+    } else {
       retain_factor_name <- character(0)
     }
   }
@@ -82,31 +85,37 @@ decompose_contrasts <- function(model_data,
       extract_these <- seq_len(nlevels(model_data[[current_factor]]))
       if (!is.null(which_contrasts)) {
         # Only use values in extract_from if they're specified for this factor
-        if (extract_from %in% names(which_contrasts))
+        if (extract_from %in% names(which_contrasts)) {
           extract_these <- which_contrasts[[current_factor]]
+        }
       }
 
-      if (!extract_intercept)
+      if (!extract_intercept) {
         extract_these <- extract_these[-1]
+      }
 
       # Get the numeric values of the contrasts
       components <-
-        stats::model.matrix(formula(paste("~",current_factor)),
-                            model_data)[,extract_these]
+        stats::model.matrix(
+          formula(paste("~", current_factor)),
+          model_data
+        )[, extract_these]
 
       # Rename the columns if extract_to is set for the current factor
       if (!is.null(extract_to)) {
-        if (current_factor %in% names(extract_to)){
+        if (current_factor %in% names(extract_to)) {
           new_column_names <- extract_to[[current_factor]]
 
           # If retain_factor_name is TRUE, prepend the factor name to the new
           # column names
-          if (current_factor %in% retain_factor_name)
+          if (current_factor %in% retain_factor_name) {
             new_column_names <- paste0(current_factor, new_column_names)
+          }
 
 
-          if (length(new_column_names) != length(extract_these))
+          if (length(new_column_names) != length(extract_these)) {
             stop("Number of names in extract.to should equal number of desired components")
+          }
           colnames(components) <- new_column_names
         }
       }
@@ -117,8 +126,9 @@ decompose_contrasts <- function(model_data,
   # Add the new columns to the model data
   model_data <- cbind(model_data, do.call(cbind, args = all_components))
 
-  if (remove_original)
-    model_data <- model_data[,colnames(model_data) != extract_from]
+  if (remove_original) {
+    model_data <- model_data[, colnames(model_data) != extract_from]
+  }
 
   model_data
 }

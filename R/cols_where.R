@@ -17,14 +17,17 @@
                         use.names = FALSE,
                         return.names = FALSE) {
   cnames <- colnames(model_data)
-  if (return.names)
+  if (return.names) {
     use.names <- TRUE
+  }
   cols <- vapply(cnames,
-                 function(x) fx(model_data[[x]]),
-                 FUN.VALUE = logical(1),
-                 USE.NAMES = use.names)
-  if (return.names)
+    function(x) fx(model_data[[x]]),
+    FUN.VALUE = logical(1),
+    USE.NAMES = use.names
+  )
+  if (return.names) {
     return(cnames[cols])
+  }
   cols
 }
 

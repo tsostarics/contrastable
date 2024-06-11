@@ -19,7 +19,8 @@ raw polynomials may increase the collinearity in your model, especially with
 higher levels.
 }
 \details{
-For n levels of factors where k in 1:n, generate a matrix with n-1 comparisons where each
-comparison looks for a polynomial trend of degree k where each polynomial
-may be correlated with the others. Normally you would use orthogonal polynomials.
+For n levels of factors where k in 1:n, generate a matrix with n-1
+comparisons where each comparison looks for a polynomial trend of degree k
+where each polynomial may be correlated with the others. Normally you would
+use orthogonal polynomials.
 }

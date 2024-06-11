@@ -13,12 +13,12 @@
   which_are_ordered <- vapply(model_data[vars_in_model], is.ordered, TRUE)
   any_ordered <- any(which_are_ordered)
   if (any_ordered) {
-    or_default <- crayon::red(options("contrasts")[[1L]]['ordered'])
+    or_default <- crayon::red(options("contrasts")[[1L]]["ordered"])
     ordered_names <-
       crayon::red(
         paste(
           names(which_are_ordered)[which_are_ordered],
-          collapse = ' '
+          collapse = " "
         )
       )
 
@@ -45,23 +45,28 @@
                               attempting_factors = NULL) {
   if (!is.null(one_level_factors)) {
     # If you try to pass the factor names but the vector is actually empty
-    if (identical(one_level_factors, character(0)))
+    if (identical(one_level_factors, character(0))) {
       return(invisible(1))
-  } else if (missing(model_data) | missing(attempting_factors)) {
+    }
+  } else if (missing(model_data) || missing(attempting_factors)) {
     stop("If factor names are not provided, the model data and factors being set must be provided")
   } else {
-    is_one_level <- vapply(attempting_factors,
-                           function(x) nlevels(model_data[[x]]) == 1L,
-                           logical(1))
+    is_one_level <- vapply(
+      attempting_factors,
+      function(x) nlevels(model_data[[x]]) == 1L,
+      logical(1)
+    )
     # If it turns out there aren't any one level factors
-    if (!any(is_one_level))
+    if (!any(is_one_level)) {
       return(invisible(1))
+    }
     one_level_factors <- names(is_one_level)[is_one_level]
   }
 
   one_level_string <- paste(crayon::cyan(one_level_factors), collapse = " ")
   warning(glue::glue("Contrasts undefined for factors with only one level: {one_level_string}"),
-          call. = FALSE)
+    call. = FALSE
+  )
   return(invisible(1))
 }
 
@@ -74,7 +79,7 @@
 #'
 #' @return Nothing, sends a message if needed
 .msg_if_coerced_to_factors <- function(which_to_factors) {
-  varnames <- crayon::blue(paste(which_to_factors, collapse = ' '))
+  varnames <- crayon::blue(paste(which_to_factors, collapse = " "))
   message(glue::glue("Converting to factors: {varnames}"))
 }
 
@@ -89,11 +94,11 @@
 #'
 #' @return nothing, just sends a message if needed
 .msg_if_remaining_factors <- function(model_data, specified_vars) {
-  which_are_factors  <- .cols_where(model_data,  is.factor,   use.names = TRUE)
-  which_are_ordered  <- .cols_where(model_data,  is.ordered,  use.names = TRUE)
+  which_are_factors <- .cols_where(model_data, is.factor, use.names = TRUE)
+  which_are_ordered <- .cols_where(model_data, is.ordered, use.names = TRUE)
   which_are_onelevel <- .cols_where(model_data, .is.onelevel, use.names = TRUE)
-  which_are_factors  <- which_are_factors[!which_are_onelevel]
-  which_are_ordered  <- which_are_ordered[!which_are_onelevel]
+  which_are_factors <- which_are_factors[!which_are_onelevel]
+  which_are_ordered <- which_are_ordered[!which_are_onelevel]
 
   # Filter named logical vector to be only those where TRUE
   factor_cols <- which_are_factors[which_are_factors]
@@ -103,17 +108,22 @@
 
   if (any(remaining_factors)) {
     # Lookup default contrasts and color code accordingly
-    uo_default <- crayon::blue(options("contrasts")[[1L]]['unordered'])
-    or_default <- crayon::red(options("contrasts")[[1L]]['ordered'])
+    uo_default <- crayon::blue(options("contrasts")[[1L]]["unordered"])
+    or_default <- crayon::red(options("contrasts")[[1L]]["ordered"])
     varnames <-
       paste(
-        vapply(names(remaining_factors),
-               function(x)
-                 ifelse(which_are_ordered[x],
-                        crayon::red(x),
-                        crayon::blue(x)),
-               character(1)),
-        collapse = " ")
+        vapply(
+          names(remaining_factors),
+          function(x) {
+            ifelse(which_are_ordered[x],
+              crayon::red(x),
+              crayon::blue(x)
+            )
+          },
+          character(1)
+        ),
+        collapse = " "
+      )
     message(glue::glue("Expect {uo_default} or {or_default} for unset factors: {varnames}"))
   }
 }

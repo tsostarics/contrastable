@@ -20,8 +20,8 @@ glimpse_contrasts(
 
 \item{...}{Series of formulas}
 
-\item{return.list}{Logical, defaults to FALSE, whether the output of enlist_contrasts should be
-returned}
+\item{return.list}{Logical, defaults to FALSE, whether the output of
+enlist_contrasts should be returned}
 
 \item{all.factors}{Logical, defaults to TRUE, whether the factors not
 explicitly set with formulas should be included}
@@ -29,11 +29,11 @@ explicitly set with formulas should be included}
 \item{add_namespace}{Logical, defaults to FALSE, whether to append the
 namespace of the contrast scheme to the scheme name}
 
-\item{incl.one.levels}{Logical, should factors with only one level be included
-in the output? Default is FALSE to omit}
+\item{incl.one.levels}{Logical, should factors with only one level be
+included in the output? Default is FALSE to omit}
 
-\item{minimal}{Logical, default TRUE, whether to omit the orthogonal, centered,
-dropped_trends, and explicitly_set columns from the output table}
+\item{minimal}{Logical, default TRUE, whether to omit the orthogonal,
+centered, dropped_trends, and explicitly_set columns from the output table}
 
 \item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
 }
@@ -42,9 +42,9 @@ A dataframe is return.list is FALSE, a list with a dataframe and list
 of named contrasts if TRUE.
 }
 \description{
-Uses the same syntax as \code{enlist_contrasts} and \code{set_contrasts}. Returns
-a summary table of the contrasts you've set. If you set \code{return.list} to TRUE
-then you can access a list of contrasts in the second element of the resulting
-list. The glimpse dataframe is the first element. FALSE will return just
-the glimpse data frame.
+Uses the same syntax as \code{enlist_contrasts} and \code{set_contrasts}. Returns a
+summary table of the contrasts you've set. If you set \code{return.list} to TRUE
+then you can access a list of contrasts in the second element of the
+resulting list. The glimpse dataframe is the first element. FALSE will return
+just the glimpse data frame.
 }

@@ -8,7 +8,7 @@
 #'  \item Reference level = -1/n
 #'  \item Comparison level = (n-1)/n
 #'  \item All others = -1/n
-#'}
+#' }
 #'
 #' Example interpretation for a 4 level factor:
 #' \itemize{
@@ -16,7 +16,7 @@
 #'  \item grp2 = mean(grp2) - mean(grp1)
 #'  \item grp3 = mean(grp3) - mean(grp1)
 #'  \item grp4 = mean(grp4) - mean(grp1)
-#'}
+#' }
 #' Note: grp coefficient estimates are the same as with contr.treatment, but
 #' the intercept is changed to the grand mean instead of the mean of grp1.
 #'
@@ -41,11 +41,11 @@
 #' # Here they happen to be equivalent (well, aside from the reference level
 #' # contr.sum uses)
 #' scaled_sum_code(2)
-#' contr.sum(2)/2
+#' contr.sum(2) / 2
 #'
 #' mydf <- data.frame(
-#'    grp = factor(c(rep("F1",5),rep("F2",5),rep("F3",5),rep("F4",5))),
-#'    resp = c(seq(1,5), seq(5,9), seq(10,14), seq(15,19))
+#'   grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+#'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
 #' mydf |>
@@ -55,8 +55,9 @@
 #'   dplyr::mutate(grand_mean = mean(mu))
 #'
 #' summary(lm(resp ~ grp,
-#'            data = mydf,
-#'            contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)))
+#'   data = mydf,
+#'   contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)
+#' ))
 scaled_sum_code <- function(n) {
-  stats::contr.treatment(n) - 1/n
+  stats::contr.treatment(n) - 1 / n
 }

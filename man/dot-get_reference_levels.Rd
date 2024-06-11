@@ -12,9 +12,10 @@
 \item{params}{Optional list of parameters from \code{.make_parameters()}, if NULL,
 then the reference level is determined from the contrast matrix directly.}
 
-\item{formulas}{Optional list of formulas, needed if \code{params} are passed. Used
-to get the correct environment for evaluating expressions in \code{params}. If NULL,
-then the reference level is determiend from the contrast matrix directly.}
+\item{formulas}{Optional list of formulas, needed if \code{params} are passed.
+Used to get the correct environment for evaluating expressions in \code{params}.
+If NULL, then the reference level is determiend from the contrast matrix
+directly.}
 }
 \value{
 Character vector of reference levels. If a contrast matrix is not
@@ -23,8 +24,8 @@ of the row for the reference level (usually 1).
 }
 \description{
 Given a list of contrast matrices, if the contrast matrices were explicitly
-generated via formulas and they have already had their parameters parsed,
-use the parameters to look up the reference level for each contrast matrix.
-If the parameters have not been computed (usually because the contrasts are
+generated via formulas and they have already had their parameters parsed, use
+the parameters to look up the reference level for each contrast matrix. If
+the parameters have not been computed (usually because the contrasts are
 using the defaults) then look up the reference level manually.
 }
