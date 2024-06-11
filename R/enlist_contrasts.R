@@ -52,6 +52,9 @@
 #' enlist_contrasts(my_df, gear ~ scaled_sum_code)
 #'
 enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
+  # Needs to be done before model_data is first evaluated
+  df_symbol <- rlang::as_label(rlang::enquo(model_data))
+
   if (!inherits(model_data, "data.frame")) {
     if (inherits(model_data, "formula"))
       stop("Formula passed to model_data, did you forget to pass a data frame?")
@@ -59,13 +62,12 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
     stop("model_data should inherit class data.frame.\nInstead found class(es): ",
          paste0(class(model_data), collapse = ", "))
   }
-    stop("model_data should inherit class data.frame,  ")
+
   # Get the formulas from the dots into list and character formats to work with
   formulas <- purrr::list_flatten(rlang::dots_list(...))
   if (identical(formulas, list())) {
     stop("No contrast formulas provided")
   }
-  df_symbol <- rlang::as_label(rlang::enquo(model_data))
 
 
   # Extract which factor columns are attempting to be set
