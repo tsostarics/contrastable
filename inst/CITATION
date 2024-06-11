@@ -1,0 +1,9 @@
+bibentry(
+  bibtype = "Manual",
+  textVersion = "Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R package version 0.1.0.",
+  header = "To cite contrastable in publications, please use",
+  author = "Thomas Sostarics",
+  title = "{contrastable}: Contrast Coding Utilities in {R}",
+  year = "2024",
+  url = "https://github.com/tsostarics/contrastable",
+)
