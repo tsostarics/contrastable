@@ -75,7 +75,7 @@ use_contrasts.array <- function(factor_col, code_by= NA, reference_level=NA, set
 #'
 #' @param factor_col A factor vector, eg from df$factorVarName
 #' @param code_by A function to be called, should return a contrast matrix
-#' @param reference_level The level to use as the reference level, default NA
+#' @param reference_level The name of the level to use as the reference level, default NA
 #' @param set_intercept The intercept to use, default NA
 #' @param drop_trends The trends to drop, default NA
 #' @param labels A vector of labels to apply to the matrix column names, default
@@ -106,15 +106,12 @@ use_contrasts.function <- function(factor_col, code_by = NA, reference_level=NA,
 
   if (!as_is) {
     # Get indices for the default reference level and user-specified level
-    default_reference <- .get_reference_level(new_contrasts)
-    new_reference <- which(matrix_labels[[1]] == reference_level)
+    new_reference_index <- which(matrix_labels[[1]] == reference_level)
 
     # Switch reference level if needed, along with various error handling
     new_contrasts <- .switch_reference_if_needed(new_contrasts,
-                                                 code_by,
                                                  reference_level,
-                                                 default_reference,
-                                                 new_reference)
+                                                 new_reference_index)
 
 
     # Set the contrast labels, reorder as needed

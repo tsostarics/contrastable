@@ -3,17 +3,16 @@
 #' Reorders the rows of a contrast matrix to properly set the reference level
 #'
 #' @param contrast_matrix An unlabeled contrast matrix
-#' @param coding_fx The function used to generate the contrasts, used to check for treatment coding
 #' @param old_reference The previously specified reference level, usually the default
 #' for the scheme found by `.get_reference_level`
 #' @param new_reference The index of the row to use as the new reference level
 #'
 #' @return A matrix with the reordered rows and correct values for the reference level
 #' @export
-.switch_reference_level <- function(contrast_matrix, coding_fx, old_reference, new_reference){
+.switch_reference_level <- function(contrast_matrix, old_reference, new_reference){
 
   # If the new reference is invalid or equal to the old reference, return the original matrix
-  if (is.na(new_reference) | new_reference == old_reference | identical(coding_fx, stats::contr.helmert))
+  if (is.na(new_reference) | new_reference == old_reference)
     return(contrast_matrix)
 
   # Swap the old reference row with the new reference row
@@ -45,26 +44,24 @@
   as.matrix(contrast_matrix[,comparison_order])
 }
 
-.switch_reference_if_needed <- function(cmat,
-                                        coding_fx,
-                                        reference_level = NA,
-                                        default_reference,
-                                        new_reference) {
-
-  if (!is.na(reference_level) && identical(new_reference, integer(0)))
+.switch_reference_if_needed <- function(cmat, new_reference_label = NA, new_reference_index) {
+  if (!is.na(new_reference_label)  && identical(new_reference_index, integer(0)))
     stop("Reference level not found in factor levels")
 
-  if (is.na(default_reference)) {
-    if (!is.na(reference_level))
+  default_reference_index <- .get_reference_level(cmat)
+
+  if (is.na(default_reference_index)) {
+    if (!is.na(new_reference_label))
       warning("Ignoring reference level for scheme lacking a singular reference")
   } else {
 
-    if (identical(new_reference, integer(0)))
-      new_reference <- 1L
+    # If a new reference level isn't specified, then make the first level the
+    # reference by default
+    if (identical(new_reference_index, integer(0)))
+      new_reference_index <- 1L
     cmat <- .switch_reference_level(cmat,
-                                    coding_fx,
-                                    default_reference,
-                                    new_reference)
+                                    default_reference_index,
+                                    new_reference_index)
   }
 
   cmat
@@ -75,9 +72,9 @@
     base::determinant(
       base::solve(
         .contrasts_to_hypotheses(cmat)
-        ),
+      ),
       logarithm = FALSE
-      )
+    )
 
   (abs(determinant_value[['modulus']]) - factorial(nrow(cmat))) < 1e-10
 }

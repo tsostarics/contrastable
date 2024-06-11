@@ -62,7 +62,7 @@ test_that("Environment handling with programmatically set reference levels works
   output <- lapply(gear_levels,
                    function(ref_level)
                      set_contrasts(my_df,
-                                   gear ~ scaled_sum_code + ref_level * ref_level)) %>%
+                                   gear ~ scaled_sum_code + ref_level * ref_level)) |>
     lapply(function(set_df) contrasts(set_df$gear))
 
   # Row names are all the same, col names vary depending on reference level
@@ -78,8 +78,8 @@ test_that("Environment handling with programmatically set reference levels works
 test_that("Environment handling when piping with magrittr works", {
   my_df <- mtcars
   my_df$gear <-  factor(my_df$gear)
-  magrittr_df <- my_df %>% set_contrasts(gear ~ helmert_code)
-  magrittr_contrasts <- my_df %>% enlist_contrasts(gear ~ helmert_code)
+  magrittr_df <- my_df |> set_contrasts(gear ~ helmert_code)
+  magrittr_contrasts <- my_df |> enlist_contrasts(gear ~ helmert_code)
   native_df <- set_contrasts(my_df,gear ~ helmert_code)
 
   expect_equal(contrasts(native_df$gear), contrasts(magrittr_df$gear))

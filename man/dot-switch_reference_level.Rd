@@ -4,17 +4,10 @@
 \alias{.switch_reference_level}
 \title{Switch reference level in contrast matrix}
 \usage{
-.switch_reference_level(
-  contrast_matrix,
-  coding_fx,
-  old_reference,
-  new_reference
-)
+.switch_reference_level(contrast_matrix, old_reference, new_reference)
 }
 \arguments{
 \item{contrast_matrix}{An unlabeled contrast matrix}
-
-\item{coding_fx}{The function used to generate the contrasts, used to check for treatment coding}
 
 \item{old_reference}{The previously specified reference level, usually the default
 for the scheme found by \code{.get_reference_level}}
