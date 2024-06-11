@@ -46,10 +46,10 @@
 #'    resp = c(seq(1,5), seq(5,9), seq(10,14), seq(15,19))
 #' )
 #'
-#' mydf %>%
-#'   dplyr::group_by(grp) %>%
-#'   dplyr::summarize(mu = mean(resp)) %>%
-#'   dplyr::ungroup() %>%
+#' mydf |>
+#'   dplyr::group_by(grp) |>
+#'   dplyr::summarize(mu = mean(resp)) |>
+#'   dplyr::ungroup() |>
 #'   dplyr::mutate(grand_mean = mean(mu))
 #'
 #' summary(lm(resp ~ grp,

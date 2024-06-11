@@ -39,7 +39,6 @@ raw_polynomial_code <- function(n) {
 
 
 .is_polynomial_scheme <- function(scheme) {
-  # maybe include a check on the numbers to handle raw passed matrices
   checks <- list(stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
                  'contr.poly', 'orth_polynomial_code', 'raw_polynomial_code')
 
