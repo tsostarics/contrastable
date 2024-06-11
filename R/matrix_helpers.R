@@ -8,9 +8,12 @@
   solve(t(hypothesis_matrix))[,-1]
 }
 
+# nocov start
+# only really used in debugging sessions
 .convert_matrix <- function(m) {
   if (nrow(m) == ncol(m))
     return(.hypotheses_to_contrasts(m))
 
   .contrasts_to_hypotheses(m)
 }
+# nocov end
