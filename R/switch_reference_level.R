@@ -67,14 +67,15 @@
   cmat
 }
 
-.is_unscaled <- function(cmat) {
-  determinant_value <-
-    base::determinant(
-      base::solve(
-        .contrasts_to_hypotheses(cmat)
-      ),
-      logarithm = FALSE
-    )
-
-  (abs(determinant_value[['modulus']]) - factorial(nrow(cmat))) < 1e-10
-}
+# Not using this for anything for the time being
+# .is_unscaled <- function(cmat) {
+#   determinant_value <-
+#     base::determinant(
+#       base::solve(
+#         .contrasts_to_hypotheses(cmat)
+#       ),
+#       logarithm = FALSE
+#     )
+#
+#   (abs(determinant_value[['modulus']]) - factorial(nrow(cmat))) < 1e-10
+# }
