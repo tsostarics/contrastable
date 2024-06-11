@@ -60,8 +60,6 @@ BAD: "We sum code our variables (Sostarics 2024)"
 
 GOOD: "We use the `sum_code()` function from the contrastable package (Sostarics 2024) for our variables."
 
-BETTER: "We use the `sum_code()` function from the contrastable package (Sostarics 2024) for our variables."
-
 Other examples:
 
  - Contrasts were set using the `scaled_sum_code()` function from the contrastable
@@ -80,9 +78,6 @@ GOOD: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics
 
 BETTER: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024).
 This contrast scheme encodes differences between each comparison level and the grand mean."
-
-The latter sentence can get long when describing multple different contrast schemes.
-You could consider putting them in a footnote.
 
 
 # Example
