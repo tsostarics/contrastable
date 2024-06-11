@@ -173,3 +173,10 @@ test_that("Warnings when reference level is attempted to be changed work properl
   expect_warning(enlist_contrasts(mtcars, cyl ~ helmert_code + 6,verbose = FALSE),
                  regexp = "Ignoring reference level")
 })
+
+test_that("Error message when forgetting model_data works", {
+  expect_error(enlist_contrasts(cyl ~ 2),
+               regexp = "forget to pass a data frame")
+  expect_error(enlist_contrasts(matrix(c(1,1,1,1), nrow = 2)),
+               regexp = "Instead found")
+})
