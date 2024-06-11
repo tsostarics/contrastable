@@ -99,9 +99,10 @@ the factors and diagnostics about the scheme we have set.
 # Set reference level with + and intercept with *
 contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
                          carb ~ helmert_code,
-                         vs   ~ sum_code + 1)
+                         vs   ~ treatment_code + 1)
 
 # Get information about our contrasts, even those we didn't explicitly set
+# (gear is ordered, and so uses contr.poly by default)
 glimpse_contrasts(my_data, 
                   contrast_schemes, 
                   add_namespace = TRUE,

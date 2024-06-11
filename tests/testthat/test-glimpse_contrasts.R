@@ -1,13 +1,3 @@
-# test_that("Intuit reference level works", {
-#   expect_equal(.intuit_reference_level(contr.poly(6), 1:6), NA)
-#   expect_equal(.intuit_reference_level(contr.treatment(2), 1:2), 1)
-#   expect_equal(.intuit_reference_level(contr.SAS(6), 1:6), 6)
-#   expect_equal(.intuit_reference_level(scaled_sum_code(6), 1:6), 6)
-#   expect_equal(.intuit_reference_level(helmert_code(6), 1:6), 6)
-#   expect_equal(.intuit_reference_level(reverse_helmert_code(6), 1:6), 1)
-#   expect_equal(.intuit_reference_level(contr.sum(6), 1:6), 6)
-# })
-
 test_that("Intercept interpretation works", {
   expect_equal(interpret_intercept(contr.treatment(5)), "mean(1)", ignore_attr = TRUE)
   expect_equal(interpret_intercept(scaled_sum_code(5)), "grand mean", ignore_attr = TRUE)
@@ -21,6 +11,7 @@ test_that("Glimpse works", {
   tst <- glimpse_contrasts(tstdf,
                            carb ~ contr.poly - 3:5,
                            gear ~ scaled_sum_code + 5,
+                           minimal = FALSE,
                            verbose = FALSE)
   expect_equal(tst$factor, c('carb','gear','cyl'))
   expect_equal(tst$n, c(6, 3, 3), ignore_attr = TRUE) # need unname
@@ -43,6 +34,7 @@ test_that("Glimpse with variables works", {
                            carb ~ contr.poly - a:c,
                            gear ~ mat + c * b,
                            cyl ~ scaled_sum_code + b * b,
+                           minimal = FALSE,
                            verbose = FALSE)
   expect_equal(tst$scheme, c('contr.poly','custom','scaled_sum_code'))
   expect_equal(tst$intercept, c('grand mean', 'grand mean', 'mean(4)'), ignore_attr = TRUE)

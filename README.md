@@ -92,9 +92,10 @@ diagnostics about the scheme we have set.
 # Set reference level with + and intercept with *
 contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
                          carb ~ helmert_code,
-                         vs   ~ sum_code + 1)
+                         vs   ~ treatment_code + 1)
 
 # Get information about our contrasts, even those we didn't explicitly set
+# (gear is ordered, and so uses contr.poly by default)
 glimpse_contrasts(my_data, 
                   contrast_schemes, 
                   add_namespace = TRUE,
@@ -102,12 +103,12 @@ glimpse_contrasts(my_data,
   knitr::kable()
 ```
 
-| factor |   n | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
-|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
-| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean | TRUE       | TRUE     | NA             | TRUE           |
-| vs     |   2 | 0, 1             | contrastable::sum_code        | 1         | grand mean | NA         | TRUE     | NA             | TRUE           |
-| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
+| factor |   n | level_names      | scheme                        | reference | intercept  |
+|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|
+| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean |
+| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean |
+| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    |
+| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
@@ -133,9 +134,9 @@ enlist_contrasts(mtcars, contrast_schemes)
 #> 8  0.0  0.0000000  0.00  0.0  0.8333333
 #> 
 #> $vs
-#>    0
-#> 0  1
-#> 1 -1
+#>   0
+#> 0 1
+#> 1 0
 ```
 
 `set_contrasts` can be used to set the contrasts onto the dataframe

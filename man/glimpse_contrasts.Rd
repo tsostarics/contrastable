@@ -8,10 +8,11 @@ glimpse_contrasts(
   model_data,
   ...,
   return.list = FALSE,
-  verbose = FALSE,
   all.factors = TRUE,
   add_namespace = FALSE,
-  incl.one.levels = FALSE
+  incl.one.levels = FALSE,
+  minimal = TRUE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -22,8 +23,6 @@ glimpse_contrasts(
 \item{return.list}{Logical, defaults to FALSE, whether the output of enlist_contrasts should be
 returned}
 
-\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
-
 \item{all.factors}{Logical, defaults to TRUE, whether the factors not
 explicitly set with formulas should be included}
 
@@ -32,6 +31,11 @@ namespace of the contrast scheme to the scheme name}
 
 \item{incl.one.levels}{Logical, should factors with only one level be included
 in the output? Default is FALSE to omit}
+
+\item{minimal}{Logical, default TRUE, whether to omit the orthogonal, centered,
+dropped_trends, and explicitly_set columns from the output table}
+
+\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
 }
 \value{
 A dataframe is return.list is FALSE, a list with a dataframe and list

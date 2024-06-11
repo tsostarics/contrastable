@@ -10,13 +10,15 @@
 #' @param ... Series of formulas
 #' @param return.list Logical, defaults to FALSE, whether the output of enlist_contrasts should be
 #' returned
-#' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #' @param all.factors Logical, defaults to TRUE, whether the factors not
 #' explicitly set with formulas should be included
 #' @param add_namespace Logical, defaults to FALSE, whether to append the
 #' namespace of the contrast scheme to the scheme name
 #' @param incl.one.levels Logical, should factors with only one level be included
 #' in the output? Default is FALSE to omit
+#' @param minimal Logical, default TRUE, whether to omit the orthogonal, centered,
+#' dropped_trends, and explicitly_set columns from the output table
+#' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
 #' of named contrasts if TRUE.
@@ -26,10 +28,11 @@
 glimpse_contrasts <- function(model_data,
                               ...,
                               return.list = FALSE,
-                              verbose = FALSE,
                               all.factors = TRUE,
                               add_namespace = FALSE,
-                              incl.one.levels = FALSE) {
+                              incl.one.levels = FALSE,
+                              minimal = TRUE,
+                              verbose = FALSE){
   formulas <- purrr::list_flatten(rlang::dots_list(...)) # outer names warning?
 
   # If no formulas are provided but we want to glimpse all factors, use
@@ -69,9 +72,11 @@ glimpse_contrasts <- function(model_data,
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
   reference_levels <- .get_reference_levels(contrast_list, params, formulas)
+  intercept_interpretations <- vapply(contrast_list, interpret_intercept,"char", USE.NAMES = FALSE)
+
   orthogonal_contrasts <- is_orthogonal(contrast_list)
   centered_contrasts <- is_centered(contrast_list)
-  intercept_interpretations <- vapply(contrast_list, interpret_intercept,"char", USE.NAMES = FALSE)
+
 
   # Double check that dropped trends are only included for polynomial contrasts
   dropped_trends <-  .get_dropped_trends(params, formulas)
@@ -96,6 +101,16 @@ glimpse_contrasts <- function(model_data,
 
   if (add_namespace)
     glimpse[['scheme']] <- .add_namespace(glimpse[['scheme']])
+
+  # TODO: Rewrite so that the additional columns are only computed if minimal is FALSE
+  if (minimal) {
+    glimpse <- glimpse[,c("factor",
+                          "n",
+                          "level_names",
+                          "scheme",
+                          "reference",
+                          "intercept")]
+  }
 
   # The default factors don't need to be specified in the contrast list,
   # they'll just use their respective defaults by the model fitting function
