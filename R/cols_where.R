@@ -12,7 +12,10 @@
 #' returned instead of a logical vector. Overwrites use.names.
 #'
 #' @return optionally named logical vector or character vector
-.cols_where <- function(model_data, fx, use.names = FALSE, return.names = FALSE) {
+.cols_where <- function(model_data,
+                        fx,
+                        use.names = FALSE,
+                        return.names = FALSE) {
   cnames <- colnames(model_data)
   if (return.names)
     use.names <- TRUE

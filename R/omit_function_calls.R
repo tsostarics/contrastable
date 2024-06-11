@@ -3,17 +3,18 @@
 #' When working with the formula interface, users can pass in function calls
 #' containing arguments. The most explicit example of this would be using a full
 #' matrix call in the formula to specify the contrast matrix exactly. However,
-#' this makes it difficult to check that the user is using the formula correctly.
-#' This function recursively removes function calls from the formula and replaces
-#' them with the string "CALL". This allows us to work with a simpler formula
-#' object that is easier to check.
+#' this makes it difficult to check that the user is using the formula
+#' correctly. This function recursively removes function calls from the formula
+#' and replaces them with the string "CALL". This allows us to work with a
+#' simpler formula object that is easier to check.
 #'
 #' @param rhs_node The right hand side of the formula, either `formula[[3]]` or
-#' `rlang::f_rhs(formula)`. This is the node that will be recursed on.
+#'   `rlang::f_rhs(formula)`. This is the node that will be recursed on.
 #' @param mothers List of operators that have been encountered so far. This is
-#' used to check that the user is not using the same operator more than once.
+#'   used to check that the user is not using the same operator more than once.
 #'
-#' @return Returns the right hand side of the formula with function calls removed
+#' @return Returns the right hand side of the formula with function calls
+#'   removed
 #' @export
 #'
 #' @examples
@@ -42,27 +43,28 @@
       # If we haven't encountered this operator before, we need to recurse
       # through the arguments
       for (i in seq_along(rhs_node)[-1L]) {
-        rhs_node[[i]] <- .omit_function_calls(rhs_node[[i]], c(mothers, rhs_node[[1]]))
+        rhs_node[[i]] <- .omit_function_calls(rhs_node[[i]],
+                                              c(mothers, rhs_node[[1]]))
       }
     } else {
-      # If the function call is not an operator, replace it with the string "CALL"
-      # and remove any arguments to the function call from the formula
+      # If the function call is not an operator, replace it with the string
+      # "CALL" and remove any arguments to the function call from the formula
       rhs_node[[1L]] <- quote(CALL)
       rhs_node[seq_along(rhs_node)[-1L]] <- NULL
     }
   }
 
-  # If the current node is not a function call or all the function call
-  # handling is done & the current node has been changed, return the current node
+  # If the current node is not a function call or all the function call handling
+  # is done & the current node has been changed, return the current node
   return(rhs_node)
 }
 
 #' Simplify formula by reducing the right hand side
 #'
 #' This function takes a formula and simplifies the right hand side by removing
-#' function calls and replacing them with the string "CALL". See `omit_function_calls`
-#' for more details. The environment of the returned formula is the same as the
-#' environment of the input formula.
+#' function calls and replacing them with the string "CALL". See
+#' `omit_function_calls` for more details. The environment of the returned
+#' formula is the same as the environment of the input formula.
 #'
 #' @param f Two-sided formula
 #'

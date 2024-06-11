@@ -26,7 +26,8 @@
 interpret_intercept <- function(contr_mat) {
   .nlevels <- nrow(contr_mat)
 
-  # Account for polynomial contrasts with dropped trends, resulting in non-square
+  # Account for polynomial contrasts with dropped trends, resulting in
+  # non-square matrices
   if (ncol(contr_mat) < (.nlevels - 1))
     return("grand mean")
   intercept_column <- .contrasts_to_hypotheses(contr_mat, nrow(contr_mat))[,1]

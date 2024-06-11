@@ -109,7 +109,7 @@ test_that("Labelling parsing works", {
                three = factor(c('a','b','c','a')),
                four = factor(c('a','b','c','d')))
 
-  my_labels = c('test1','test2')
+  my_labels <- c('test1','test2')
 
   test_contrasts <-
     enlist_contrasts(tst_data,

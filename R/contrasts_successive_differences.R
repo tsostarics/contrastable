@@ -1,7 +1,7 @@
 #' Forward difference code
 #'
-#' Compares the mean of level k to level k+1. Differs from helmert coding because
-#' it doesn't compare k to mean(k_i, ..., k_n)
+#' Compares the mean of level k to level k+1. Differs from helmert coding
+#' because it doesn't compare k to mean(k_i, ..., k_n)
 #'
 #' Example interpretation for a 4 level factor:
 #' \itemize{
@@ -43,9 +43,9 @@ forward_difference_code <- function(n) {
 
 #' Backward difference code
 #'
-#' Compares the mean of level k to level k-1. Differs from reverse helmert coding
-#' because it doesn't compare k to mean(k_0, ..., k_i-1). Mathematically just
-#' flipping the signs of the matrix from forward difference coding.
+#' Compares the mean of level k to level k-1. Differs from reverse helmert
+#' coding because it doesn't compare k to mean(k_0, ..., k_i-1). Mathematically
+#' just flipping the signs of the matrix from forward difference coding.
 #'
 #' Example interpretation for a 4 level factor:
 #' \itemize{
@@ -73,7 +73,10 @@ forward_difference_code <- function(n) {
 #'
 #' summary(lm(resp ~ grp,
 #'            data = mydf,
-#'            contrasts = enlist_contrasts(mydf, grp ~ backward_difference_code)))
+#'            contrasts = enlist_contrasts(mydf,
+#'                                         grp ~ backward_difference_code)
+#'            )
+#'        )
 backward_difference_code <- function(n) {
   -forward_difference_code(n)
 }

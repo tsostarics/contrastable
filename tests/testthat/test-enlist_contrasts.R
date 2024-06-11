@@ -21,8 +21,8 @@ test_that("Throw error when factor column not found in model data frame", {
 test_that("Setting both reference and intercept simultaneously with + and * works", {
 
   my_df <- mtcars
-  my_df$gear = factor(my_df$gear)
-  my_df$carb = factor(my_df$carb)
+  my_df$gear <-  factor(my_df$gear)
+  my_df$carb <-  factor(my_df$carb)
   expect_equal(
     enlist_contrasts(my_df,
                      gear ~ contr.treatment,

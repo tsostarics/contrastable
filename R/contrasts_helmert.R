@@ -2,8 +2,8 @@
 #'
 #' R's contr.helmert function is unscaled, meaning that you need to scale the
 #' coefficients of a model fit to get the actual comparisons of interest. This
-#' version will automatically scale the contrast matrix such taht the coefficients
-#' are the expected scaled values.
+#' version will automatically scale the contrast matrix such taht the
+#' coefficients are the expected scaled values.
 #'
 #' Helmert coding compares each level to the total mean of all levels
 #' that have come before it. Differs from backward difference coding, which

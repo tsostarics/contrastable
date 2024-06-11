@@ -30,7 +30,8 @@
 #'                          rnorm(2000, 5, 1),
 #'                          rnorm(2000, 7.5, 1),
 #'                          rnorm(2000, 15, 1))) |>
-#'   set_contrasts(grp ~ cumulative_split_code | c("a-rest", "ab-rest", "abc-rest"))
+#'   set_contrasts(grp ~ cumulative_split_code |
+#'                   c("a-rest", "ab-rest", "abc-rest"))
 #'
 #' lm(val ~ grp, data = df)
 #'

@@ -14,7 +14,14 @@
   any_ordered <- any(which_are_ordered)
   if (any_ordered) {
     or_default <- crayon::red(options("contrasts")[[1L]]['ordered'])
-    ordered_names <- crayon::red(paste(names(which_are_ordered)[which_are_ordered], collapse = ' '))
+    ordered_names <-
+      crayon::red(
+        paste(
+          names(which_are_ordered)[which_are_ordered],
+          collapse = ' '
+        )
+      )
+
     message(glue::glue("These factors are ordered, you may lose {or_default}: {ordered_names}"))
   }
 }
@@ -33,7 +40,9 @@
 #' @param attempting_factors Factor column names to check
 #'
 #' @return Warns if factors with only one level are detected.
-.warn_if_onelevel <- function(one_level_factors = NULL, model_data = NULL, attempting_factors = NULL) {
+.warn_if_onelevel <- function(one_level_factors = NULL,
+                              model_data = NULL,
+                              attempting_factors = NULL) {
   if (!is.null(one_level_factors)) {
     # If you try to pass the factor names but the vector is actually empty
     if (identical(one_level_factors, character(0)))
@@ -43,7 +52,7 @@
   } else {
     is_one_level <- vapply(attempting_factors,
                            function(x) nlevels(model_data[[x]]) == 1L,
-                           TRUE)
+                           logical(1))
     # If it turns out there aren't any one level factors
     if (!any(is_one_level))
       return(invisible(1))
@@ -80,11 +89,11 @@
 #'
 #' @return nothing, just sends a message if needed
 .msg_if_remaining_factors <- function(model_data, specified_vars) {
-  which_are_factors <- .cols_where(model_data, is.factor, use.names = TRUE)
-  which_are_ordered <- .cols_where(model_data, is.ordered, use.names = TRUE)
+  which_are_factors  <- .cols_where(model_data,  is.factor,   use.names = TRUE)
+  which_are_ordered  <- .cols_where(model_data,  is.ordered,  use.names = TRUE)
   which_are_onelevel <- .cols_where(model_data, .is.onelevel, use.names = TRUE)
-  which_are_factors <- which_are_factors[!which_are_onelevel]
-  which_are_ordered <- which_are_ordered[!which_are_onelevel]
+  which_are_factors  <- which_are_factors[!which_are_onelevel]
+  which_are_ordered  <- which_are_ordered[!which_are_onelevel]
 
   # Filter named logical vector to be only those where TRUE
   factor_cols <- which_are_factors[which_are_factors]

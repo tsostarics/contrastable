@@ -1,23 +1,23 @@
 #' Glimpse contrasts in dataframe
 #'
-#' Uses the same syntax as `enlist_contrasts` and `set_contrasts`. Returns
-#' a summary table of the contrasts you've set. If you set `return.list` to TRUE
-#' then you can access a list of contrasts in the second element of the resulting
-#' list. The glimpse dataframe is the first element. FALSE will return just
-#' the glimpse data frame.
+#' Uses the same syntax as `enlist_contrasts` and `set_contrasts`. Returns a
+#' summary table of the contrasts you've set. If you set `return.list` to TRUE
+#' then you can access a list of contrasts in the second element of the
+#' resulting list. The glimpse dataframe is the first element. FALSE will return
+#' just the glimpse data frame.
 #'
 #' @param model_data Data to be passed to a model fitting function
 #' @param ... Series of formulas
-#' @param return.list Logical, defaults to FALSE, whether the output of enlist_contrasts should be
-#' returned
+#' @param return.list Logical, defaults to FALSE, whether the output of
+#'   enlist_contrasts should be returned
 #' @param all.factors Logical, defaults to TRUE, whether the factors not
-#' explicitly set with formulas should be included
+#'   explicitly set with formulas should be included
 #' @param add_namespace Logical, defaults to FALSE, whether to append the
-#' namespace of the contrast scheme to the scheme name
-#' @param incl.one.levels Logical, should factors with only one level be included
-#' in the output? Default is FALSE to omit
-#' @param minimal Logical, default TRUE, whether to omit the orthogonal, centered,
-#' dropped_trends, and explicitly_set columns from the output table
+#'   namespace of the contrast scheme to the scheme name
+#' @param incl.one.levels Logical, should factors with only one level be
+#'   included in the output? Default is FALSE to omit
+#' @param minimal Logical, default TRUE, whether to omit the orthogonal,
+#'   centered, dropped_trends, and explicitly_set columns from the output table
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
@@ -39,7 +39,10 @@ glimpse_contrasts <- function(model_data,
   # glimpse_default_factors and return early. If all.factors is FALSE, then
   # we're going to get an error from enlist_contrasts anyways
   if (identical(formulas, list()) && all.factors) {
-    glimpse <- .glimpse_default_factors(model_data, set_factors = c(), incl.one.levels, verbose)
+    glimpse <- .glimpse_default_factors(model_data,
+                                        set_factors = c(),
+                                        incl.one.levels,
+                                        verbose)
 
     if (add_namespace)
       glimpse$scheme <- .add_namespace(glimpse$scheme)
@@ -58,9 +61,10 @@ glimpse_contrasts <- function(model_data,
   params <- lapply(formulas, .make_parameters)
 
   # Ignore explicitly set factors that actually only have one level
-  is_onelevel_factor <- vapply(params,
-                               function(x) nlevels(model_data[[x[["factor_col"]]]]) == 1L,
-                               TRUE)
+  is_onelevel_factor <-
+    vapply(params,
+           function(x) nlevels(model_data[[x[["factor_col"]]]]) == 1L,
+           logical(1))
 
   formulas <- formulas[!is_onelevel_factor]
   params <- params[!is_onelevel_factor]
@@ -72,7 +76,10 @@ glimpse_contrasts <- function(model_data,
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
   reference_levels <- .get_reference_levels(contrast_list, params, formulas)
-  intercept_interpretations <- vapply(contrast_list, interpret_intercept,"char", USE.NAMES = FALSE)
+  intercept_interpretations <- vapply(contrast_list,
+                                      interpret_intercept,
+                                      character(1),
+                                      USE.NAMES = FALSE)
 
   orthogonal_contrasts <- is_orthogonal(contrast_list)
   centered_contrasts <- is_centered(contrast_list)
@@ -97,12 +104,16 @@ glimpse_contrasts <- function(model_data,
 
 
   if (all.factors)
-    glimpse <- rbind(glimpse, .glimpse_default_factors(model_data, set_factors, incl.one.levels, verbose))
+    glimpse <- rbind(glimpse,
+                     .glimpse_default_factors(model_data,
+                                              set_factors,
+                                              incl.one.levels,
+                                              verbose))
 
   if (add_namespace)
     glimpse[['scheme']] <- .add_namespace(glimpse[['scheme']])
 
-  # TODO: Rewrite so that the additional columns are only computed if minimal is FALSE
+  # TODO: Rewrite so that the additional columns are only computed if FALSE
   if (minimal) {
     glimpse <- glimpse[,c("factor",
                           "n",
@@ -148,19 +159,20 @@ glimpse_contrasts <- function(model_data,
 
 #' Glimpse default factors
 #'
-#' Given a dataframe with some factor columns and a character vector of
-#' which columns you've already set yourself, look at all the other
-#' factor columns and get a glimpse at how they're treated by the defaults
-#' specified in `options('contrasts')`. Reference level is assumed to be the
-#' first level for unordered factors and nonexistent for ordered factors.
+#' Given a dataframe with some factor columns and a character vector of which
+#' columns you've already set yourself, look at all the other factor columns and
+#' get a glimpse at how they're treated by the defaults specified in
+#' `options('contrasts')`. Reference level is assumed to be the first level for
+#' unordered factors and nonexistent for ordered factors.
 #'
 #' @param model_data Dataframe
 #' @param set_factors Explicitly set columns to ignore
-#' @param incl.one.levels Should factor columns with only 1 level be included? Default FALSE
+#' @param incl.one.levels Should factor columns with only 1 level be included?
+#'   Default FALSE
 #' @param verbose Defaults to FALSE, should messages and warnings be printed?
 #'
 #' @return A table with information about the contrasts for all remaining factor
-#' columns
+#'   columns
 .glimpse_default_factors <- function(model_data,
                                      set_factors = NULL,
                                      incl.one.levels = FALSE,
@@ -199,7 +211,10 @@ glimpse_contrasts <- function(model_data,
   reference_levels <- .get_reference_levels(default_contrasts)
 
   # Interpret each contrast matrix, then check if they're orthogonal or centered
-  intercept_interpretations <- vapply(default_contrasts, interpret_intercept, character(1), USE.NAMES = FALSE)
+  intercept_interpretations <- vapply(default_contrasts,
+                                      interpret_intercept,
+                                      character(1),
+                                      USE.NAMES = FALSE)
   orthogonal_contrasts <- is_orthogonal(default_contrasts)
   centered_contrasts   <- is_centered(default_contrasts)
 
@@ -220,7 +235,11 @@ glimpse_contrasts <- function(model_data,
 
   # If we want to show the one-level factors, add those rows in
   if (incl.one.levels)
-    glimpse <- rbind(glimpse, .make_placeholder_glimpse(model_data, fct_info[["one_level_factors"]]))
+    glimpse <- rbind(glimpse,
+                     .make_placeholder_glimpse(model_data,
+                                               fct_info[["one_level_factors"]])
+    )
+
 
   glimpse
 }
@@ -241,7 +260,7 @@ glimpse_contrasts <- function(model_data,
                         function(x) levels(model_data[[x]]))
 
   tibble::tibble("factor"         = one_level_factors,
-                 "n"       = 1L,
+                 "n"              = 1L,
                  "level_names"    = level_names,
                  "scheme"         = NA_character_,
                  "reference"      = NA_character_,
@@ -257,7 +276,8 @@ glimpse_contrasts <- function(model_data,
   # which ones have been explicitly set given `set_factors`
   all_factors <- .cols_where(model_data, is.factor, return.names = TRUE)
   unset_factors <- all_factors[!all_factors %in% set_factors]
-  is_ordered_factor <- unset_factors %in% .cols_where(model_data, is.ordered, return.names = TRUE)
+  is_ordered_factor <-
+    unset_factors %in% .cols_where(model_data, is.ordered, return.names = TRUE)
   names(is_ordered_factor) <- unset_factors
 
   # Filter out any factors that only have 1 level to avoid undefined contrasts
@@ -280,20 +300,24 @@ glimpse_contrasts <- function(model_data,
 #' Warn user if nondefault contrasts are set
 #'
 #' R automatically assigns specific contrast schemes to ordered and unordered
-#' factors as specified in `options('contrasts')` but users are of course
-#' free to set these on the factor themselves. But, if they do this outside
-#' of a call to `glimpse_contrasts` it's hard and time consuming to check what they
-#' set against the different possible common schemes. So, rather than checking
-#' all possible combinations, this will only check against the defaults R already
+#' factors as specified in `options('contrasts')` but users are of course free
+#' to set these on the factor themselves. But, if they do this outside of a call
+#' to `glimpse_contrasts` it's hard and time consuming to check what they set
+#' against the different possible common schemes. So, rather than checking all
+#' possible combinations, this will only check against the defaults R already
 #' uses and alert the user if something else is set.
 #'
-#' @param contrast_list List of contrasts like that generated by `enlist_contrasts`
+#' @param contrast_list List of contrasts like that generated by
+#'   `enlist_contrasts`
 #' @param factor_names Names of the factors, also the names of the contrast list
 #' @param factor_sizes Number of levels for each factor
 #' @param which_ordered Which of the factors are ordered
 #'
 #' @return Warns if non default contrasts are set
-.warn_if_nondefault <- function(contrast_list, factor_names, factor_sizes, which_ordered) {
+.warn_if_nondefault <- function(contrast_list,
+                                factor_names,
+                                factor_sizes,
+                                which_ordered) {
   indices <- seq_along(factor_sizes)
   factor_sizes <- unname(factor_sizes)
   ord_fx <- str2lang(options('contrasts')[[1]][["ordered"]])
@@ -320,9 +344,13 @@ glimpse_contrasts <- function(model_data,
   ord_str <- crayon::red(as.character(ord_fx))
   names(which_ordered) <- factor_names
   nondefaults <- vapply(factor_names[!same_as_default],
-                        function(x)
-                          ifelse(which_ordered[x], crayon::red(x), crayon::blue(x)),
-                        "char")
+                        function(x) {
+                          if (which_ordered[x])
+                            return(crayon::red(x))
+
+                          crayon::blue(x)
+                        },
+                        character(1))
   nondefaults <- paste(paste(" - ", nondefaults, sep = ""), collapse = "\n")
 
   warning(glue::glue("Unset factors do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.
@@ -345,7 +373,7 @@ glimpse_contrasts <- function(model_data,
 
 .get_scheme_labels <- function(params, formulas) {
   vapply(seq_along(params), \(i) {
-    scheme <- deparse1(params[[i]][["code_by"]]) # code_by param is a symbol or NA
+    scheme <- deparse1(params[[i]][["code_by"]]) # code_by param is a sym or NA
     # If it's a matrix call then it's taken to be custom contrasts
     if (grepl("^matrix\\(", scheme))
       return("custom")
@@ -383,40 +411,44 @@ glimpse_contrasts <- function(model_data,
 #' Get reference levels from a (possibly set) list of contrasts
 #'
 #' Given a list of contrast matrices, if the contrast matrices were explicitly
-#' generated via formulas and they have already had their parameters parsed,
-#' use the parameters to look up the reference level for each contrast matrix.
-#' If the parameters have not been computed (usually because the contrasts are
+#' generated via formulas and they have already had their parameters parsed, use
+#' the parameters to look up the reference level for each contrast matrix. If
+#' the parameters have not been computed (usually because the contrasts are
 #' using the defaults) then look up the reference level manually.
 #'
 #'
 #' @param contrast_list List of contrasts, does not need to be named
 #' @param params Optional list of parameters from `.make_parameters()`, if NULL,
-#' then the reference level is determined from the contrast matrix directly.
-#' @param formulas Optional list of formulas, needed if `params` are passed. Used
-#' to get the correct environment for evaluating expressions in `params`. If NULL,
-#' then the reference level is determiend from the contrast matrix directly.
+#'   then the reference level is determined from the contrast matrix directly.
+#' @param formulas Optional list of formulas, needed if `params` are passed.
+#'   Used to get the correct environment for evaluating expressions in `params`.
+#'   If NULL, then the reference level is determiend from the contrast matrix
+#'   directly.
 #'
 #' @return Character vector of reference levels. If a contrast matrix is not
-#' specified for row names, the character value will denote the integer index
-#' of the row for the reference level (usually 1).
+#'   specified for row names, the character value will denote the integer index
+#'   of the row for the reference level (usually 1).
 .get_reference_levels <- function(contrast_list, params=NULL, formulas=NULL) {
   if (!is.null(params) && !is.null(formulas)) {
-    reference_levels <- vapply(seq_along(params),
-                               function(i){
-                                 ref_level <- params[[i]][["reference_level"]]
+    reference_levels <-
+      vapply(seq_along(params),
+             function(i){
+               ref_level <- params[[i]][["reference_level"]]
 
-                                 if (!is.symbol(ref_level) && is.na(ref_level))
-                                   return(NA_character_)
+               if (!is.symbol(ref_level) && is.na(ref_level))
+                 return(NA_character_)
 
-                                 # Will evaluate variables and syntactic literals accordingly
-                                 as.character(eval(ref_level, rlang::get_env(formulas[[i]])))
-                               },
-                               character(1))
+               # Will evaluate variables and syntactic literals accordingly
+               as.character(eval(ref_level, rlang::get_env(formulas[[i]])))
+             },
+             character(1))
   } else {
     reference_levels <- rep(NA_character_, length(contrast_list))
-    # If a reference level wasn't specified, try to figure it out from the matrix
+    # If a reference level wasn't specified, try to figure it out from the
+    # matrix
     for (i in seq_along(reference_levels)) {
-      is_contrast_matrix <- diff(dim(contrast_list[[i]])) == -1 # Dont bother with contr.poly - x:y
+      # Dont bother with contr.poly - x:y
+      is_contrast_matrix <- diff(dim(contrast_list[[i]])) == -1
       if (is.na(reference_levels[i]) &&  is_contrast_matrix) {
         reference_index <- .get_reference_level(contrast_list[[i]])
         if (!is.na(reference_index))

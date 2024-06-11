@@ -3,15 +3,19 @@
 #' Reorders the rows of a contrast matrix to properly set the reference level
 #'
 #' @param contrast_matrix An unlabeled contrast matrix
-#' @param old_reference The previously specified reference level, usually the default
-#' for the scheme found by `.get_reference_level`
+#' @param old_reference The previously specified reference level, usually the
+#'   default for the scheme found by `.get_reference_level`
 #' @param new_reference The index of the row to use as the new reference level
 #'
-#' @return A matrix with the reordered rows and correct values for the reference level
+#' @return A matrix with the reordered rows and correct values for the reference
+#'   level
 #' @export
-.switch_reference_level <- function(contrast_matrix, old_reference, new_reference){
+.switch_reference_level <- function(contrast_matrix,
+                                    old_reference,
+                                    new_reference){
 
-  # If the new reference is invalid or equal to the old reference, return the original matrix
+  # If the new reference is invalid or equal to the old reference, return the
+  # original matrix
   if (is.na(new_reference) | new_reference == old_reference)
     return(contrast_matrix)
 
@@ -30,9 +34,11 @@
                             1L,
                             comparison_order[comparison_order >= old_reference])
     } else if (new_reference > old_reference) {
-      comparison_order <- c(comparison_order[comparison_order < old_reference],
-                            new_reference - 1,
-                            comparison_order[comparison_order >= old_reference & comparison_order != (new_reference-1)])
+      comparison_order <-
+        c(comparison_order[comparison_order < old_reference],
+          new_reference - 1,
+          comparison_order[comparison_order >= old_reference &
+                             comparison_order != (new_reference-1)])
     } else if (new_reference < old_reference) {
       comparison_order <- c(new_reference,
                             comparison_order[comparison_order != new_reference])
@@ -44,8 +50,11 @@
   as.matrix(contrast_matrix[,comparison_order])
 }
 
-.switch_reference_if_needed <- function(cmat, new_reference_label = NA, new_reference_index) {
-  if (!is.na(new_reference_label)  && identical(new_reference_index, integer(0)))
+.switch_reference_if_needed <- function(cmat,
+                                        new_reference_label = NA,
+                                        new_reference_index) {
+  if (!is.na(new_reference_label)  &&
+      identical(new_reference_index, integer(0)))
     stop("Reference level not found in factor levels")
 
   default_reference_index <- .get_reference_level(cmat)

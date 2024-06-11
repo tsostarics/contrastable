@@ -21,12 +21,13 @@
 #' the intercept is changed to the grand mean instead of the mean of grp1.
 #'
 #' IMPORTANT: This coding scheme is NOT the same as contr.sum/2 when the number
-#' of levels is GREATER than 2. When k=2, estimates with contr.sum can be interpreted
-#' as "half the distance between levels" but when k>2, contr.sum is to be interpreted
-#' as "the distance between this level and the GRAND MEAN". You may be tempted
-#' to use contr.sum(k)/2, but this tests the hypothesis that 3/2 times the mean
-#' of a level is equal to half the sum of the means of the other levels, i.e.,
-#' 1.5mu1 - .5mu2 - .5mu3 - .5mu4 = 0. I'm not sure when this would be useful.
+#' of levels is GREATER than 2. When k=2, estimates with contr.sum can be
+#' interpreted as "half the distance between levels" but when k>2, contr.sum is
+#' to be interpreted as "the distance between this level and the GRAND MEAN".
+#' You may be tempted to use contr.sum(k)/2, but this tests the hypothesis that
+#' 3/2 times the mean of a level is equal to half the sum of the means of the
+#' other levels, i.e., 1.5mu1 - .5mu2 - .5mu3 - .5mu4 = 0. I'm not sure when
+#' this would be useful.
 #'
 #' @param n number of levels for this factor
 #'
@@ -37,7 +38,8 @@
 #' scaled_sum_code(4)
 #' contr.sum(4)
 #'
-#' # Here they happen to be equivalent (well, aside from the reference level contr.sum uses)
+#' # Here they happen to be equivalent (well, aside from the reference level
+#' # contr.sum uses)
 #' scaled_sum_code(2)
 #' contr.sum(2)/2
 #'

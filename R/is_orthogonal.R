@@ -1,7 +1,8 @@
 #' Check for orthogonality
 #'
-#' Given a contrast matrix or list of contrast matrices (eg from `enlist_contrasts`),
-#' return a logical vector of whether each contrast is orthogonal or not.
+#' Given a contrast matrix or list of contrast matrices (eg from
+#' `enlist_contrasts`), return a logical vector of whether each contrast is
+#' orthogonal or not.
 #'
 #' @param .contrasts Contrast matrix or list of contrast matrices
 #' @param USE.NAMES  Logical, whether vector should be named
@@ -20,7 +21,8 @@ is_orthogonal <- function(.contrasts, USE.NAMES = FALSE) {
            cor_lower <- cor_mat[lower.tri(cor_mat)] == 0
 
            # 2 level factor contrasts return logical(0)s
-           if (identical(cor_upper, logical(0)) || identical(cor_lower, logical(0)))
+           if (identical(cor_upper, logical(0)) ||
+               identical(cor_lower, logical(0)))
              return(NA)
 
            all(c(cor_upper, cor_lower))
