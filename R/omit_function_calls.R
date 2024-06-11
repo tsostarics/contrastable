@@ -21,7 +21,7 @@
 #'   varname ~
 #'   matrix(c(1,2,3),
 #'          nrow = 3,
-#'          ncol = 1) + 1 * get_whatever(asd = 2) |
+#'          ncol = 1) + 1 * get_whatever(param = 2) |
 #'   c('one', 'two', 'three')
 #'
 #' # Returns `CALL() + 1 * CALL() | CALL()`
@@ -31,24 +31,24 @@
   # to do some pruning or recursion on the arguments
   if(is.call(rhs_node) && is.language(rhs_node)) {
 
-    # If the function call is an operator and we've already encountered one
-    # before, then we can throw an error that we can only use the operator once
-    if(.is_reserved_operator(rhs_node[[1]])) {
+    # If the function call is an operator that we've already encountered before,
+    # then we can throw an error that we can only use the operator once
+    if(.is_reserved_operator(rhs_node[[1L]])) {
       for (mother in mothers){
-        if (identical(rhs_node[[1]], mother))
+        if (identical(rhs_node[[1L]], mother))
           stop("You may only use +, -, and * once")
       }
 
       # If we haven't encountered this operator before, we need to recurse
       # through the arguments
-      for (i in seq_along(rhs_node)[-1]) {
+      for (i in seq_along(rhs_node)[-1L]) {
         rhs_node[[i]] <- .omit_function_calls(rhs_node[[i]], c(mothers, rhs_node[[1]]))
       }
     } else {
       # If the function call is not an operator, replace it with the string "CALL"
       # and remove any arguments to the function call from the formula
-      rhs_node[[1]] <- quote(CALL)
-      rhs_node[seq_along(rhs_node)[-1]] <- NULL
+      rhs_node[[1L]] <- quote(CALL)
+      rhs_node[seq_along(rhs_node)[-1L]] <- NULL
     }
   }
 
@@ -74,13 +74,13 @@
 #'   varname ~
 #'   matrix(c(1,2,3),
 #'          nrow = 3,
-#'          ncol = 1) + 1 * get_whatever(asd = 2) |
+#'          ncol = 1) + 1 * get_whatever(param = 2) |
 #'   c('one', 'two', 'three')
 #'
 #'  # Returns `varname ~ CALL() + 1 * CALL() | CALL()`
 #' .simplify_formula(my_formula)
 .simplify_formula <- function(f) {
-  if (length(f) != 3)
+  if (length(f) != 3L)
     stop("Formula must be two-sided")
   rhs <- rlang::f_rhs(f)
   lhs <- rlang::f_lhs(f)

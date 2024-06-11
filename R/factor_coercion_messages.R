@@ -96,7 +96,6 @@
     # Lookup default contrasts and color code accordingly
     uo_default <- crayon::blue(options("contrasts")[[1L]]['unordered'])
     or_default <- crayon::red(options("contrasts")[[1L]]['ordered'])
-    default_contrasts <- paste(c(uo_default, or_default), collapse = " or ")
     varnames <-
       paste(
         vapply(names(remaining_factors),
@@ -104,8 +103,8 @@
                  ifelse(which_are_ordered[x],
                         crayon::red(x),
                         crayon::blue(x)),
-               "char"),
+               character(1)),
         collapse = " ")
-    message(glue::glue("Expect {default_contrasts} for unset factors: {varnames}"))
+    message(glue::glue("Expect {uo_default} or {or_default} for unset factors: {varnames}"))
   }
 }

@@ -18,7 +18,7 @@
     use.names <- TRUE
   cols <- vapply(cnames,
                  function(x) fx(model_data[[x]]),
-                 FUN.VALUE = TRUE,
+                 FUN.VALUE = logical(1),
                  USE.NAMES = use.names)
   if (return.names)
     return(cnames[cols])

@@ -45,15 +45,29 @@
   as.matrix(contrast_matrix[,comparison_order])
 }
 
-.get_reference_level <- function(cmat) {
-  # Inverse matrix
-  inv_matrix <- solve(.contrasts_to_hypotheses(cmat))
+.switch_reference_if_needed <- function(cmat,
+                                        coding_fx,
+                                        reference_level = NA,
+                                        default_reference,
+                                        new_reference) {
 
-  # if (all((cmat - stats::contr.helmert(nrow(cmat)) < 1e-10)))
-  #   return(NA_integer_)
+  if (!is.na(reference_level) && identical(new_reference, integer(0)))
+    stop("Reference level not found in factor levels")
 
-  inverse_matrix_result <- find_same_col(inv_matrix)
-  inverse_matrix_result
+  if (is.na(default_reference)) {
+    if (!is.na(reference_level))
+      warning("Ignoring reference level for scheme lacking a singular reference")
+  } else {
+
+    if (identical(new_reference, integer(0)))
+      new_reference <- 1L
+    cmat <- .switch_reference_level(cmat,
+                                    coding_fx,
+                                    default_reference,
+                                    new_reference)
+  }
+
+  cmat
 }
 
 .is_unscaled <- function(cmat) {
