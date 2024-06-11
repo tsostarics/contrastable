@@ -27,8 +27,10 @@ test_that("Warning if one level factor works", {
   tstdf <- data.frame(a = 1:5,
              b = factor("a"))
 
-  expect_error(suppressWarnings(enlist_contrasts(tstdf, b ~ sum_code)), regexp = "No factors with more")
-  expect_warning(enlist_contrasts(tstdf, b ~ treatment_code, a ~ treatment_code), regexp = "only one level")
+  expect_error(suppressWarnings(enlist_contrasts(tstdf, b ~ sum_code)),
+               regexp = "No factors with more")
+  expect_warning(enlist_contrasts(tstdf, b ~ treatment_code, a ~ treatment_code, verbose=FALSE),
+                 regexp = "only one level")
 })
 
 test_that("Warning if one level works with different parameters", {

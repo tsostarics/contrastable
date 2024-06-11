@@ -166,3 +166,10 @@ test_that("setting contrasts with external list works", {
 test_that('error when no formula provided', {
   expect_error(enlist_contrasts(mtcars), regexp = "No contrast formulas provided")
 })
+
+test_that("Warnings when reference level is attempted to be changed work properly", {
+  expect_error(enlist_contrasts(mtcars, cyl ~ helmert_code + "a",verbose = FALSE),
+                 regexp = "Reference level not found")
+  expect_warning(enlist_contrasts(mtcars, cyl ~ helmert_code + 6,verbose = FALSE),
+                 regexp = "Ignoring reference level")
+})
