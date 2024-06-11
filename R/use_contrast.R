@@ -40,6 +40,8 @@ use_contrasts <- function(factor_col, code_by = NA, reference_level=NA, set_inte
 #' @param drop_trends The trends to drop, default NA
 #'
 #' @return A contrast coding matrix with labels and proper reference level
+#' @method use_contrasts symbol
+#' @export
 use_contrasts.symbol <- function(factor_col, code_by= NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
   code_by <- get(code_by)
   UseMethod('use_contrasts', code_by)
@@ -60,6 +62,7 @@ use_contrasts.symbol <- function(factor_col, code_by= NA, reference_level=NA, se
 #' @param ... Additional arguments to be passed to `code_by()`
 #'
 #' @return A contrast coding matrix with labels and proper reference level
+#' @method use_contrasts array
 #' @export
 use_contrasts.array <- function(factor_col, code_by= NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
   use_contrasts.matrix(factor_col, code_by, reference_level, set_intercept, drop_trends, labels, as_is, ...)
@@ -80,6 +83,7 @@ use_contrasts.array <- function(factor_col, code_by= NA, reference_level=NA, set
 #' @param ... Additional arguments to be passed to `code_by()`
 #'
 #' @return A contrast coding matrix with labels and proper reference level
+#' @method use_contrasts function
 #' @export
 use_contrasts.function <- function(factor_col, code_by = NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
   # Extract labels to use for contrast matrix
@@ -153,6 +157,8 @@ use_contrasts.function <- function(factor_col, code_by = NA, reference_level=NA,
 #' @param drop_trends Not used
 #'
 #' @return A contrast coding matrix with labels and proper reference level
+#' @method use_contrasts matrix
+#' @export
 use_contrasts.matrix <- function(factor_col, code_by = NA, reference_level=NA, set_intercept = NA, drop_trends = NA, labels=NULL, as_is=FALSE, ...) {
   if (any(is.na(code_by)) & length(levels(factor_col)) > 2) {
     stop("This factor has more than 2 levels, please provide a matrix.")
@@ -297,3 +303,53 @@ use_contrasts.hypr <- function(factor_col, code_by = NA, reference_level=NA, set
 
   contrast_matrix
 }
+
+
+
+
+# Extract parameters to coding function call from user-supplied dots
+.bundle_params <- function(factor_col, ...) {
+  n <- nlevels(factor_col)
+  other_args <- rlang::dots_list(...)[['other']]
+  if ('n' %in% names(other_args)) {
+    if (n != other_args[['n']])
+      warning("Number of factor levels does not match `n` specified in function call, using number of factor levels")
+    other_args[['n']] <- NULL
+  }
+
+  params <- list(n = n)
+  if (length(other_args) != 0)
+    params <- c(params, other_args)
+
+  params
+}
+
+.get_dimnames <- function(factor_col) {
+  labels <- dimnames(stats::contrasts(factor_col))
+  if (is.null(labels[[1L]]))
+    labels[[1L]] <- levels(factor_col)
+  if (is.null(labels[[2L]]))
+    labels[[2L]] <- levels(factor_col)[-1L]
+  labels
+}
+
+.set_intercept <- function(contrast_matrix, intercept_level) {
+  if (!intercept_level %in% rownames(contrast_matrix))
+    stop("Specified level to use as intercept not found in factor level names")
+
+  n <- nrow(contrast_matrix)
+  # Add back the missing intercept, solve the transpose for hypothesis matrix
+  hypothesis_matrix <- .contrasts_to_hypotheses(contrast_matrix, n)
+
+  intercept_column <- rep(0, n)
+  intercept_index <- which(rownames(contrast_matrix) == intercept_level)
+  intercept_column[intercept_index] <- 1
+  hypothesis_matrix[,1] <- intercept_column
+
+  # Resolve the new hypothesis matrix and remove intercept column for contrasts
+  new_contrasts <- .hypotheses_to_contrasts(hypothesis_matrix)
+  dimnames(new_contrasts) <- dimnames(contrast_matrix)
+  new_contrasts
+}
+
+
