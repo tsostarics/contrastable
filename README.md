@@ -25,6 +25,60 @@ You can install the development version from
 devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 ```
 
+## Citation
+
+To cite contrastable in publications, please use
+
+Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
+package version 0.1.0.
+
+A BibTeX entry for LaTeX users is
+
+      @Manual{,
+        author = {Thomas Sostarics},
+        title = {{contrastable}: Contrast Coding Utilities in {R}},
+        year = {2024},
+        url = {https://github.com/tsostarics/contrastable},
+      }
+
+In-text citations should reference the package and ideally which
+contrast functions were used to avoid ambiguity.
+
+BAD: “We sum code our variables (Sostarics 2024)”
+
+GOOD: “We use the `sum_code()` function from the contrastable package
+(Sostarics 2024) for our variables.”
+
+BETTER: “We use the `sum_code()` function from the contrastable package
+(Sostarics 2024) for our variables.”
+
+Other examples:
+
+- Contrasts were set using the `scaled_sum_code()` function from the
+  contrastable package (Sostarics 2024).
+- We use the contrastable package (Sostarics 2024) for contrast coding
+  our categorical variables; details of the contrasts for each model are
+  provided in the appendix. (be sure to do the latter!)
+- Below are the contrast matrices returned by the `helmert_code()` and
+  `scaled_sum_code()` functions from the contrastable R package
+  (Sostarics 2024)
+- We use the `set_contrasts()` and `sum_code()` functions from the
+  contrastable package (Sostarics 2024) to sum code (+1/-1) our
+  variables
+
+I also recommend writing out, potentially in a footnote, what the
+comparisons are.
+
+GOOD: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024).”
+
+BETTER: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024). This contrast scheme encodes differences between each
+comparison level and the grand mean.”
+
+The latter sentence can get long when describing multple different
+contrast schemes. You could consider putting them in a footnote.
+
 # Example
 
 Here is a simple example showing how to set particular factors to a
