@@ -8,7 +8,7 @@ Maintainer: Thomas Sostarics <tsostarics@gmail.com>
 Description: A package to easily set contrasts for factor variables
     in regression analyses. Provide common and consistent scheme
     names to use for contrast coding that "just works."
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 

@@ -32,15 +32,17 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
-package version 0.1.0.
+package version 0.2.0.
 
 A BibTeX entry for LaTeX users is
 
-      @Manual{,
+    @Manual{,
         author = {Thomas Sostarics},
         title = {{contrastable}: Contrast Coding Utilities in {R}},
         year = {2024},
+        note = {R package version 0.2.0},
         url = {https://github.com/tsostarics/contrastable},
+        doi = {10.5281/zenodo.11869427},
       }
 
 In-text citations should reference the package and ideally which
