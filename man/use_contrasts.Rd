@@ -26,13 +26,14 @@ use_contrasts(
 
 \item{drop_trends}{Whether to drop trends, default NA}
 
-\item{labels}{Labels to use in the contrast matrix, must equal number of contrasts}
+\item{labels}{Labels to use in the contrast matrix, must equal number of
+contrasts}
 
 \item{as_is}{Logical, default FALSE, whether to suppress auto switching of
 the reference level to the first level if not specified}
 
-\item{...}{Additional arguments to be passed to use_contrast_function, specifically,
-which level you want the reference level to be}
+\item{...}{Additional arguments to be passed to use_contrast_function,
+specifically, which level you want the reference level to be}
 }
 \value{
 A contrast coding matrix with labels and proper reference level
@@ -40,9 +41,9 @@ A contrast coding matrix with labels and proper reference level
 \description{
 Helper to do contrast coding. There are two options:
 \itemize{
-\item Manually specify a matrix for code_by (implements use_contrast_matrix). Reference level
-is automatically set to the row that's always negative.
-\item Specify a style of contrast coding as a function (implements use_contrast_function).
-Label of the reference level should be specified in ...
+\item Manually specify a matrix for code_by (implements use_contrast_matrix).
+Reference level is automatically set to the row that's always negative.
+\item Specify a style of contrast coding as a function. Label of the reference
+level should be specified in ...
 }
 }

@@ -14,18 +14,19 @@ Returns a two-sided formula with the right hand side simplified
 }
 \description{
 This function takes a formula and simplifies the right hand side by removing
-function calls and replacing them with the string "CALL". See \code{omit_function_calls}
-for more details. The environment of the returned formula is the same as the
-environment of the input formula.
+function calls and replacing them with the string "CALL". See
+\code{omit_function_calls} for more details. The environment of the returned
+formula is the same as the environment of the input formula.
 }
 \examples{
 my_formula <-
   varname ~
-  matrix(c(1,2,3),
-         nrow = 3,
-         ncol = 1) + 1 * get_whatever(asd = 2) |
-  c('one', 'two', 'three')
+  matrix(c(1, 2, 3),
+    nrow = 3,
+    ncol = 1
+  ) + 1 * get_whatever(param = 2) |
+    c("one", "two", "three")
 
- # Returns `varname ~ CALL() + 1 * CALL() | CALL()`
+# Returns `varname ~ CALL() + 1 * CALL() | CALL()`
 .simplify_formula(my_formula)
 }

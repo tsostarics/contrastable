@@ -25,6 +25,54 @@ You can install the development version from
 devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 ```
 
+## Citation
+
+To cite contrastable in publications, please use
+
+Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
+package version 0.1.0.
+
+A BibTeX entry for LaTeX users is
+
+      @Manual{,
+        author = {Thomas Sostarics},
+        title = {{contrastable}: Contrast Coding Utilities in {R}},
+        year = {2024},
+        url = {https://github.com/tsostarics/contrastable},
+      }
+
+In-text citations should reference the package and ideally which
+contrast functions were used to avoid ambiguity.
+
+BAD: “We sum code our variables (Sostarics 2024)”
+
+GOOD: “We use the `sum_code()` function from the contrastable package
+(Sostarics 2024) for our variables.”
+
+Other examples:
+
+- Contrasts were set using the `scaled_sum_code()` function from the
+  contrastable package (Sostarics 2024).
+- We use the contrastable package (Sostarics 2024) for contrast coding
+  our categorical variables; details of the contrasts for each model are
+  provided in the appendix. (be sure to do the latter!)
+- Below are the contrast matrices returned by the `helmert_code()` and
+  `scaled_sum_code()` functions from the contrastable R package
+  (Sostarics 2024)
+- We use the `set_contrasts()` and `sum_code()` functions from the
+  contrastable package (Sostarics 2024) to sum code (+1/-1) our
+  variables
+
+I also recommend writing out, potentially in a footnote, what the
+comparisons are.
+
+GOOD: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024).”
+
+BETTER: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024). This contrast scheme encodes differences between each
+comparison level and the grand mean.”
+
 # Example
 
 Here is a simple example showing how to set particular factors to a
@@ -44,9 +92,10 @@ diagnostics about the scheme we have set.
 # Set reference level with + and intercept with *
 contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
                          carb ~ helmert_code,
-                         vs   ~ sum_code + 1)
+                         vs   ~ treatment_code + 1)
 
 # Get information about our contrasts, even those we didn't explicitly set
+# (gear is ordered, and so uses contr.poly by default)
 glimpse_contrasts(my_data, 
                   contrast_schemes, 
                   add_namespace = TRUE,
@@ -54,12 +103,12 @@ glimpse_contrasts(my_data,
   knitr::kable()
 ```
 
-| factor |   n | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
-|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
-| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean | TRUE       | TRUE     | NA             | TRUE           |
-| vs     |   2 | 0, 1             | contrastable::sum_code        | 1         | grand mean | NA         | TRUE     | NA             | TRUE           |
-| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
+| factor |   n | level_names      | scheme                        | reference | intercept  |
+|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|
+| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean |
+| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean |
+| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    |
+| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
@@ -85,9 +134,9 @@ enlist_contrasts(mtcars, contrast_schemes)
 #> 8  0.0  0.0000000  0.00  0.0  0.8333333
 #> 
 #> $vs
-#>    0
-#> 0  1
-#> 1 -1
+#>   0
+#> 0 1
+#> 1 0
 ```
 
 `set_contrasts` can be used to set the contrasts onto the dataframe

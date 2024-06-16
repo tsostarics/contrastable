@@ -24,17 +24,21 @@
   simplified_formula <- .simplify_formula(formula)
   simplified_formula_string <- deparse1(simplified_formula)
 
-  if (grepl("[|][^*+-]+[*+-]", simplified_formula_string))
+  if (grepl("[|][^*+-]+[*+-]", simplified_formula_string)) {
     stop("If using labels, | must be the last operator in the formula")
+  }
 
-  if (grepl("[*+-][^~]+~",simplified_formula_string))
+  if (grepl("[*+-][^~]+~", simplified_formula_string)) {
     stop("Formula must have 1 variable name on left hand side.")
+  }
 
-  if (grepl("([|+*-]).+(\\1)", simplified_formula_string))
+  if (grepl("([|+*-]).+(\\1)", simplified_formula_string)) {
     stop("You may only use +, *, -, and | once")
+  }
 
-  if (grepl(" ~ ([|+*-]|\\d)", simplified_formula_string))
+  if (grepl(" ~ ([|+*-]|\\d)", simplified_formula_string)) {
     stop("First term in right hand side must be a symbol or function call")
+  }
 
   return(invisible(TRUE))
 }

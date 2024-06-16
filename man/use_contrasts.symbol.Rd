@@ -4,7 +4,7 @@
 \alias{use_contrasts.symbol}
 \title{Symbol handler for use_contrasts}
 \usage{
-use_contrasts.symbol(
+\method{use_contrasts}{symbol}(
   factor_col,
   code_by = NA,
   reference_level = NA,

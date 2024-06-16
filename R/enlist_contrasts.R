@@ -2,16 +2,18 @@
 #'
 #' Returns a list of contrast matrices to use with modeling functions directly.
 #'
-#' Typically model functions like lm will have a contrasts argument where you can
-#' set the contrasts at model run time, rather than having to manually change
-#' the contrasts on the underlying factor columns in your data. If you prefer
-#' this way, you can use this to generate the named list of contrast matrices.
+#' Typically model functions like lm will have a contrasts argument where you
+#' can set the contrasts at model run time, rather than having to manually
+#' change the contrasts on the underlying factor columns in your data. If you
+#' prefer this way, you can use this to generate the named list of contrast
+#' matrices.
 #'
 #'
 #' @param model_data Data frame you intend on passing to your model
 #' @param ... A series of 2 sided formulas with factor name on the LHS and
-#' desired contrast scheme on the RHS, reference levels can be set with + and the
-#' intercept can be overwritten with * (+ should come first if both are set)
+#'   desired contrast scheme on the RHS, reference levels can be set with + and
+#'   the intercept can be overwritten with * (+ should come first if both are
+#'   set)
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
 #' @return List of named contrast matrices
@@ -19,79 +21,110 @@
 #'
 #' @examples
 #' my_df <- mtcars
-#' my_df$gear = factor(my_df$gear)
-#' my_df$carb = factor(my_df$carb)
+#' my_df$gear <- factor(my_df$gear)
+#' my_df$carb <- factor(my_df$carb)
 #'
 #' # Use formulas where left hand side is the factor column name
 #' # and the right hand side is the contrast scheme you want to use
-#' enlist_contrasts(my_df,
-#'     gear ~ scaled_sum_code, # Using helpers from this package
-#'     carb ~ helmert_code)
+#' enlist_contrasts(
+#'   my_df,
+#'   gear ~ scaled_sum_code, # Using helpers from this package
+#'   carb ~ helmert_code
+#' )
 #'
 #' # Add reference levels with +
-#' enlist_contrasts(my_df,
-#'     gear ~ scaled_sum_code + 5,
-#'     carb ~ contr.sum + 6)
+#' enlist_contrasts(
+#'   my_df,
+#'   gear ~ scaled_sum_code + 5,
+#'   carb ~ contr.sum + 6
+#' )
 #' # Manually specifying matrix also works
-#' enlist_contrasts(my_df,
-#'     gear ~ matrix(c(1,-1,0,0,-1,1), nrow = 3),
-#'     carb ~ forward_difference_code)
+#' enlist_contrasts(
+#'   my_df,
+#'   gear ~ matrix(c(1, -1, 0, 0, -1, 1), nrow = 3),
+#'   carb ~ forward_difference_code
+#' )
 #'
 #' # User matrices can be assigned to a variable first, but this may make the
 #' # comparison labels confusing. You should rename them manually to something
 #' # that makes sense. This will invoke use_contrast_matrix, so reference levels
 #' # specified with + will be ignored.
-#' my_gear_contrasts <- matrix(c(1,-1,0,0,-1,1), nrow = 3)
+#' my_gear_contrasts <- matrix(c(1, -1, 0, 0, -1, 1), nrow = 3)
 #' colnames(my_gear_contrasts) <- c("CMP1", "CMP2")
-#' enlist_contrasts(my_df,
-#'     gear ~ my_gear_contrasts,
-#'     carb ~ forward_difference_code)
+#' enlist_contrasts(
+#'   my_df,
+#'   gear ~ my_gear_contrasts,
+#'   carb ~ forward_difference_code
+#' )
 #'
 #'
 #' # Will inform you if there are factors you didn't set
 #' enlist_contrasts(my_df, gear ~ scaled_sum_code)
 #'
-enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
+enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
+  # Needs to be done before model_data is first evaluated
+  df_symbol <- rlang::as_label(rlang::enquo(model_data))
+
+  if (!inherits(model_data, "data.frame")) {
+    if (inherits(model_data, "formula")) {
+      stop("Formula passed to model_data, did you forget to pass a data frame?")
+    }
+
+    stop(
+      "model_data should inherit class data.frame.\nInstead found class(es): ",
+      paste0(class(model_data), collapse = ", ")
+    )
+  }
+
   # Get the formulas from the dots into list and character formats to work with
   formulas <- purrr::list_flatten(rlang::dots_list(...))
   if (identical(formulas, list())) {
     stop("No contrast formulas provided")
   }
-  df_symbol <- rlang::as_label(rlang::enquo(model_data))
 
 
   # Extract which factor columns are attempting to be set
   lhs_variables <-
-    tryCatch(vapply(formulas,
-                    function(x) as.character(rlang::f_lhs(x)),
-                    "char",
-                    USE.NAMES = FALSE),
-             error = function(c) {
-               err <- conditionMessage(c)
-               if (!grepl("must be a formula", err))
-                 stop(c)
-               stop(paste(err, "Did you use = instead of ~ when setting the contrast?",sep="\n"))
-             })
+    tryCatch(
+      vapply(formulas,
+             function(x) as.character(rlang::f_lhs(x)),
+             "char",
+             USE.NAMES = FALSE
+      ),
+      error = function(c) {
+        err <- conditionMessage(c)
+        if (!grepl("must be a formula", err)) {
+          stop(c)
+        }
+        stop(paste(err, "Did you use = instead of ~ when setting the contrast?", sep = "\n"))
+      }
+    )
 
   ## TODO: add tidyselect functionality for variable names on the left hand side
-  stopifnot("Only one variable on the left hand side currently supported" = length(lhs_variables) == length(formulas))
+  stopifnot(
+    "Only one variable on the left hand side currently supported" =
+      length(lhs_variables) == length(formulas)
+  )
 
   vars_in_model <- lhs_variables %in% names(model_data)
 
-  if (any(!vars_in_model)){
+  if (any(!vars_in_model)) {
     variables <- paste(lhs_variables[!vars_in_model], collapse = ", ")
     stop(paste0("Columns not found in ", df_symbol, ": ", variables))
   }
 
   model_data <- .convert_to_factors(model_data, lhs_variables, verbose)
 
-  if (verbose)
+  if (verbose) {
     .msg_if_remaining_factors(model_data, lhs_variables)
+  }
 
   # Ignore factors with only 1 level to avoid undefined contrasts
-  is_onelevel_factor <-  vapply(lhs_variables,
-                                function(x) nlevels(model_data[[x]]) == 1L,
-                                TRUE)
+  is_onelevel_factor <- vapply(
+    lhs_variables,
+    function(x) nlevels(model_data[[x]]) == 1L,
+    logical(1)
+  )
 
   .warn_if_onelevel(lhs_variables[is_onelevel_factor])
 
@@ -99,15 +132,17 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   vars_in_model <- vars_in_model[!is_onelevel_factor]
   lhs_variables <- lhs_variables[!is_onelevel_factor]
 
-  if (length(formulas) == 0)
+  if (length(formulas) == 0) {
     stop("No factors with more than 1 level found")
+  }
 
   stats::setNames(
-    lapply(seq_along(formulas),
-           function(i)
-             .process_contrasts(model_data,
-                                raw_formula = formulas[[i]] # Reference value bindings
-             )
+    lapply(
+      seq_along(formulas),
+      function(i) {
+        # Reference value bindings
+        .process_contrasts(model_data, raw_formula = formulas[[i]])
+      }
     ),
     lhs_variables
   )
@@ -131,14 +166,13 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
   use_contrasts(
     factor_col = get(params[["factor_col"]], model_data),
     code_by = eval(params[["code_by"]], var_envir),
-    labels = eval(params[['labels']], var_envir),
+    labels = eval(params[["labels"]], var_envir),
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir),
-    as_is = params[['as_is']],
-    other = params[['other_args']]
+    as_is = params[["as_is"]],
+    other = params[["other_args"]]
   )
-
 }
 
 #' Split contrast function using parens
@@ -160,28 +194,31 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' arguments are provided.
 .split_if_language <- function(params, var_envir) {
   # In the event someone tries to do v ~ as_is(as_is(as_is(foo)))
-  while(length(params[['code_by']]) > 1L && identical(params[['code_by']][[1]], quote(as_is))){
-    params[['as_is']] <- TRUE
-    params[['code_by']][1] <- NULL
+  while (length(params[["code_by"]]) > 1L &&
+         identical(params[["code_by"]][[1]], quote(as_is))) {
+    params[["as_is"]] <- TRUE
+    params[["code_by"]][1] <- NULL
   }
 
-  params[['other_args']] <- list()
+  params[["other_args"]] <- list()
+  language_detected <-
+    !is.symbol(params[["code_by"]]) && is.language(params[["code_by"]])
 
-  if (!is.symbol(params[['code_by']]) &&
-      is.language(params[['code_by']]) &&
-      # If the namespace is passed with the function, it will be a language
-      # but we don't want to split it from the function name in that case
-      !identical(params[['code_by']][[1]], quote(`::`)) &&
-      !identical(params[['code_by']][[1]], quote(`:::`))){
-    params[['other_args']] <- as.list(params[['code_by']])[-1]
-    params[['code_by']] <- params[['code_by']][[1]]
+  # If the namespace is passed with the function, it will be a language
+  # but we don't want to split it from the function name in that case
+  not_namespace_symbol <-
+    language_detected &&
+    !identical(params[["code_by"]][[1]], quote(`::`)) &&
+    !identical(params[["code_by"]][[1]], quote(`:::`))
 
-    if (length(params[['other_args']]) > 0) {
-      for (arg_i in seq_along(params['other_args'])) {
+  if (language_detected && not_namespace_symbol) {
+    params[["other_args"]] <- as.list(params[["code_by"]])[-1]
+    params[["code_by"]] <- params[["code_by"]][[1]]
 
-        params[['other_args']][arg_i] <- list(eval(params[['other_args']][[arg_i]],
-                                                   var_envir)
-        )
+    if (length(params[["other_args"]]) > 0) {
+      for (arg_i in seq_along(params["other_args"])) {
+        params[["other_args"]][arg_i] <-
+          list(eval(params[["other_args"]][[arg_i]], var_envir))
       }
     }
   }
@@ -197,8 +234,8 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' that do not natively specify that already. Consider `contr.treatment` and
 #' `contr.SAS`, which provide the same treatment-coded matrices BUT the former
 #' moves the reference level to the first level while the latter sets the
-#' reference level to the last level. The contrast between the two functions
-#' is thus neutralized in this package. If we have reason to avoid this behavior,
+#' reference level to the last level. The contrast between the two functions is
+#' thus neutralized in this package. If we have reason to avoid this behavior,
 #' especially for manually created matrices for niche situations, we can
 #' suppress the behavior by wrapping the matrix/contrast function in `as_is`.
 #'
@@ -221,7 +258,8 @@ enlist_contrasts <- function(model_data, ...,  verbose=TRUE) {
 #' enlist_contrasts(mtcars, carb ~ as_is(contr.SAS))
 #'
 #' # Particularly helpful for external matrices
-#' my_contrasts <- contr.SAS(6) # Imagine this is some other more complicated matrix
+#' # Imagine this is some other more complicated matrix
+#' my_contrasts <- contr.SAS(6)
 #'
 #' # This is the same as as_is(contr.SAS)
 #' enlist_contrasts(mtcars, carb ~ as_is(my_contrasts))

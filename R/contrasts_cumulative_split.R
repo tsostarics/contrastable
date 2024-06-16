@@ -25,25 +25,29 @@
 #'
 #'
 #' set.seed(111)
-#' df <- data.frame(grp = rep(c('a', 'b', 'c', 'd'), each = 2000),
-#'                  val = c(rnorm(2000, 2, 1),
-#'                          rnorm(2000, 5, 1),
-#'                          rnorm(2000, 7.5, 1),
-#'                          rnorm(2000, 15, 1))) |>
-#'   set_contrasts(grp ~ cumulative_split_code | c("a-rest", "ab-rest", "abc-rest"))
+#' df <- data.frame(
+#'   grp = rep(c("a", "b", "c", "d"), each = 2000),
+#'   val = c(
+#'     rnorm(2000, 2, 1),
+#'     rnorm(2000, 5, 1),
+#'     rnorm(2000, 7.5, 1),
+#'     rnorm(2000, 15, 1)
+#'   )
+#' ) |>
+#'   set_contrasts(grp ~ cumulative_split_code |
+#'     c("a-rest", "ab-rest", "abc-rest"))
 #'
 #' lm(val ~ grp, data = df)
-#'
 #'
 cumulative_split_code <- function(n) {
   contrast_matrix <- matrix(0, nrow = n, ncol = n - 1)
 
-  for (i in seq_len(n-1)) {
+  for (i in seq_len(n - 1)) {
     n_up <- seq(1, i)
-    n_down <- seq(i+1, n)
+    n_down <- seq(i + 1, n)
     contrast_matrix[n_up, i] <- 1 / length(n_up)
     contrast_matrix[n_down, i] <- -1 / length(n_down)
   }
 
-  .hypotheses_to_contrasts(cbind(rep(1/n, n), contrast_matrix))
+  .hypotheses_to_contrasts(cbind(rep(1 / n, n), contrast_matrix))
 }

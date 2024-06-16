@@ -16,7 +16,8 @@
 
 \item{set_factors}{Explicitly set columns to ignore}
 
-\item{incl.one.levels}{Should factor columns with only 1 level be included? Default FALSE}
+\item{incl.one.levels}{Should factor columns with only 1 level be included?
+Default FALSE}
 
 \item{verbose}{Defaults to FALSE, should messages and warnings be printed?}
 }
@@ -25,9 +26,9 @@ A table with information about the contrasts for all remaining factor
 columns
 }
 \description{
-Given a dataframe with some factor columns and a character vector of
-which columns you've already set yourself, look at all the other
-factor columns and get a glimpse at how they're treated by the defaults
-specified in \code{options('contrasts')}. Reference level is assumed to be the
-first level for unordered factors and nonexistent for ordered factors.
+Given a dataframe with some factor columns and a character vector of which
+columns you've already set yourself, look at all the other factor columns and
+get a glimpse at how they're treated by the defaults specified in
+\code{options('contrasts')}. Reference level is assumed to be the first level for
+unordered factors and nonexistent for ordered factors.
 }

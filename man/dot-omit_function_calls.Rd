@@ -14,24 +14,26 @@
 used to check that the user is not using the same operator more than once.}
 }
 \value{
-Returns the right hand side of the formula with function calls removed
+Returns the right hand side of the formula with function calls
+removed
 }
 \description{
 When working with the formula interface, users can pass in function calls
 containing arguments. The most explicit example of this would be using a full
 matrix call in the formula to specify the contrast matrix exactly. However,
-this makes it difficult to check that the user is using the formula correctly.
-This function recursively removes function calls from the formula and replaces
-them with the string "CALL". This allows us to work with a simpler formula
-object that is easier to check.
+this makes it difficult to check that the user is using the formula
+correctly. This function recursively removes function calls from the formula
+and replaces them with the string "CALL". This allows us to work with a
+simpler formula object that is easier to check.
 }
 \examples{
 my_formula <-
   varname ~
-  matrix(c(1,2,3),
-         nrow = 3,
-         ncol = 1) + 1 * get_whatever(asd = 2) |
-  c('one', 'two', 'three')
+  matrix(c(1, 2, 3),
+    nrow = 3,
+    ncol = 1
+  ) + 1 * get_whatever(param = 2) |
+    c("one", "two", "three")
 
 # Returns `CALL() + 1 * CALL() | CALL()`
 .omit_function_calls(rlang::f_rhs(my_formula))

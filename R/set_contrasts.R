@@ -1,24 +1,27 @@
 #' Set contrasts to dataframe
 #'
 #' Uses the same syntax as enlist_contrasts, but returns the dataframe with the
-#' new contrasts applied. Use this when your model function doesnt have a contrasts
-#' argument and you want to avoid writing contrasts<- multiple times.
+#' new contrasts applied. Use this when your model function doesnt have a
+#' contrasts argument and you want to avoid writing contrasts<- multiple times.
 #'
 #' NOTE: Sometimes when using orthogonal polynomial contrasts from contr.poly,
 #' people will drop higher level polynomials for parsimony. Note however that
 #' these do capture some amount of variation, so even though they're orthogonal
-#' contrasts the lower level polynomials will have their estimates changed. Moreover,
-#' you cannot reduce a contrast matrix to a matrix smaller than size k*k-1 in
-#' the dataframe you pass to a model fitting function itself, as R will try
-#' to fill in the gaps with something else. I don't know what these correpond to,
-#' but it's unlikely to be anything meaningful. If you want to drop contrasts
-#' you'll need to use something like `enlist_contrasts(df, x ~ contr.poly - 3:5)`
-#' and pass this to the `contrasts` argument in the model fitting function.
+#' contrasts the lower level polynomials will have their estimates changed.
+#' Moreover, you cannot reduce a contrast matrix to a matrix smaller than size
+#' k*k-1 in the dataframe you pass to a model fitting function itself, as R will
+#' try to fill in the gaps with something else. I don't know what these
+#' correpond to, but it's unlikely to be anything meaningful. If you want to
+#' drop contrasts you'll need to use something like `enlist_contrasts(df, x ~
+#' contr.poly - 3:5)` and pass this to the `contrasts` argument in the model
+#' fitting function.
 #'
-#' @param model_data Data to be passed to the model, ensure factors are available
-#' @param ... Series of formulas denoting which contrast scheme to use for each factor
-#' @param verbose Whether messages should be displayed, default TRUE, must be named
-#' if passed
+#' @param model_data Data to be passed to the model, ensure factors are
+#'   available
+#' @param ... Series of formulas denoting which contrast scheme to use for each
+#'   factor
+#' @param verbose Whether messages should be displayed, default TRUE, must be
+#'   named if passed
 #'
 #' @return the model_data dataframe, but with updated contrasts.
 #' @export
@@ -54,8 +57,8 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
 
   poly_schemes <- "contr\\.poly|orth_polynomial_code|raw_polynomial_code"
 
-  uses_contrpoly <- vapply(char_formulas, function(x) grepl(poly_schemes, x), TRUE)
-  has_dropped_trends <- vapply(char_formulas, function(x) grepl(" - [^ ]+:[^ ]+", x), TRUE)
+  uses_contrpoly <- grepl(poly_schemes, char_formulas)
+  has_dropped_trends <- grepl(" - [^ ]+:[^ ]+", char_formulas)
 
   which_to_ignore <- uses_contrpoly & has_dropped_trends
   which_used_incorrectly <- (!uses_contrpoly) & has_dropped_trends
@@ -64,22 +67,25 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
 
   # The ignoring part actually happens at the use_contrasts level, where
   # drop trends is simply not used if polynomial contrasts are not detected
-  if (any(which_used_incorrectly)){
+  if (any(which_used_incorrectly)) {
     # Note: there's no check to see if a passed matrix is actually equivalent
     # to polynomial contrasts. I'm not sure why someone would do that, but
     # something to note for the future.
     warning(paste("Ignoring dropped trends, `-` used in invalid context (use only with polynomial contrast functions):",
-          crayon::cyan(char_formulas[which_used_incorrectly]),
-          sep = "\n",
-          collapse = "\n"))
+      crayon::cyan(char_formulas[which_used_incorrectly]),
+      sep = "\n",
+      collapse = "\n"
+    ))
   }
 
-  if (num_ignoring == 0)
+  if (num_ignoring == 0) {
     return(formulas)
+  }
 
-  ignore_string <- paste(crayon::cyan(num_ignoring),
-                         ifelse(num_ignoring == 1, "formula", "formulas")
-                         )
+  ignore_string <- paste(
+    crayon::cyan(num_ignoring),
+    ifelse(num_ignoring == 1, "formula", "formulas")
+  )
 
   if (any(has_dropped_trends)) {
     warning(glue::glue("Cannot drop trends with set_contrasts, ignoring in {ignore_string}. Use enlist_contrasts instead."))
@@ -89,7 +95,7 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
 
   for (i in formulas_dropped_indices) {
     var_envir <- rlang::get_env(formulas[[i]])
-    new_formula <- gsub(" - [^ ]+:[^ ]+","",deparse1(formulas[[i]]))
+    new_formula <- gsub(" - [^ ]+:[^ ]+", "", deparse1(formulas[[i]]))
     formulas[[i]] <- formula(new_formula, env = var_envir)
   }
 

@@ -2,9 +2,9 @@
 #'
 #' Wrapper around R's built in function
 #'
-#' For n levels of factors where k in 1:n, generate a matrix with n-1 comparisons where each
-#' comparison looks for a polynomial trend of degree k where each polynomial
-#' is independent of the others.
+#' For n levels of factors where k in 1:n, generate a matrix with n-1
+#' comparisons where each comparison looks for a polynomial trend of degree k
+#' where each polynomial is independent of the others.
 #'
 #' @param n number of levels for this factor
 #'
@@ -21,9 +21,10 @@ orth_polynomial_code <- function(n) {
 #' raw polynomials may increase the collinearity in your model, especially with
 #' higher levels.
 #'
-#' For n levels of factors where k in 1:n, generate a matrix with n-1 comparisons where each
-#' comparison looks for a polynomial trend of degree k where each polynomial
-#' may be correlated with the others. Normally you would use orthogonal polynomials.
+#' For n levels of factors where k in 1:n, generate a matrix with n-1
+#' comparisons where each comparison looks for a polynomial trend of degree k
+#' where each polynomial may be correlated with the others. Normally you would
+#' use orthogonal polynomials.
 #'
 #' @param n number of levels for this factor
 #'
@@ -39,9 +40,10 @@ raw_polynomial_code <- function(n) {
 
 
 .is_polynomial_scheme <- function(scheme) {
-  # maybe include a check on the numbers to handle raw passed matrices
-  checks <- list(stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
-                 'contr.poly', 'orth_polynomial_code', 'raw_polynomial_code')
+  checks <- list(
+    stats::contr.poly, orth_polynomial_code, raw_polynomial_code,
+    "contr.poly", "orth_polynomial_code", "raw_polynomial_code"
+  )
 
   any(vapply(checks, function(x) identical(x, scheme), FUN.VALUE = TRUE))
 }
