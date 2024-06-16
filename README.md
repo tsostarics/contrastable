@@ -10,6 +10,8 @@ coverage](https://codecov.io/gh/tsostarics/contrastable/branch/main/graph/badge.
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/tsostarics/contrastable/workflows/R-CMD-check/badge.svg)](https://github.com/tsostarics/contrastable/actions)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11869428.svg)](https://doi.org/10.5281/zenodo.11869428)
+
 <!-- badges: end -->
 
 This package provides utilities to set different common contrast coding
@@ -90,25 +92,28 @@ diagnostics about the scheme we have set.
 ``` r
 # Specify the contrast schemes we want, factor conversion done automatically
 # Set reference level with + and intercept with *
-contrast_schemes <- list(cyl  ~ scaled_sum_code + 6,
-                         carb ~ helmert_code,
-                         vs   ~ treatment_code + 1)
+contrast_schemes <- list(
+  cyl ~ scaled_sum_code + 6,
+  carb ~ helmert_code,
+  vs ~ treatment_code + 1
+)
 
 # Get information about our contrasts, even those we didn't explicitly set
 # (gear is ordered, and so uses contr.poly by default)
-glimpse_contrasts(my_data, 
-                  contrast_schemes, 
-                  add_namespace = TRUE,
-                  all.factors = TRUE) |> 
+glimpse_contrasts(my_data,
+  contrast_schemes,
+  add_namespace = TRUE,
+  all.factors = TRUE
+) |>
   knitr::kable()
 ```
 
-| factor |   n | level_names      | scheme                        | reference | intercept  |
-|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|
-| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean |
-| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean |
-| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    |
-| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean |
+| factor |   n | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
+|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
+| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
+| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean | TRUE       | TRUE     | NA             | TRUE           |
+| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    | NA         | FALSE    | NA             | TRUE           |
+| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling

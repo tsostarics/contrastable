@@ -2,12 +2,13 @@ Package: contrastable
 Type: Package
 Title: Tidy contrast coding utilities
 Version: 0.2.0
+Year: 2024
 Author: Thomas Sostarics
 Maintainer: Thomas Sostarics <tsostarics@gmail.com>
 Description: A package to easily set contrasts for factor variables
     in regression analyses. Provide common and consistent scheme
     names to use for contrast coding that "just works."
-License: MIT + file LICENSE
+License: MIT
 Encoding: UTF-8
 LazyData: true
 Imports: 
