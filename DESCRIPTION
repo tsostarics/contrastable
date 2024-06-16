@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Tidy contrast coding utilities
-Version: 0.1.0
+Version: 0.2.0
 Author: Thomas Sostarics
 Maintainer: Thomas Sostarics <tsostarics@gmail.com>
 Description: A package to easily set contrasts for factor variables
