@@ -2,19 +2,19 @@
 % Please edit documentation in R/contrasts_helmert.R
 \name{reverse_helmert_code}
 \alias{reverse_helmert_code}
-\title{Helmert code}
+\title{Reverse Helmert code}
 \usage{
 reverse_helmert_code(n)
 }
 \arguments{
-\item{n}{Number of levels in the factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-Contrast matrix
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
 Reverse helmert coding is the same concept as helmert coding, but the order
-of the groupings is reversed.
+of the groupings is reversed. See also \link[contrastable]{helmert_code}.
 }
 \details{
 Reverse helmert coding compares each level to the total mean of all levels

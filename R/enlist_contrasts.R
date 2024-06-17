@@ -1,22 +1,73 @@
 #' List of contrast matrices
 #'
-#' Returns a list of contrast matrices to use with modeling functions directly.
+#' @description Returns a named list of contrast matrices to use with modeling
+#'   functions directly. See \link[contrastable]{set_contrasts} for a function
+#'   to set contrasts directly to the dataframe. See details for syntax
+#'   information
+#'
+#' @details
+#'
+#' \link[contrastable]{enlist_contrasts}, \link[contrastable]{set_contrasts},
+#' and \link[contrastable]{glimpse_contrasts} use special syntax to set
+#' contrasts for multiple factors. The syntax consists of two-sided formulas
+#' with the desired factor column on the left hand side and the contrast
+#' specification on the right hand side. For example, `varname ~
+#' scaled_sum_code`. Many contrasts support additional kinds of contrast
+#' manipulations using overloaded operators:
+#'
+#'  - `+ X`: Set the reference level to the level named X. Only supported for
+#' schemes that have a singular reference level such as
+#' \link[contrastable]{sum_code}, \link[contrastable]{scaled_sum_code},
+#' \link[contrastable]{treatment_code}, \link[stats]{contr.treatment},
+#' \link[stats]{contr.sum}, \link[stats]{contr.SAS}. Ignored for schemes like
+#' \link[contrastable]{helmert_code}.
+#'  - `* X`: Overwrite the intercept to the mean of the level named X
+#'  - `- A:B`: For polynomial coding schemes only, drop comparisons A through B.
+#'  - `| c(...)`: Change the comparison labels for the contrast matrix to the
+#' character vector `c(...)` of length `n-1`. These labels will appear in the
+#' output/summary of a statistical model. Note that for \link[brms]{brm},
+#' instances of `-` (a minus sign) are replaced with `M`.
 #'
 #' Typically model functions like lm will have a contrasts argument where you
 #' can set the contrasts at model run time, rather than having to manually
-#' change the contrasts on the underlying factor columns in your data. If you
-#' prefer this way, you can use this to generate the named list of contrast
-#' matrices.
+#' change the contrasts on the underlying factor columns in your data. This
+#' function will return such a named list of contrast matrices to pass to these
+#' functions. Note that this function should not be used within a modeling
+#' function call, e.g., \code{lm(y~x, data = model_data, contrasts =
+#' enlist_contrasts(model_data, x~sum_code))}. Often, this will call
+#' `enlist_contrasts` twice, rather than just once.
 #'
+#' For some model fitting functions, like \link[brms]{brm}, there is no
+#' contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
+#' set contrasts directly to the factors in a dataframe.
+#'
+#' One good way to use \link[contrastable]{enlist_contrasts} is in conjunction
+#' with \link[MASS]{fractions} to create a list of matrices that can be printed
+#' to explicitly show the entire contrast matrices you're using for your models.
+#' This can be especially helpful for supplementary materials in an academic
+#' paper.
+#'
+#' Sometimes when using orthogonal polynomial contrasts from
+#' \link[stats]{contr.poly}, people will drop higher level polynomials for
+#' parsimony. Note however that these do capture some amount of variation, so
+#' even though they're orthogonal contrasts the lower level polynomials will
+#' have their estimates changed. Moreover, you cannot reduce a contrast matrix
+#' to a matrix smaller than size n*n-1 in the dataframe you pass to a model
+#' fitting function itself, as R will try to fill in the gaps with something
+#' else. If you want to drop contrasts you'll need to use something like
+#' \code{enlist_contrasts(df, x ~ contr.poly - 3:5)} and pass this to the
+#' `contrasts` argument in the model fitting function.
 #'
 #' @param model_data Data frame you intend on passing to your model
-#' @param ... A series of 2 sided formulas with factor name on the LHS and
-#'   desired contrast scheme on the RHS, reference levels can be set with + and
-#'   the intercept can be overwritten with * (+ should come first if both are
-#'   set)
+#' @param ... A series of 2 sided formulas with factor name on the left hand
+#'   side and desired contrast scheme on the right hand side. The reference
+#'   level can be set with `+`, the intercept can be overwritten with `*`,
+#'   comparison labels can be set using `|`, and trends for polynomial coding
+#'   can be removed using `-`.
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
 #' @return List of named contrast matrices
+#' @seealso [set_contrasts()]
 #' @export
 #'
 #' @examples
@@ -60,6 +111,15 @@
 #'
 #' # Will inform you if there are factors you didn't set
 #' enlist_contrasts(my_df, gear ~ scaled_sum_code)
+#'
+#' # Use MASS::fractions to pretty print matrices for academic papers:
+#' enlist_contrasts(my_df, gear ~ scaled_sum_code, carb ~ helmert_code) |>
+#' lapply(MASS::fractions)
+#'
+#' # Use a list of formulas to use the same contrasts with different datasets
+#' my_contrasts <- list(gear ~ scaled_sum_code, carb ~ helmert_code)
+#' enlist_contrasts(my_df,  my_contrasts)
+#' enlist_contrasts(mtcars, my_contrasts)
 #'
 enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
   # Needs to be done before model_data is first evaluated

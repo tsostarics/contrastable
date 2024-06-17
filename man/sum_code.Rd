@@ -7,17 +7,34 @@
 sum_code(n)
 }
 \arguments{
-\item{n}{number of levels for this factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-A matrix of sum coded contrasts, unlabeled
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around R's built in function
+Wrapper around \link[stats]{contr.sum}, but ensures that the reference level
+is the first level alphabetically, not the last. Returns a contrast matrix
+where comparisons give differences between comparison levels and the grand
+mean.
 }
 \details{
 For n levels of factors, generate a matrix with n-1 comparisons where:
-Reference level = -1
-Comparison level = 1
-All others = 0
+\itemize{
+\item Reference level = -1
+\item Comparison level = 1
+\item All others = 0
+}
+
+Example interpretation for a 4 level factor:
+\itemize{
+\item Intercept = Grand mean (mean of the means of each level)
+\item grp2 = grp2 - mean(grp4, grp3, grp2, grp1)
+\item grp3 = grp3 - mean(grp4, grp3, grp2, grp1)
+\item grp4 =  grp4 - mean(grp4, grp3, grp2, grp1)
+}
+
+Note that when n = 2, the coefficient estimate is half of the difference
+between the two levels. But, this coincidence does not hold when the number
+of levels is greater than 2.
 }

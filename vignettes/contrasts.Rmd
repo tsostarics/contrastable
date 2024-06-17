@@ -43,8 +43,8 @@ library(contrastable)
 library(dplyr)
 library(MASS)
 mdl_data <- 
-  mtcars %>% 
-  as_tibble() %>% 
+  mtcars |> 
+  as_tibble() |> 
   mutate(cyl = factor(cyl), 
          twolevel = round(runif(n()),0),
          twolevel = ifelse(twolevel == 1, "a", "b"),
@@ -94,8 +94,8 @@ for all your categorical variables in your head, as you'll likely make a mistake
 
 ```{r reset, echo = FALSE}
 mdl_data <- 
-  mtcars %>% 
-  as_tibble() %>% 
+  mtcars |> 
+  as_tibble() |> 
   mutate(cyl = factor(cyl), 
          twolevel = round(runif(n()),0),
          twolevel = ifelse(twolevel == 1, "a", "b"),
@@ -254,7 +254,7 @@ mdl_data2 <-
 
 # Compare treatment coding to helmert coding (note these are different dfs)
 contrasts(mdl_data$carb)
-contrasts(mdl_data2$carb) %>% fractions()
+contrasts(mdl_data2$carb) |> fractions()
 ```
 
 One other thing to know is that when calling `get_prior` or setting priors for
@@ -303,19 +303,19 @@ difference between, each level and the reference level, you need to use the
 following matrix, which this package provides a helper for:
 
 ```{r}
-scaled_sum_code(4) %>% MASS::fractions()
+scaled_sum_code(4) |> MASS::fractions()
 ```
 
 We can verify this by looking at the hypothesis matrices.
 
 ```{r}
 # Not what we want
-matrix(c(1,1,1,1,-contr.sum(4)/2), nrow = 4) %>%
-  t() %>% solve() %>% fractions()
+matrix(c(1,1,1,1,-contr.sum(4)/2), nrow = 4) |>
+  t() |> solve() |> fractions()
 
 # Actually what we want
-matrix(c(1,1,1,1,scaled_sum_code(4)), nrow = 4) %>%
-  t() %>% solve() %>% fractions()
+matrix(c(1,1,1,1,scaled_sum_code(4)), nrow = 4) |>
+  t() |> solve() |> fractions()
 ```
 
 Rather than thinking about "testing half the difference," framing things in terms
@@ -366,7 +366,7 @@ The intercept in this case is actually represented by an omitted column of 1s
 ```{r}
 matrix(c(rep(1,4),
          scaled_sum_code(4)),
-       nrow = 4) %>% fractions()
+       nrow = 4) |> fractions()
 ```
 
 Why are there fractions though? If I'm comparing level 1 to level 2, why aren't
@@ -437,7 +437,7 @@ a harder case of forward difference coding with the intercept changed.
 ```{r}
 forward_contrasts <- forward_difference_code(6)
 forward_hypotheses <- 
-  matrix(c(rep(1,6), forward_contrasts), nrow = 6) %>% t() %>% solve()
+  matrix(c(rep(1,6), forward_contrasts), nrow = 6) |> t() |> solve()
 
 fractions(forward_contrasts)
 fractions(forward_hypotheses)
@@ -512,23 +512,23 @@ my_contrasts <- enlist_contrasts(diamonds,
                                  clarity ~ contr.poly - 4:7)
 
 # Higher trends removed
-lm(price ~ clarity, data = diamonds, contrasts = my_contrasts) %>% 
+lm(price ~ clarity, data = diamonds, contrasts = my_contrasts) |> 
   broom::tidy()
 
 # Higher trends retained
-lm(price ~ clarity, data = diamonds) %>% 
+lm(price ~ clarity, data = diamonds) |> 
   broom::tidy()
 
 # Trying to manually remove trends on the contrast in the data set doesn't work
 diamonds1 <- diamonds
 contrasts(diamonds1$clarity) <- contr.poly(8)[,1:3]
-lm(price ~ clarity, data = diamonds1) %>% 
+lm(price ~ clarity, data = diamonds1) |> 
   broom::tidy()
 
 # Decomposing the contrasts to create new columns for the first three trends
 # also works well (decompose_contrasts is still experimental)
-diamonds2 <- decompose_contrasts(diamonds, "clarity", 1:3)
-lm(price ~ clarity.L + clarity.Q + clarity.C, data = diamonds2) %>% 
+diamonds2 <- decompose_contrasts(diamonds, extract_from = "clarity")
+lm(price ~ clarity.L + clarity.Q, data = diamonds2) |> 
   broom::tidy()
 ```
 
@@ -670,7 +670,7 @@ library(lme4)
 library(contrastable)
 mdl_data <- set_contrasts(mtcars, cyl ~ sum_code |
                             c("longlonglonglonglongname",'shortname'))
-lmer(mpg ~ cyl + (1|gear), data = mdl_data) %>% summary()
+lmer(mpg ~ cyl + (1|gear), data = mdl_data) |> summary()
 ```
 
 While not run here, the output of the fixed effects table in the summary

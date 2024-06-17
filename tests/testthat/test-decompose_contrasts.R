@@ -3,18 +3,52 @@ test_that("Decomposing contrasts into new columns works", {
   tst$carb <- factor(mtcars$carb)
   tst$cyl <- factor(mtcars$cyl)
 
-  dec_test1 <- decompose_contrasts(tst, "cyl")
-  dec_test2 <- decompose_contrasts(tst, "cyl", list(cyl = c("6-4", "8-4")))
-  dec_test3 <- decompose_contrasts(
-    tst,
-    c("cyl", "carb"),
-    list(
-      cyl = c("6-4", "8-4"),
-      carb = c("a", "b", "c", "d", "e")
+  test_extract_norenaming <- decompose_contrasts(tst, extract_from = "cyl")
+  test_extract_rename <-
+    decompose_contrasts(tst,
+                        extract_from = "cyl",
+                        extract_to = list(cyl = c("6-4", "8-4")))
+  test_extract_multifactors <-
+    decompose_contrasts(
+      tst,
+      extract_from = c("cyl", "carb"),
+      extract_to = list(
+        cyl = c("6-4", "8-4"),
+        carb = c("a", "b", "c", "d", "e")
+      )
     )
-  )
-  expect_true(all(c("cyl6", "cyl8") %in% colnames(dec_test1)))
-  expect_true(all(c("cyl6-4", "cyl8-4") %in% colnames(dec_test2)))
+  test_extract_remove_original <-
+    decompose_contrasts(tst,
+                        extract_from = c("cyl", "carb"),
+                        remove_original = TRUE)
+
+  test_extract_intercept <-
+    decompose_contrasts(tst,
+                        extract_from = "cyl",
+                        extract_intercept = TRUE)
+
+
+
+  expect_true(all(c("cyl6", "cyl8") %in% colnames(test_extract_norenaming)))
+  expect_true(all(c("cyl6-4", "cyl8-4") %in% colnames(test_extract_rename)))
   expect_true(all(c("cyl6-4", "cyl8-4", paste0("carb", c("a", "b", "c", "d", "e")))
-                  %in% colnames(dec_test3)))
+                  %in% colnames(test_extract_multifactors)))
+  expect_true(all(!c("cyl", "carb") %in% colnames(test_extract_remove_original)))
+  expect_true('(Intercept)' %in% colnames(test_extract_intercept))
+
+})
+
+test_that("Decomposing interactions works", {
+  tst <- set_contrasts(mtcars[1:5,],
+                       cyl ~ scaled_sum_code,
+                       carb ~ scaled_sum_code,
+                       verbose = FALSE)
+
+  output <- decompose_contrasts(tst,
+                                extract_from = c("cyl", "carb"),
+                                extract_interaction = TRUE)
+
+  expect_equal(as.character(MASS::fractions(output$`cyl6:carb2`)),
+               c("-2/9", "-2/9", "1/9", "-2/9", "-2/9"))
+
 })

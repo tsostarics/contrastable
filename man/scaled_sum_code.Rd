@@ -7,16 +7,22 @@
 scaled_sum_code(n)
 }
 \arguments{
-\item{n}{number of levels for this factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-A matrix of scaled sum coded contrasts, unlabeled
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-This is also sometimes called simple, sum, or deviation coding depending on
-the field and source. Use this to compare each level to a reference level.
+Contrast coding scheme with a centered intercept and comparisons
+from a baseline reference level.
 }
 \details{
+The name for this contrast scheme varies widely in different fields
+and across experimental psychology papers. It has been called simple, sum,
+contrast, sum-to-zero, and deviation coding (among other names). This package
+uses scaled sum coding to explicitly differentiate it from sum coding, which
+has an implementation in base R with \code{contr.sum}.
+
 For n levels of factors, generate a matrix with n-1 comparisons where:
 \itemize{
 \item Reference level = -1/n
@@ -31,17 +37,18 @@ Example interpretation for a 4 level factor:
 \item grp3 = mean(grp3) - mean(grp1)
 \item grp4 = mean(grp4) - mean(grp1)
 }
-Note: grp coefficient estimates are the same as with contr.treatment, but
-the intercept is changed to the grand mean instead of the mean of grp1.
 
-IMPORTANT: This coding scheme is NOT the same as contr.sum/2 when the number
-of levels is GREATER than 2. When k=2, estimates with contr.sum can be
-interpreted as "half the distance between levels" but when k>2, contr.sum is
-to be interpreted as "the distance between this level and the GRAND MEAN".
-You may be tempted to use contr.sum(k)/2, but this tests the hypothesis that
-3/2 times the mean of a level is equal to half the sum of the means of the
-other levels, i.e., 1.5mu1 - .5mu2 - .5mu3 - .5mu4 = 0. I'm not sure when
-this would be useful.
+Note: grp coefficient estimates are the same as with contr.treatment, but the
+intercept is changed to the grand mean instead of the mean of grp1.
+
+IMPORTANT: This coding scheme is NOT the same as \code{contr.sum/2} when the
+number of levels is GREATER than 2. When n=2, estimates with \code{contr.sum} can
+be interpreted as "half the distance between levels" but when k>2,
+\code{contr.sum} is to be interpreted as "the distance between this level and the
+GRAND MEAN". You may be tempted to use \code{contr.sum(n)/2}, but this tests the
+hypothesis that 3/2 times the mean of a level is equal to half the sum of the
+means of the other levels, i.e., \eqn{1.5\mu_1 - .5\mu_2 - .5\mu_3 - .5\mu_4
+= 0}, which is not likely to be what you're looking for.
 }
 \examples{
 # Compare these two, note that contr.sum(4)/2 is not the same

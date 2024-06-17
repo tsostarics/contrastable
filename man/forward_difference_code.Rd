@@ -7,14 +7,15 @@
 forward_difference_code(n)
 }
 \arguments{
-\item{n}{Number of factor levels}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-Forward difference contrast matrix
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Compares the mean of level k to level k+1. Differs from helmert coding
-because it doesn't compare k to mean(k_i, ..., k_n)
+Compares the mean of level k to level k+1. Differs in direction from
+\link[contrastable]{backward_difference_code}, so be careful to pick the
+right function. See also \link[stats]{contr.sdif}.
 }
 \details{
 Example interpretation for a 4 level factor:

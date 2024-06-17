@@ -39,7 +39,8 @@ test_that("Glimpse with variables works", {
     verbose = FALSE
   )
   expect_equal(tst$scheme, c("contr.poly", "custom", "scaled_sum_code"))
-  expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"), ignore_attr = TRUE)
+  expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"),
+               ignore_attr = TRUE)
   expect_equal(tst$dropped_trends, c("3,4,5", NA, NA))
 })
 
@@ -51,15 +52,22 @@ test_that("Append namespace to scheme names", {
 })
 
 test_that("Warning with non default contrasts works", {
-  tstdf <- dplyr::mutate(mtcars, gear = factor(gear), cyl = factor(cyl), carb = ordered(carb))
-  tstdf <- set_contrasts(tstdf, cyl ~ contr.sum, carb ~ raw_polynomial_code, verbose = FALSE)
+  tstdf <- dplyr::mutate(mtcars,
+                         gear = factor(gear),
+                         cyl = factor(cyl),
+                         carb = ordered(carb))
+  tstdf <- set_contrasts(tstdf,
+                         cyl ~ contr.sum,
+                         carb ~ raw_polynomial_code,
+                         verbose = FALSE)
 
-  expect_warning(.glimpse_default_factors(tstdf), regexp = "Glimpse table may be unreliable")
+  expect_warning(.glimpse_default_factors(tstdf),
+                 regexp = "Glimpse table may be unreliable")
 })
 
 test_that("Grouping columns aren't detected as ordered", {
-  tst <- mtcars %>%
-    dplyr::mutate(cyl = factor(cyl), carb = ordered(carb), gear = factor(gear)) %>%
+  tst <- mtcars |>
+    dplyr::mutate(cyl = factor(cyl), carb = ordered(carb), gear = factor(gear)) |>
     dplyr::group_by(cyl)
 
   # Avoid message from .warn_if_nondefault
@@ -72,10 +80,14 @@ test_that("List output works", {
     cyl ~ helmert_code,
     gear ~ orth_polynomial_code
   )
-  glimpse_list <- glimpse_contrasts(mtcars, schemes, return.list = TRUE, verbose = FALSE)
+  glimpse_list <- glimpse_contrasts(mtcars,
+                                    schemes,
+                                    return_list = TRUE,
+                                    verbose = FALSE)
 
   expect_equal(length(glimpse_list), 2L)
-  expect_equal(glimpse_list$contrasts, enlist_contrasts(mtcars, schemes, verbose = FALSE))
+  expect_equal(glimpse_list$contrasts,
+               enlist_contrasts(mtcars, schemes, verbose = FALSE))
 })
 
 test_that("One level factor glimpse works", {
@@ -84,7 +96,7 @@ test_that("One level factor glimpse works", {
     twolevel = factor(c("a", "b"))
   )
 
-  glimpse <- glimpse_contrasts(tst, incl.one.levels = TRUE, verbose = FALSE)
+  glimpse <- glimpse_contrasts(tst, show_one_level_factors = TRUE, verbose = FALSE)
 
   expect_equal(glimpse$explicitly_set, c(FALSE, NA))
   expect_equal(glimpse$factor, c("twolevel", "onelevel"))

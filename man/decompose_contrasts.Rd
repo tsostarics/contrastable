@@ -8,10 +8,9 @@ decompose_contrasts(
   model_data,
   extract_from,
   extract_to = NULL,
-  which_contrasts = NULL,
   extract_intercept = FALSE,
-  remove_original = FALSE,
-  retain_factor_name = TRUE
+  extract_interaction = FALSE,
+  remove_original = FALSE
 )
 }
 \arguments{
@@ -23,27 +22,15 @@ from}
 \item{extract_to}{Optional names to give the new columns, must equal number
 of extracted components.}
 
-\item{which_contrasts}{Optional named list of which columns to extract. The
-names of the list should match some or all of the values in \code{extract_from}
-if used. The values should be integer vectors corresponding to the column
-indices to extract.}
-
 \item{extract_intercept}{Logical, whether to extract the intercept column
 from each contrast. Default \code{FALSE} since this is typically dropped since
 it's all 1s.}
 
+\item{extract_interaction}{Logical, whether the interaction between two
+variables should be extracted.}
+
 \item{remove_original}{Logical, whether to remove the original factor column
 after decomposing into separate columns. Default \code{FALSE}.}
-
-\item{retain_factor_name}{Either a logical value or a character vector of
-which factor names should have their original variable name prepended to
-the extracted components. Default \code{TRUE} will prepend the factor name to
-all extracted components. \code{FALSE} will not prepend the factor name to any
-extracted components. A character vector will prepend the factor name to
-only the factors specified in the vector. Note that \code{FALSE} will only
-affect columns that are extracted with \code{extract_to} set. If \code{extract_to} is
-not set, then the factor name will still be prepended to the extracted
-components, as this is the default behavior of \code{model.matrix()}.}
 }
 \value{
 model_data but with new columns corresponding to the numeric coding
@@ -60,6 +47,21 @@ want to use all of the contrasts, you can extract the ones you want and use
 them in your model. This is sometimes used with polynomial contrasts when you
 don't want to use higher order polynomials.
 }
+\details{
+An additional usage for this function is to compute the contrasts for
+interaction terms in a model. In \code{lm(y ~ A * B)}, where A and B are factors,
+the expanded form is \code{lm(y ~ A + B + A:B)} with an equation of \eqn{y =
+\beta_Ax_A + \beta_Bx_B + \beta_{A:B}x_Ax_B}. The thing to note is that the
+coefficient for the interaction(s) are multiplied by the product of \eqn{x_A}
+and \eqn{x_B}. Let's call this product \eqn{x_C}. For example, if one value
+of \eqn{x_A} is
+-1/3 and one value of \eqn{x_B} is 2/3, then the product \eqn{x_C} is -2/9. But,
+if there are 3 levels for \eqn{x_A} and 3 levels for \eqn{x_B}, then we get 4
+columns for the fixed effects \emph{and} 4 \emph{more} columns for the interaction
+terms. It can be a lot of tedious work to precompute the products manually,
+so we can use this function with \code{extract_interaction = TRUE} to compute
+everything at once.
+}
 \examples{
 
 # Decomose contrasts for carb and gear columns into new columns, using
@@ -71,18 +73,13 @@ mtcars |>
   ) |>
   decompose_contrasts(c("carb", "gear"))
 
-# Decompose contrasts, but set new labels for gear using extract_to,
-# and don't prepend 'gear' to these new columns. Note that this isn't
-# recommended in practice since you'll need to escape the column names with
-# backticks when using them.
+# Decompose contrasts, but set new labels for gear using extract_to.
 mtcars |>
   set_contrasts(
     carb ~ scaled_sum_code,
     gear ~ contr.sum
   ) |>
   decompose_contrasts(c("carb", "gear"),
-    extract_to = list(gear = c("4-mean", "5-mean")),
-    retain_factor_name = FALSE
-  )
+    extract_to = list(gear = c("4-mean", "5-mean")))
 
 }

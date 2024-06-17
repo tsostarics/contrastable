@@ -7,10 +7,10 @@
 glimpse_contrasts(
   model_data,
   ...,
-  return.list = FALSE,
-  all.factors = TRUE,
+  return_list = FALSE,
+  show_all_factors = TRUE,
   add_namespace = FALSE,
-  incl.one.levels = FALSE,
+  show_one_level_factors = FALSE,
   minimal = TRUE,
   verbose = FALSE
 )
@@ -20,16 +20,16 @@ glimpse_contrasts(
 
 \item{...}{Series of formulas}
 
-\item{return.list}{Logical, defaults to FALSE, whether the output of
+\item{return_list}{Logical, defaults to FALSE, whether the output of
 enlist_contrasts should be returned}
 
-\item{all.factors}{Logical, defaults to TRUE, whether the factors not
+\item{show_all_factors}{Logical, defaults to TRUE, whether the factors not
 explicitly set with formulas should be included}
 
 \item{add_namespace}{Logical, defaults to FALSE, whether to append the
 namespace of the contrast scheme to the scheme name}
 
-\item{incl.one.levels}{Logical, should factors with only one level be
+\item{show_one_level_factors}{Logical, should factors with only one level be
 included in the output? Default is FALSE to omit}
 
 \item{minimal}{Logical, default TRUE, whether to omit the orthogonal,
@@ -42,9 +42,61 @@ A dataframe is return.list is FALSE, a list with a dataframe and list
 of named contrasts if TRUE.
 }
 \description{
-Uses the same syntax as \code{enlist_contrasts} and \code{set_contrasts}. Returns a
-summary table of the contrasts you've set. If you set \code{return.list} to TRUE
-then you can access a list of contrasts in the second element of the
-resulting list. The glimpse dataframe is the first element. FALSE will return
-just the glimpse data frame.
+Uses the same syntax as \link[contrastable]{enlist_contrasts} and
+\link[contrastable]{set_contrasts} Returns a summary table of the contrasts
+you've set. If you set \code{return.list=TRUE} then you can access a list of
+contrasts in the second element of the resulting list. The glimpse dataframe
+is the first element. \code{FALSE} will return just the glimpse data frame.
+}
+\details{
+\link[contrastable]{enlist_contrasts}, \link[contrastable]{set_contrasts},
+and \link[contrastable]{glimpse_contrasts} use special syntax to set
+contrasts for multiple factors. The syntax consists of two-sided formulas
+with the desired factor column on the left hand side and the contrast
+specification on the right hand side. For example, \code{varname ~ scaled_sum_code}. Many contrasts support additional kinds of contrast
+manipulations using overloaded operators:
+\itemize{
+\item \code{+ X}: Set the reference level to the level named X. Only supported for
+schemes that have a singular reference level such as
+\link[contrastable]{sum_code}, \link[contrastable]{scaled_sum_code},
+\link[contrastable]{treatment_code}, \link[stats]{contr.treatment},
+\link[stats]{contr.sum}, \link[stats]{contr.SAS}. Ignored for schemes like
+\link[contrastable]{helmert_code}.
+\item \verb{* X}: Overwrite the intercept to the mean of the level named X
+\item \code{- A:B}: For polynomial coding schemes only, drop comparisons A through B.
+\item \verb{| c(...)}: Change the comparison labels for the contrast matrix to the
+character vector \code{c(...)} of length \code{n-1}. These labels will appear in the
+output/summary of a statistical model. Note that for \link[brms]{brm},
+instances of \code{-} (a minus sign) are replaced with \code{M}.
+}
+
+Typically model functions like lm will have a contrasts argument where you
+can set the contrasts at model run time, rather than having to manually
+change the contrasts on the underlying factor columns in your data. This
+function will return such a named list of contrast matrices to pass to these
+functions. Note that this function should not be used within a modeling
+function call, e.g., \code{lm(y~x, data = model_data, contrasts =
+enlist_contrasts(model_data, x~sum_code))}. Often, this will call
+\code{enlist_contrasts} twice, rather than just once.
+
+For some model fitting functions, like \link[brms]{brm}, there is no
+contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
+set contrasts directly to the factors in a dataframe.
+
+One good way to use \link[contrastable]{enlist_contrasts} is in conjunction
+with \link[MASS]{fractions} to create a list of matrices that can be printed
+to explicitly show the entire contrast matrices you're using for your models.
+This can be especially helpful for supplementary materials in an academic
+paper.
+
+Sometimes when using orthogonal polynomial contrasts from
+\link[stats]{contr.poly}, people will drop higher level polynomials for
+parsimony. Note however that these do capture some amount of variation, so
+even though they're orthogonal contrasts the lower level polynomials will
+have their estimates changed. Moreover, you cannot reduce a contrast matrix
+to a matrix smaller than size n*n-1 in the dataframe you pass to a model
+fitting function itself, as R will try to fill in the gaps with something
+else. If you want to drop contrasts you'll need to use something like
+\code{enlist_contrasts(df, x ~ contr.poly - 3:5)} and pass this to the
+\code{contrasts} argument in the model fitting function.
 }

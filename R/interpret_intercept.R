@@ -7,7 +7,7 @@
 #'
 #' @param contr_mat Contrast matrix
 #'
-#' @return a string describing how to interpret the effect on the intercept
+#' @return A string describing how to interpret the effect on the intercept
 #' this coding scheme has
 #' @export
 #'

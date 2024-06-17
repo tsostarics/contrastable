@@ -1,24 +1,22 @@
-#' Reverse helmert code
+#' Helmert code
 #'
-#' R's contr.helmert function is unscaled, meaning that you need to scale the
-#' coefficients of a model fit to get the actual comparisons of interest. This
-#' version will automatically scale the contrast matrix such taht the
-#' coefficients are the expected scaled values.
+#' @description R's \link[stats]{contr.helmert} function is unscaled, meaning
+#' that you need to scale the coefficients of a model fit to get the actual
+#' comparisons of interest. This version will automatically scale the contrast
+#' matrix such that the coefficients are the expected scaled values.
 #'
-#' Helmert coding compares each level to the total mean of all levels
+#' @details Helmert coding compares each level to the total mean of all levels
 #' that have come before it. Differs from backward difference coding, which
 #' compares only pairs of levels (not a level to a cumulative mean of levels)
 #'
 #' Example interpretation for a 4 level factor:
-#' \itemize{
-#' \item Intercept = Grand mean (mean of the means of each level)
-#' \item grp2 = mean(grp2) - mean(grp1)
-#' \item grp3 = mean(grp3) - mean(grp1, grp2)
-#' \item grp4 = mean(grp4) - mean(grp1, grp2, grp3)
-#' }
-#' @param n Number of levels in the factor
 #'
-#' @return Contrast matrix
+#'  - Intercept = Grand mean (mean of the means of each level)
+#'  - grp2 = mean(grp2) - mean(grp1)
+#'  - grp3 = mean(grp3) - mean(grp1, grp2)
+#'  - grp4 = mean(grp4) - mean(grp1, grp2, grp3)
+#'
+#' @inherit scaled_sum_code params return
 #' @export
 #'
 #' @examples
@@ -42,26 +40,26 @@ helmert_code <- function(n) {
   apply(unname(stats::contr.helmert(n)), 2L, function(x) x / sum(x != 0))
 }
 
-#' Helmert code
+#' Reverse Helmert code
 #'
+#' @description
 #' Reverse helmert coding is the same concept as helmert coding, but the order
-#' of the groupings is reversed.
+#' of the groupings is reversed. See also \link[contrastable]{helmert_code}.
 #'
+#' @details
 #' Reverse helmert coding compares each level to the total mean of all levels
 #' that come after it. Differs from forward difference coding, which only
 #' compares pairs of levels (not a level to a cumulative mean of levels).
 #'
 #' Example interpretation for a 4 level factor:
-#' \itemize{
-#' \item Intercept = Grand mean (mean of the means of each level)
-#' \item grp1 = mean(grp4, grp3, grp2) - grp(1)
-#' \item grp2 = mean(grp4, grp3) - mean(grp2)
-#' \item grp3 = mean(grp3) - mean(grp4)
-#' }
 #'
-#' @param n Number of levels in the factor
+#'  - Intercept = Grand mean (mean of the means of each level)
+#'  - grp1 = mean(grp4, grp3, grp2) - grp(1)
+#'  - grp2 = mean(grp4, grp3) - mean(grp2)
+#'  - grp3 = mean(grp3) - mean(grp4)
 #'
-#' @return Contrast matrix
+#' @inherit scaled_sum_code params return
+#'
 #' @export
 #' @examples
 #'

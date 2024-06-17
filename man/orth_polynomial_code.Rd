@@ -2,18 +2,22 @@
 % Please edit documentation in R/contrasts_polynomial.R
 \name{orth_polynomial_code}
 \alias{orth_polynomial_code}
+\alias{polynomial_code}
 \title{Orthogonal Polynomial code}
 \usage{
 orth_polynomial_code(n)
+
+polynomial_code(n)
 }
 \arguments{
-\item{n}{number of levels for this factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-A matrix of orthogonal polynomial contrasts
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around R's built in function
+Wrapper around \link[stats]{contr.poly}. You can also use \code{polynomial_code}
+as an alias.
 }
 \details{
 For n levels of factors where k in 1:n, generate a matrix with n-1

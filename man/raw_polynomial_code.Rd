@@ -7,20 +7,21 @@
 raw_polynomial_code(n)
 }
 \arguments{
-\item{n}{number of levels for this factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-A matrix of raw polynomial contrasts
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
 Make raw polynomial contrast, rather than orthogonal ones. Normally you
 would use orthogonal polynomials, so make sure this is what you want. Using
 raw polynomials may increase the collinearity in your model, especially with
-higher levels.
+higher numbers of levels.
 }
 \details{
 For n levels of factors where k in 1:n, generate a matrix with n-1
-comparisons where each comparison looks for a polynomial trend of degree k
+comparisons where each comparison looks for a polynomial trend of degree k,
 where each polynomial may be correlated with the others. Normally you would
-use orthogonal polynomials.
+use orthogonal polynomials, see \link[stats]{contr.poly} and
+\link[contrastable]{orth_polynomial_code}
 }

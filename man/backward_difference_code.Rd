@@ -7,15 +7,15 @@
 backward_difference_code(n)
 }
 \arguments{
-\item{n}{Number of factor levels}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-Backward difference contrast matrix
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Compares the mean of level k to level k-1. Differs from reverse helmert
-coding because it doesn't compare k to mean(k_0, ..., k_i-1). Mathematically
-just flipping the signs of the matrix from forward difference coding.
+Compares the mean of level k to level k-1. Differs in direction from
+\link[contrastable]{forward_difference_code}, so be careful to pick the
+right function.  See also \link[stats]{contr.sdif}.
 }
 \details{
 Example interpretation for a 4 level factor:

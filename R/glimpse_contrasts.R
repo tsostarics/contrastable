@@ -1,36 +1,37 @@
 #' Glimpse contrasts in dataframe
 #'
-#' Uses the same syntax as `enlist_contrasts` and `set_contrasts`. Returns a
-#' summary table of the contrasts you've set. If you set `return.list` to TRUE
-#' then you can access a list of contrasts in the second element of the
-#' resulting list. The glimpse dataframe is the first element. FALSE will return
-#' just the glimpse data frame.
+#' Uses the same syntax as \link[contrastable]{enlist_contrasts} and
+#' \link[contrastable]{set_contrasts} Returns a summary table of the contrasts
+#' you've set. If you set `return.list=TRUE` then you can access a list of
+#' contrasts in the second element of the resulting list. The glimpse dataframe
+#' is the first element. `FALSE` will return just the glimpse data frame.
 #'
 #' @param model_data Data to be passed to a model fitting function
 #' @param ... Series of formulas
-#' @param return.list Logical, defaults to FALSE, whether the output of
+#' @param return_list Logical, defaults to FALSE, whether the output of
 #'   enlist_contrasts should be returned
-#' @param all.factors Logical, defaults to TRUE, whether the factors not
+#' @param show_all_factors Logical, defaults to TRUE, whether the factors not
 #'   explicitly set with formulas should be included
 #' @param add_namespace Logical, defaults to FALSE, whether to append the
 #'   namespace of the contrast scheme to the scheme name
-#' @param incl.one.levels Logical, should factors with only one level be
+#' @param show_one_level_factors Logical, should factors with only one level be
 #'   included in the output? Default is FALSE to omit
 #' @param minimal Logical, default TRUE, whether to omit the orthogonal,
 #'   centered, dropped_trends, and explicitly_set columns from the output table
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
+#' @inherit enlist_contrasts details
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
-#' of named contrasts if TRUE.
+#'   of named contrasts if TRUE.
 #' @export
 #'
 #' @importFrom tibble tibble
 glimpse_contrasts <- function(model_data,
                               ...,
-                              return.list = FALSE,
-                              all.factors = TRUE,
+                              return_list = FALSE,
+                              show_all_factors = TRUE,
                               add_namespace = FALSE,
-                              incl.one.levels = FALSE,
+                              show_one_level_factors = FALSE,
                               minimal = TRUE,
                               verbose = FALSE) {
   formulas <- purrr::list_flatten(rlang::dots_list(...)) # outer names warning?
@@ -38,10 +39,10 @@ glimpse_contrasts <- function(model_data,
   # If no formulas are provided but we want to glimpse all factors, use
   # glimpse_default_factors and return early. If all.factors is FALSE, then
   # we're going to get an error from enlist_contrasts anyways
-  if (identical(formulas, list()) && all.factors) {
+  if (identical(formulas, list()) && show_all_factors) {
     glimpse <- .glimpse_default_factors(model_data,
       set_factors = c(),
-      incl.one.levels,
+      show_one_level_factors,
       verbose
     )
 
@@ -51,7 +52,7 @@ glimpse_contrasts <- function(model_data,
 
     # The default factors don't need to be specified in the contrast list,
     # they'll just use their respective defaults by the model fitting function
-    if (return.list) {
+    if (return_list) {
       return(list("glimpse" = glimpse, "contrasts" = list()))
     }
 
@@ -110,13 +111,13 @@ glimpse_contrasts <- function(model_data,
 
 
 
-  if (all.factors) {
+  if (show_all_factors) {
     glimpse <- rbind(
       glimpse,
       .glimpse_default_factors(
         model_data,
         set_factors,
-        incl.one.levels,
+        show_one_level_factors,
         verbose
       )
     )
@@ -140,7 +141,7 @@ glimpse_contrasts <- function(model_data,
 
   # The default factors don't need to be specified in the contrast list,
   # they'll just use their respective defaults by the model fitting function
-  if (return.list) {
+  if (return_list) {
     return(list("glimpse" = glimpse, "contrasts" = contrast_list))
   }
 
@@ -204,7 +205,8 @@ glimpse_contrasts <- function(model_data,
   unset_factors <- unset_factors[!unset_factors %in% fct_info[["one_level_factors"]]]
 
   # Extract contrasts from the factor columns
-  default_contrasts <- lapply(unset_factors, function(x) stats::contrasts(model_data[[x]]))
+  default_contrasts <- lapply(unset_factors,
+                              function(x) stats::contrasts(model_data[[x]]))
   names(default_contrasts) <- unset_factors
 
   # Extract the number of levels levels for each factor
@@ -239,7 +241,8 @@ glimpse_contrasts <- function(model_data,
   orthogonal_contrasts <- is_orthogonal(default_contrasts)
   centered_contrasts <- is_centered(default_contrasts)
 
-  dropped_trends <- rep(NA, length(unset_factors)) # Trends are never dropped w/ R's defaults
+  # Trends are never dropped w/ R's defaults
+  dropped_trends <- rep(NA, length(unset_factors))
 
   .warn_if_nondefault(default_contrasts, unset_factors, factor_sizes, is_ordered_factor)
 

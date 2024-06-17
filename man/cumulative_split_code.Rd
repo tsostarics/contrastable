@@ -7,12 +7,15 @@
 cumulative_split_code(n)
 }
 \arguments{
-\item{n}{Number of levels in the factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-Contrast matrix
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
+Contrast coding scheme that repeatedly dichotomizes the factor levels.
+}
+\details{
 This scheme is similar to Helmert contrasts, but instead of comparing one
 level to the accumulated mean of all previous levels, each comparison with
 this scheme splits the levels into two groups: those below and including
@@ -20,8 +23,6 @@ the current level, and those above the current level. Conceptually this is
 similar to continuation ratio logits used in ordinal models. For example,
 with a four level factor with levels A, B, C, and D, the comparisons would
 be:
-}
-\details{
 \itemize{
 \item A vs. BCD
 \item AB vs. CD
@@ -39,10 +40,10 @@ set.seed(111)
 df <- data.frame(
   grp = rep(c("a", "b", "c", "d"), each = 2000),
   val = c(
-    rnorm(2000, 2, 1),
-    rnorm(2000, 5, 1),
-    rnorm(2000, 7.5, 1),
-    rnorm(2000, 15, 1)
+    rnorm(200, 2, 1),
+    rnorm(200, 5, 1),
+    rnorm(200, 7.5, 1),
+    rnorm(200, 15, 1)
   )
 ) |>
   set_contrasts(grp ~ cumulative_split_code |

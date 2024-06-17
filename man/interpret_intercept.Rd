@@ -10,7 +10,7 @@ interpret_intercept(contr_mat)
 \item{contr_mat}{Contrast matrix}
 }
 \value{
-a string describing how to interpret the effect on the intercept
+A string describing how to interpret the effect on the intercept
 this coding scheme has
 }
 \description{

@@ -1,21 +1,20 @@
 #' Forward difference code
 #'
-#' Compares the mean of level k to level k+1. Differs from helmert coding
-#' because it doesn't compare k to mean(k_i, ..., k_n)
+#' @description
+#' Compares the mean of level k to level k+1. Differs in direction from
+#' \link[contrastable]{backward_difference_code}, so be careful to pick the
+#' right function. See also \link[stats]{contr.sdif}.
 #'
+#' @details
 #' Example interpretation for a 4 level factor:
-#' \itemize{
-#' \item Intercept = Grand mean (mean of the means of each level)
-#' \item grp1 = mean(grp1) - mean(grp2)
-#' \item grp2 = mean(grp2) - mean(grp3)
-#' \item grp3 = mean(grp3) - mean(grp4)
-#' }
 #'
-#' @param n Number of factor levels
+#'  - Intercept = Grand mean (mean of the means of each level)
+#'  - grp1 = mean(grp1) - mean(grp2)
+#'  - grp2 = mean(grp2) - mean(grp3)
+#'  - grp3 = mean(grp3) - mean(grp4)
 #'
-#' @return Forward difference contrast matrix
+#' @inherit scaled_sum_code params return
 #' @export
-#'
 #'
 #' @examples
 #' mydf <- data.frame(
@@ -48,20 +47,20 @@ forward_difference_code <- function(n) {
 
 #' Backward difference code
 #'
-#' Compares the mean of level k to level k-1. Differs from reverse helmert
-#' coding because it doesn't compare k to mean(k_0, ..., k_i-1). Mathematically
-#' just flipping the signs of the matrix from forward difference coding.
+#' @description
+#' Compares the mean of level k to level k-1. Differs in direction from
+#' \link[contrastable]{forward_difference_code}, so be careful to pick the
+#' right function.  See also \link[stats]{contr.sdif}.
 #'
+#' @details
 #' Example interpretation for a 4 level factor:
-#' \itemize{
-#' \item Intercept = Grand mean (mean of the means of each level)
-#' \item grp1 = mean(grp2) - mean(grp1)
-#' \item grp2 = mean(grp3) - mean(grp2)
-#' \item grp3 = mean(grp4) - mean(grp3)
-#' }
-#' @param n Number of factor levels
 #'
-#' @return Backward difference contrast matrix
+#'  - Intercept = Grand mean (mean of the means of each level)
+#'  - grp1 = mean(grp2) - mean(grp1)
+#'  - grp2 = mean(grp3) - mean(grp2)
+#'  - grp3 = mean(grp4) - mean(grp3)
+#'
+#' @inherit scaled_sum_code params return
 #' @export
 #'
 #' @examples

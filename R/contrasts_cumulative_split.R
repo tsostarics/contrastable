@@ -1,5 +1,10 @@
 #' Cumulative split contrasts
 #'
+#' @description
+#' Contrast coding scheme that repeatedly dichotomizes the factor levels.
+#'
+#'
+#' @details
 #' This scheme is similar to Helmert contrasts, but instead of comparing one
 #' level to the accumulated mean of all previous levels, each comparison with
 #' this scheme splits the levels into two groups: those below and including
@@ -16,9 +21,7 @@
 #'  Each of these comparisons uses the cumulative mean of all the levels in
 #'  each group. The intercept is the grand mean.
 #'
-#' @param n Number of levels in the factor
-#'
-#' @return Contrast matrix
+#' @inherit scaled_sum_code params return
 #' @export
 #'
 #' @examples
@@ -28,10 +31,10 @@
 #' df <- data.frame(
 #'   grp = rep(c("a", "b", "c", "d"), each = 2000),
 #'   val = c(
-#'     rnorm(2000, 2, 1),
-#'     rnorm(2000, 5, 1),
-#'     rnorm(2000, 7.5, 1),
-#'     rnorm(2000, 15, 1)
+#'     rnorm(200, 2, 1),
+#'     rnorm(200, 5, 1),
+#'     rnorm(200, 7.5, 1),
+#'     rnorm(200, 15, 1)
 #'   )
 #' ) |>
 #'   set_contrasts(grp ~ cumulative_split_code |
@@ -40,14 +43,21 @@
 #' lm(val ~ grp, data = df)
 #'
 cumulative_split_code <- function(n) {
-  contrast_matrix <- matrix(0, nrow = n, ncol = n - 1)
+  hypothesis_matrix <- matrix(0, nrow = n, ncol = n - 1)
 
   for (i in seq_len(n - 1)) {
     n_up <- seq(1, i)
     n_down <- seq(i + 1, n)
-    contrast_matrix[n_up, i] <- 1 / length(n_up)
-    contrast_matrix[n_down, i] <- -1 / length(n_down)
+    hypothesis_matrix[n_up, i] <- 1 / length(n_up)
+    hypothesis_matrix[n_down, i] <- -1 / length(n_down)
   }
 
-  .hypotheses_to_contrasts(cbind(rep(1 / n, n), contrast_matrix))
+  # Add in centered intercept and convert to contrast matrix
+  contrast_matrix <-
+    .hypotheses_to_contrasts(cbind(rep(1 / n, n), hypothesis_matrix))
+
+  if(!is.matrix(contrast_matrix))
+    contrast_matrix <- matrix(contrast_matrix, nrow = n)
+
+  contrast_matrix
 }

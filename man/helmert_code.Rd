@@ -2,21 +2,21 @@
 % Please edit documentation in R/contrasts_helmert.R
 \name{helmert_code}
 \alias{helmert_code}
-\title{Reverse helmert code}
+\title{Helmert code}
 \usage{
 helmert_code(n)
 }
 \arguments{
-\item{n}{Number of levels in the factor}
+\item{n}{Integer umber of factor levels to compute contrasts for.}
 }
 \value{
-Contrast matrix
+A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-R's contr.helmert function is unscaled, meaning that you need to scale the
-coefficients of a model fit to get the actual comparisons of interest. This
-version will automatically scale the contrast matrix such taht the
-coefficients are the expected scaled values.
+R's \link[stats]{contr.helmert} function is unscaled, meaning
+that you need to scale the coefficients of a model fit to get the actual
+comparisons of interest. This version will automatically scale the contrast
+matrix such that the coefficients are the expected scaled values.
 }
 \details{
 Helmert coding compares each level to the total mean of all levels
