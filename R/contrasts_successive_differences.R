@@ -3,7 +3,7 @@
 #' @description
 #' Compares the mean of level k to level k+1. Differs in direction from
 #' \link[contrastable]{backward_difference_code}, so be careful to pick the
-#' right function. See also \link[stats]{contr.sdif}.
+#' right function. See also \link[MASS]{contr.sdif}.
 #'
 #' @details
 #' Example interpretation for a 4 level factor:
@@ -50,7 +50,7 @@ forward_difference_code <- function(n) {
 #' @description
 #' Compares the mean of level k to level k-1. Differs in direction from
 #' \link[contrastable]{forward_difference_code}, so be careful to pick the
-#' right function.  See also \link[stats]{contr.sdif}.
+#' right function.  See also \link[MASS]{contr.sdif}.
 #'
 #' @details
 #' Example interpretation for a 4 level factor:

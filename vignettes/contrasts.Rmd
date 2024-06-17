@@ -556,7 +556,7 @@ contrast_info <- glimpse_contrasts(tstdf,
                                    am ~ scaled_sum_code + 1,
                                    gear ~ helmert_code,
                                    carb ~ contr.poly,
-                                   all.factors = TRUE)
+                                   show_all_factors = TRUE)
 
 contrast_info
 ```
@@ -588,8 +588,8 @@ contrast_info <- glimpse_contrasts(tstdf,
                                    am ~ scaled_sum_code + 1,
                                    gear ~ helmert_code,
                                    carb ~ contr.poly,
-                                   all.factors = TRUE,
-                                   return.list = TRUE)
+                                   show_all_factors = TRUE,
+                                   return_list = TRUE)
 
 my_contrasts <- contrast_info$contrasts
 contrast_glimpse <- contrast_info$glimpse
