@@ -4,9 +4,7 @@
 #' `enlist_contrasts`), return a logical vector of whether each contrast is
 #' centered or not.
 #'
-#' @param .contrasts Contrast matrix or list of contrast matrices
-#' @param USE.NAMES Logical, whether vector should be named
-#'
+#' @inherit is_orthogonal params
 #' @return Logical vector, will retain names of a passed list
 #' @export
 is_centered <- function(.contrasts, USE.NAMES = FALSE) {
@@ -16,7 +14,7 @@ is_centered <- function(.contrasts, USE.NAMES = FALSE) {
 
   # Contrasts centered if column sums are all 0
   vapply(.contrasts,
-    function(m) all(round(colSums(m), 10) == 0),
+    function(m) all(colSums(m) < 1e-15),
     logical(1),
     USE.NAMES = USE.NAMES
   )
