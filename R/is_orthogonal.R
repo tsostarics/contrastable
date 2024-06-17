@@ -17,9 +17,9 @@ is_orthogonal <- function(.contrasts, USE.NAMES = FALSE) {
   vapply(.contrasts,
          function(m) {
            # Orthogonal polynomial contrasts have floating point issues
-           cor_mat <- round(stats::cor(m), digits = 10L)
-           cor_upper <- cor_mat[upper.tri(cor_mat)] == 0
-           cor_lower <- cor_mat[lower.tri(cor_mat)] == 0
+           cor_mat <- stats::cor(m)
+           cor_upper <- cor_mat[upper.tri(cor_mat)] < 1e-15
+           cor_lower <- cor_mat[lower.tri(cor_mat)] < 1e-15
 
            # 2 level factor contrasts return logical(0)s
            if (identical(cor_upper, logical(0)) ||
