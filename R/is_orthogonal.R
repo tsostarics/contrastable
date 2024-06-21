@@ -4,17 +4,17 @@
 #' `enlist_contrasts`), return a logical vector of whether each contrast is
 #' orthogonal or not.
 #'
-#' @param contrast_matrics Contrast matrix or list of contrast matrices
+#' @param contrast_matrices Contrast matrix or list of contrast matrices
 #' @param USE.NAMES  Logical, whether vector should be named
 #'
 #' @return Logical vector, will retain names of a passed list
 #' @export
-is_orthogonal <- function(contrast_matrics, USE.NAMES = FALSE) {
-  if (is.matrix(contrast_matrics)) {
-    contrast_matrics <- list(contrast_matrics)
+is_orthogonal <- function(contrast_matrices, USE.NAMES = FALSE) {
+  if (is.matrix(contrast_matrices)) {
+    contrast_matrices <- list(contrast_matrices)
   }
 
-  vapply(contrast_matrics,
+  vapply(contrast_matrices,
          function(m) {
            # Orthogonal polynomial contrasts have floating point issues
            cor_mat <- stats::cor(m)
