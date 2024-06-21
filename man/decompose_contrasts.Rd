@@ -55,12 +55,12 @@ the expanded form is \code{lm(y ~ A + B + A:B)} with an equation of \eqn{y =
 coefficient for the interaction(s) are multiplied by the product of \eqn{x_A}
 and \eqn{x_B}. Let's call this product \eqn{x_C}. For example, if one value
 of \eqn{x_A} is
--1/3 and one value of \eqn{x_B} is 2/3, then the product \eqn{x_C} is -2/9. But,
-if there are 3 levels for \eqn{x_A} and 3 levels for \eqn{x_B}, then we get 4
-columns for the fixed effects \emph{and} 4 \emph{more} columns for the interaction
-terms. It can be a lot of tedious work to precompute the products manually,
-so we can use this function with \code{extract_interaction = TRUE} to compute
-everything at once.
+-1/3 and one value of \eqn{x_B} is 2/3, then the product \eqn{x_C} is -2/9.
+But, if there are 3 levels for \eqn{x_A} and 3 levels for \eqn{x_B}, then we
+get 4 columns for the fixed effects \emph{and} 4 \emph{more} columns for the
+interaction terms. It can be a lot of tedious work to precompute the products
+manually, so we can use this function with \code{extract_interaction = TRUE} to
+compute everything at once.
 }
 \examples{
 

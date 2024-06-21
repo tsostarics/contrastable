@@ -4,7 +4,7 @@
 \alias{.cols_where}
 \title{Get columns where}
 \usage{
-.cols_where(model_data, fx, use.names = FALSE, return.names = FALSE)
+.cols_where(model_data, fx, use_names = FALSE, return_names = FALSE)
 }
 \arguments{
 \item{model_data}{Model data}
@@ -12,9 +12,9 @@
 \item{fx}{Function to apply, must be something that returns a logical value.
 Usually either \code{is.factor} or \code{is.ordered}}
 
-\item{use.names}{Whether the resulting vector should be named}
+\item{use_names}{Whether the resulting vector should be named}
 
-\item{return.names}{Whether names (where the fx returns TRUE) should be
+\item{return_names}{Whether names (where the fx returns TRUE) should be
 returned instead of a logical vector. Overwrites use.names.}
 }
 \value{

@@ -7,13 +7,13 @@
 #' @inherit is_orthogonal params
 #' @return Logical vector, will retain names of a passed list
 #' @export
-is_centered <- function(.contrasts, USE.NAMES = FALSE) {
-  if (is.matrix(.contrasts)) {
-    .contrasts <- list(.contrasts)
+is_centered <- function(contrast_matrices, USE.NAMES = FALSE) {
+  if (is.matrix(contrast_matrices)) {
+    contrast_matrices <- list(contrast_matrices)
   }
 
   # Contrasts centered if column sums are all 0
-  vapply(.contrasts,
+  vapply(contrast_matrices,
     function(m) all(colSums(m) < 1e-15),
     logical(1),
     USE.NAMES = USE.NAMES

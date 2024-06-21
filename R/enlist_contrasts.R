@@ -156,7 +156,11 @@ enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
         if (!grepl("must be a formula", err)) {
           stop(c)
         }
-        stop(paste(err, "Did you use = instead of ~ when setting the contrast?", sep = "\n"))
+        stop(
+          paste(err,
+                "Did you use = instead of ~ when setting the contrast?",
+                sep = "\n")
+        )
       }
     )
 

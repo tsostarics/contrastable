@@ -7,7 +7,7 @@
 .glimpse_default_factors(
   model_data,
   set_factors = NULL,
-  incl.one.levels = FALSE,
+  show_one_level_factors = FALSE,
   verbose = TRUE
 )
 }
@@ -16,7 +16,7 @@
 
 \item{set_factors}{Explicitly set columns to ignore}
 
-\item{incl.one.levels}{Should factor columns with only 1 level be included?
+\item{show_one_level_factors}{Should factor columns with only 1 level be included?
 Default FALSE}
 
 \item{verbose}{Defaults to FALSE, should messages and warnings be printed?}

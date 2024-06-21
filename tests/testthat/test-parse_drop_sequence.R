@@ -9,5 +9,6 @@ test_that("Parsing drop sequences works", {
   expect_equal(.parse_drop_sequence("a:5", test_env), 3:5)
   expect_equal(.parse_drop_sequence("3:b", test_env), 3:5)
   expect_equal(.parse_drop_sequence("a:b", test_env), 3:5)
-  expect_error(.parse_drop_sequence("cc:5", test_env), regexp = r"(object 'cc' not found)")
+  expect_error(.parse_drop_sequence("cc:5", test_env),
+               regexp = r"(object 'cc' not found)")
 })

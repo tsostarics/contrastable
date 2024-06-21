@@ -4,11 +4,9 @@
 \alias{is_centered}
 \title{Check for orthogonality}
 \usage{
-is_centered(.contrasts, USE.NAMES = FALSE)
+is_centered(contrast_matrices, USE.NAMES = FALSE)
 }
 \arguments{
-\item{.contrasts}{Contrast matrix or list of contrast matrices}
-
 \item{USE.NAMES}{Logical, whether vector should be named}
 }
 \value{

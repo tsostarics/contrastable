@@ -186,7 +186,7 @@ glimpse_contrasts <- function(model_data,
 #'
 #' @param model_data Dataframe
 #' @param set_factors Explicitly set columns to ignore
-#' @param incl.one.levels Should factor columns with only 1 level be included?
+#' @param show_one_level_factors Should factor columns with only 1 level be included?
 #'   Default FALSE
 #' @param verbose Defaults to FALSE, should messages and warnings be printed?
 #'
@@ -194,7 +194,7 @@ glimpse_contrasts <- function(model_data,
 #'   columns
 .glimpse_default_factors <- function(model_data,
                                      set_factors = NULL,
-                                     incl.one.levels = FALSE,
+                                     show_one_level_factors = FALSE,
                                      verbose = TRUE) {
   fct_info <- .get_factor_info(model_data, set_factors, verbose)
   unset_factors <- fct_info[["unset_factors"]]
@@ -202,7 +202,8 @@ glimpse_contrasts <- function(model_data,
 
   # Some factors may not be explicitly set, but if they only have one level
   # then we need to ignore them
-  unset_factors <- unset_factors[!unset_factors %in% fct_info[["one_level_factors"]]]
+  unset_factors <-
+    unset_factors[!unset_factors %in% fct_info[["one_level_factors"]]]
 
   # Extract contrasts from the factor columns
   default_contrasts <- lapply(unset_factors,
@@ -244,7 +245,10 @@ glimpse_contrasts <- function(model_data,
   # Trends are never dropped w/ R's defaults
   dropped_trends <- rep(NA, length(unset_factors))
 
-  .warn_if_nondefault(default_contrasts, unset_factors, factor_sizes, is_ordered_factor)
+  .warn_if_nondefault(default_contrasts,
+                      unset_factors,
+                      factor_sizes,
+                      is_ordered_factor)
 
   glimpse <- tibble::tibble(
     "factor" = unset_factors,
@@ -260,7 +264,7 @@ glimpse_contrasts <- function(model_data,
   )
 
   # If we want to show the one-level factors, add those rows in
-  if (incl.one.levels) {
+  if (show_one_level_factors) {
     glimpse <- rbind(
       glimpse,
       .make_placeholder_glimpse(
@@ -308,16 +312,16 @@ glimpse_contrasts <- function(model_data,
 .get_factor_info <- function(model_data, set_factors = NULL, verbose = TRUE) {
   # Look up all the factor columns inthe dataframe, then check to see if
   # which ones have been explicitly set given `set_factors`
-  all_factors <- .cols_where(model_data, is.factor, return.names = TRUE)
+  all_factors <- .cols_where(model_data, is.factor, return_names = TRUE)
   unset_factors <- all_factors[!all_factors %in% set_factors]
   is_ordered_factor <-
-    unset_factors %in% .cols_where(model_data, is.ordered, return.names = TRUE)
+    unset_factors %in% .cols_where(model_data, is.ordered, return_names = TRUE)
   names(is_ordered_factor) <- unset_factors
 
   # Filter out any factors that only have 1 level to avoid undefined contrasts
   # Happens when character vectors with only 1 value are converted to a factor
   # without specifying the levels parameter in factor()
-  is_one_level <- .cols_where(model_data, .is.onelevel, use.names = TRUE)
+  is_one_level <- .cols_where(model_data, .is.onelevel, use_names = TRUE)
   is_one_level <- is_one_level[names(is_one_level) %in% unset_factors]
   is_ordered_factor <- is_ordered_factor[!is_one_level]
   unset_factors <- unset_factors[!is_one_level]
@@ -479,7 +483,9 @@ glimpse_contrasts <- function(model_data,
 #' @return Character vector of reference levels. If a contrast matrix is not
 #'   specified for row names, the character value will denote the integer index
 #'   of the row for the reference level (usually 1).
-.get_reference_levels <- function(contrast_list, params = NULL, formulas = NULL) {
+.get_reference_levels <- function(contrast_list,
+                                  params = NULL,
+                                  formulas = NULL) {
   if (!is.null(params) && !is.null(formulas)) {
     reference_levels <- .get_from_params("reference_level", params, formulas)
   } else {

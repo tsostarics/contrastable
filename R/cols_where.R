@@ -7,25 +7,25 @@
 #' @param model_data Model data
 #' @param fx Function to apply, must be something that returns a logical value.
 #' Usually either `is.factor` or `is.ordered`
-#' @param use.names Whether the resulting vector should be named
-#' @param return.names Whether names (where the fx returns TRUE) should be
+#' @param use_names Whether the resulting vector should be named
+#' @param return_names Whether names (where the fx returns TRUE) should be
 #' returned instead of a logical vector. Overwrites use.names.
 #'
 #' @return optionally named logical vector or character vector
 .cols_where <- function(model_data,
                         fx,
-                        use.names = FALSE,
-                        return.names = FALSE) {
+                        use_names = FALSE,
+                        return_names = FALSE) {
   cnames <- colnames(model_data)
-  if (return.names) {
-    use.names <- TRUE
+  if (return_names) {
+    use_names <- TRUE
   }
   cols <- vapply(cnames,
     function(x) fx(model_data[[x]]),
     FUN.VALUE = logical(1),
-    USE.NAMES = use.names
+    USE.NAMES = use_names
   )
-  if (return.names) {
+  if (return_names) {
     return(cnames[cols])
   }
   cols

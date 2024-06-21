@@ -21,7 +21,7 @@
 
   # Swap the old reference row with the new reference row
   reference_row <- as.matrix(contrast_matrix[old_reference, ])
-  if (length(reference_row) == 2) { # Ensure that the row is in the correct format
+  if (length(reference_row) == 2) { # Ensure row is in the correct format
     reference_row <- t(reference_row)
   }
   contrast_matrix[old_reference, ] <- contrast_matrix[new_reference, ]

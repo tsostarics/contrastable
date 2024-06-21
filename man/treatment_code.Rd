@@ -13,15 +13,16 @@ treatment_code(n)
 A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around \link[stats]{contr.treatment}. Returns a contrast matrix where
-comparisons give differences between each comparison level and a baseline
-reference level, while the intercept equals the first level of the factor.
-See \link[contrastable]{scaled_sum_code} for a function that centers
+Wrapper around \link[stats]{contr.treatment}. Returns a contrast
+matrix where comparisons give differences between each comparison level and a
+baseline reference level, while the intercept equals the first level of the
+factor. See \link[contrastable]{scaled_sum_code} for a function that centers
 the intercept on the grand mean while retaining pairwise comparisons from a
 reference level.
 }
 \details{
-For n levels of factors, generate a matrix with n-1 comparisons where:
+For n levels of factors, generate a matrix with n-1 comparisons
+where:
 \itemize{
 \item Reference level = 0
 \item Comparison level = 1
@@ -29,8 +30,9 @@ For n levels of factors, generate a matrix with n-1 comparisons where:
 }
 
 Note that this function sets the first level (alphabetically) as the
-reference level while \link[stats]{contr.SAS} sets the LAST level as
-the reference level. However, in functions like \link[contrastable]{set_contrasts},
-and \link[contrastable]{enlist_contrasts}, the reference level is automatically
+reference level while \link[stats]{contr.SAS} sets the LAST level as the
+reference level. However, in functions like
+\link[contrastable]{set_contrasts}, and
+\link[contrastable]{enlist_contrasts}, the reference level is automatically
 set to be the first level alphabetically.
 }
