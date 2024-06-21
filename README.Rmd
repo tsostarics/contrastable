@@ -60,9 +60,13 @@ A BibTeX entry for LaTeX users is
 In-text citations should reference the package and ideally which contrast 
 functions were used to avoid ambiguity.
 
-BAD: "We sum code our variables (Sostarics 2024)"
+Bad: "We sum code our variables (Sostarics 2024)"
 
-GOOD: "We use the `sum_code()` function from the contrastable package (Sostarics 2024) for our variables."
+Good: "We use the `sum_code()` function from the contrastable package (Sostarics 2024) for our variables."
+
+Also good: "We sum code our variable (reference level -1, comparisons +1). All
+contrasts are set using the contrastable package (Sostarics 2024)." (point here
+is to remove ambiguity of "sum code" using the specific numbers)
 
 Other examples:
 
@@ -78,9 +82,9 @@ Other examples:
  
 I also recommend writing out, potentially in a footnote, what the comparisons are.
 
-GOOD: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024)."
+God: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024)."
 
-BETTER: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024).
+Better: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024).
 This contrast scheme encodes differences between each comparison level and the grand mean."
 
 
@@ -112,7 +116,7 @@ contrast_schemes <- list(
 glimpse_contrasts(my_data,
   contrast_schemes,
   add_namespace = TRUE,
-  all.factors = TRUE
+  show_all_factors = TRUE
 ) |>
   knitr::kable()
 ```

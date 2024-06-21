@@ -48,10 +48,15 @@ A BibTeX entry for LaTeX users is
 In-text citations should reference the package and ideally which
 contrast functions were used to avoid ambiguity.
 
-BAD: “We sum code our variables (Sostarics 2024)”
+Bad: “We sum code our variables (Sostarics 2024)”
 
-GOOD: “We use the `sum_code()` function from the contrastable package
+Good: “We use the `sum_code()` function from the contrastable package
 (Sostarics 2024) for our variables.”
+
+Also good: “We sum code our variable (reference level -1, comparisons
++1). All contrasts are set using the contrastable package (Sostarics
+2024).” (point here is to remove ambiguity of “sum code” using the
+specific numbers)
 
 Other examples:
 
@@ -70,10 +75,10 @@ Other examples:
 I also recommend writing out, potentially in a footnote, what the
 comparisons are.
 
-GOOD: “We use the contrastable package’s `sum_code()` function (+1/-1,
+God: “We use the contrastable package’s `sum_code()` function (+1/-1,
 Sostarics 2024).”
 
-BETTER: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Better: “We use the contrastable package’s `sum_code()` function (+1/-1,
 Sostarics 2024). This contrast scheme encodes differences between each
 comparison level and the grand mean.”
 
@@ -105,17 +110,17 @@ contrast_schemes <- list(
 glimpse_contrasts(my_data,
   contrast_schemes,
   add_namespace = TRUE,
-  all.factors = TRUE
+  show_all_factors = TRUE
 ) |>
   knitr::kable()
 ```
 
-| factor |   n | level_names      | scheme                        | reference | intercept  | orthogonal | centered | dropped_trends | explicitly_set |
-|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|:-----------|:---------|:---------------|:---------------|
-| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean | FALSE      | TRUE     | NA             | TRUE           |
-| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean | TRUE       | TRUE     | NA             | TRUE           |
-| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    | NA         | FALSE    | NA             | TRUE           |
-| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean | TRUE       | TRUE     | NA             | FALSE          |
+| factor |   n | level_names      | scheme                        | reference | intercept  |
+|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|
+| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean |
+| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean |
+| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    |
+| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
