@@ -137,7 +137,7 @@ enlist_contrasts(mtcars, contrast_schemes)
 #> 8 -0.3333333  0.6666667
 #> 
 #> $carb
-#>     >1         >2    >3   >4         >6
+#>     <2         <3    <4   <6         <8
 #> 1 -0.5 -0.3333333 -0.25 -0.2 -0.1666667
 #> 2  0.5 -0.3333333 -0.25 -0.2 -0.1666667
 #> 3  0.0  0.6666667 -0.25 -0.2 -0.1666667
@@ -161,7 +161,7 @@ my_data <- set_contrasts(my_data, contrast_schemes)
 #> Converting to factors: cyl carb vs
 #> Expect contr.treatment or contr.poly for unset factors: gear
 MASS::fractions(contrasts(my_data$carb))
-#>   >1   >2   >3   >4   >6  
+#>   <2   <3   <4   <6   <8  
 #> 1 -1/2 -1/3 -1/4 -1/5 -1/6
 #> 2  1/2 -1/3 -1/4 -1/5 -1/6
 #> 3    0  2/3 -1/4 -1/5 -1/6

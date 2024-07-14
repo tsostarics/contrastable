@@ -10,9 +10,9 @@
   } else if (n != 2 && .check_forward_difference(contr_mat)) {
     colnames(contr_mat) <- paste(rownames(contr_mat)[-n], rownames(contr_mat)[-1], sep = "-")
   } else if (n != 2 && .check_reverse_helmert(contr_mat)) {
-    colnames(contr_mat) <- paste0("<", rownames(contr_mat)[-1L])
-  } else if (n != 2 && .check_helmert(contr_mat)) {
     colnames(contr_mat) <- paste0(">", rownames(contr_mat)[-n])
+  } else if (n != 2 && .check_helmert(contr_mat)) {
+    colnames(contr_mat) <- paste0("<", rownames(contr_mat)[-1L])
   } else {
     new_colnames <- unname(apply(contr_mat, 2, \(x) rownames(contr_mat)[x > 0]))
     if (all(vapply(new_colnames, \(x) length(x) == 1, TRUE))) {
