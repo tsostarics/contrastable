@@ -10,6 +10,7 @@
 #' them in your model. This is sometimes used with polynomial contrasts when you
 #' don't want to use higher order polynomials.
 #'
+#' @details
 #' An additional usage for this function is to compute the contrasts for
 #' interaction terms in a model. In `lm(y ~ A * B)`, where A and B are factors,
 #' the expanded form is `lm(y ~ A + B + A:B)` with an equation of \eqn{y =
@@ -25,17 +26,13 @@
 #' compute everything at once.
 #'
 #' @param model_data Dataframe with factor columns
-#' @param extract_from Character vector of column names to extract contrasts
-#'   from
-#' @param extract_to Optional names to give the new columns, must equal number
-#'   of extracted components.
-#' @param extract_intercept Logical, whether to extract the intercept column
-#'   from each contrast. Default `FALSE` since this is typically dropped since
-#'   it's all 1s.
-#' @param remove_original Logical, whether to remove the original factor column
-#'   after decomposing into separate columns. Default `FALSE`.
-#' @param extract_interaction Logical, whether the interaction between two
-#'   variables should be extracted.
+#' @param extract A one-sided formula denoting the factors to extract. Note this
+#' should ideally be what you would pass to your model fitting function, sans
+#' any non-factors.
+#' @param remove_intercept Logical, whether to remove the column corresponding
+#' to the intercept. Default `TRUE`  since it's always just a column of 1s
+#' @param remove_original Logical, whether to remove the original columns in
+#' the data frame after decomposing into separate columns. Default `FALSE`.
 #'
 #' @return model_data but with new columns corresponding to the numeric coding
 #'   of the given factor's contrasts
@@ -50,58 +47,45 @@
 #'     carb ~ scaled_sum_code,
 #'     gear ~ contr.sum | c("4-mean", "5-mean")
 #'   ) |>
-#'   decompose_contrasts(c("carb", "gear"))
+#'   decompose_contrasts(~ carb + gear)
 #'
-#' # Decompose contrasts, but set new labels for gear using extract_to.
-#' mtcars |>
-#'   set_contrasts(
-#'     carb ~ scaled_sum_code,
-#'     gear ~ contr.sum
-#'   ) |>
-#'   decompose_contrasts(c("carb", "gear"),
-#'     extract_to = list(gear = c("4-mean", "5-mean")))
 #'
 #' @importFrom stats contrasts
 decompose_contrasts <- function(model_data,
-                                extract_from,
-                                extract_to = NULL,
-                                extract_intercept = FALSE,
-                                extract_interaction = FALSE,
+                                extract,
+                                remove_intercept = TRUE,
                                 remove_original = FALSE) {
   # If we want the interactions between the factors, then we'd use * in the
   # formula. If we don't want it, then we can just use +.
-  collapse_by <- " + "
-  if (extract_interaction)
-    collapse_by <- " * "
-
-  # If we want to rename any comparisons, do so in the contrast matrices first
-  # so that the model matrix can expand everything for us
-  if (!is.null(extract_to)) {
-    for (factor_name in names(extract_to)) {
-      ncomparisons <- nlevels(model_data[[factor_name]]) - 1L
-
-      if (length(extract_to[[factor_name]]) != ncomparisons)
-        stop("Number of names in extract_to should equal number of desired components")
-
-      colnames(contrasts(model_data[[factor_name]])) <-
-        extract_to[[factor_name]]
-    }
-  }
+  # collapse_by <- " + "
+  # if (extract_interaction)
+  #   collapse_by <- " * "
+  #
+  # # If we want to rename any comparisons, do so in the contrast matrices first
+  # # so that the model matrix can expand everything for us
+  # if (!is.null(extract_to)) {
+  #   for (factor_name in names(extract_to)) {
+  #     ncomparisons <- nlevels(model_data[[factor_name]]) - 1L
+  #
+  #     if (length(extract_to[[factor_name]]) != ncomparisons)
+  #       stop("Number of names in extract_to should equal number of desired components")
+  #
+  #     colnames(contrasts(model_data[[factor_name]])) <-
+  #       extract_to[[factor_name]]
+  #   }
+  # }
 
   # Expand all contrasts into individual columns
-  components <-
-    stats::model.matrix(
-      formula(paste("~", paste0(extract_from, collapse = collapse_by))),
-      model_data
-    )
+  components <- stats::model.matrix(extract, model_data)
 
   # Model matrix gives us an intercept column that we usually do not care about
-  if (!extract_intercept)
+  if (remove_intercept)
     components <- components[, -1]
 
   # Remove the original columns as needed
   if (remove_original) {
-    model_data <- model_data[, !colnames(model_data) %in% extract_from]
+    original_varnames <-as.character(attr(terms(extract), "variables")[-1])
+    model_data <- model_data[, !colnames(model_data) %in% original_varnames]
   }
 
   # Add back in the components

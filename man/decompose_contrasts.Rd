@@ -6,31 +6,23 @@
 \usage{
 decompose_contrasts(
   model_data,
-  extract_from,
-  extract_to = NULL,
-  extract_intercept = FALSE,
-  extract_interaction = FALSE,
+  extract,
+  remove_intercept = TRUE,
   remove_original = FALSE
 )
 }
 \arguments{
 \item{model_data}{Dataframe with factor columns}
 
-\item{extract_from}{Character vector of column names to extract contrasts
-from}
+\item{extract}{A one-sided formula denoting the factors to extract. Note this
+should ideally be what you would pass to your model fitting function, sans
+any non-factors.}
 
-\item{extract_to}{Optional names to give the new columns, must equal number
-of extracted components.}
+\item{remove_intercept}{Logical, whether to remove the column corresponding
+to the intercept. Default \code{TRUE}  since it's always just a column of 1s}
 
-\item{extract_intercept}{Logical, whether to extract the intercept column
-from each contrast. Default \code{FALSE} since this is typically dropped since
-it's all 1s.}
-
-\item{extract_interaction}{Logical, whether the interaction between two
-variables should be extracted.}
-
-\item{remove_original}{Logical, whether to remove the original factor column
-after decomposing into separate columns. Default \code{FALSE}.}
+\item{remove_original}{Logical, whether to remove the original columns in
+the data frame after decomposing into separate columns. Default \code{FALSE}.}
 }
 \value{
 model_data but with new columns corresponding to the numeric coding
@@ -71,15 +63,7 @@ mtcars |>
     carb ~ scaled_sum_code,
     gear ~ contr.sum | c("4-mean", "5-mean")
   ) |>
-  decompose_contrasts(c("carb", "gear"))
+  decompose_contrasts(~ carb + gear)
 
-# Decompose contrasts, but set new labels for gear using extract_to.
-mtcars |>
-  set_contrasts(
-    carb ~ scaled_sum_code,
-    gear ~ contr.sum
-  ) |>
-  decompose_contrasts(c("carb", "gear"),
-    extract_to = list(gear = c("4-mean", "5-mean")))
 
 }
