@@ -55,26 +55,6 @@ decompose_contrasts <- function(model_data,
                                 extract,
                                 remove_intercept = TRUE,
                                 remove_original = FALSE) {
-  # If we want the interactions between the factors, then we'd use * in the
-  # formula. If we don't want it, then we can just use +.
-  # collapse_by <- " + "
-  # if (extract_interaction)
-  #   collapse_by <- " * "
-  #
-  # # If we want to rename any comparisons, do so in the contrast matrices first
-  # # so that the model matrix can expand everything for us
-  # if (!is.null(extract_to)) {
-  #   for (factor_name in names(extract_to)) {
-  #     ncomparisons <- nlevels(model_data[[factor_name]]) - 1L
-  #
-  #     if (length(extract_to[[factor_name]]) != ncomparisons)
-  #       stop("Number of names in extract_to should equal number of desired components")
-  #
-  #     colnames(contrasts(model_data[[factor_name]])) <-
-  #       extract_to[[factor_name]]
-  #   }
-  # }
-
   # Expand all contrasts into individual columns
   components <- stats::model.matrix(extract, model_data)
 
