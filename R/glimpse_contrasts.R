@@ -638,7 +638,7 @@ glimpse_contrasts <- function(model_data,
                         WARN_reminder)
 
   if (length(warning_messages) > 0) {
-    warning(paste0(warning_messages, collapse = "\n"))
+    warning(paste0(warning_messages, collapse = "\n"),call. = FALSE)
   }
 
 }
