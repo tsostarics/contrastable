@@ -35,7 +35,7 @@ included in the output? Default is FALSE to omit}
 \item{minimal}{Logical, default TRUE, whether to omit the orthogonal,
 centered, dropped_trends, and explicitly_set columns from the output table}
 
-\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
+\item{verbose}{Logical, defaults to TRUE, whether messages should be printed}
 }
 \value{
 A dataframe is return.list is FALSE, a list with a dataframe and list
