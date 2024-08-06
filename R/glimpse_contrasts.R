@@ -619,7 +619,7 @@ glimpse_contrasts <- function(model_data,
     # If the user typed out formulas manually, then we need to expand the ...
     if (dots_names[1] == "...") {
       padding <- strrep(" ", nchar(model_data_name) + 18L) # nchar(" <- set_contrasts(")
-      initial_newlines <- c("\n", strrep("", length(formulas) -1)) # need an extra \n on the first formula
+      initial_newlines <- c("\n", rep("", length(formulas) -1)) # need an extra \n on the first formula
       dots_names <-
         paste0(initial_newlines,
                padding,
