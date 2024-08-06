@@ -53,6 +53,123 @@ mdl_data <-
          carb = factor(carb))
 ```
 
+## Introduction to contrasts
+
+Statistical models such as linear regression need numbers to operate with,
+but often we have discrete categories that we want to model such as ethnicity,
+country, treatment group, etc.
+Typically, we have some comparisons in mind before we do our statistics:
+compare the group receiving treatment to a reference level who did not, or
+something like compare group A to group B.
+**Contrast coding** is the process of assigning numbers that encode the
+comparisons we want to make prior to fitting a statistical model.
+What this allows us to do is strategically set up our model to be interpretable
+in a way that's meaningful to us even though the *fit* of the statistical model
+is unchanged.
+So, contrast coding is important for inferential statistics and reporting
+coefficients correctly, but is not that important for group-level predictions.
+
+Throughout this vignette and package, I refer to different **contrast schemes**,
+which I define as *an encoding of a principled set of comparisons for an arbitrary number of factor levels*.
+The important bit here is the *arbitrary* number part.
+
+To start with an example, consider an experiment where people are tasked with
+keeping track of the location of different shapes under different levels of
+cognitive load, such as needing to remember different strings of numbers.
+Basically, a change detection task with a digit span cognitive load manipulation.
+We'll call the levels of this *cognitive load* factor none, low, and high.
+A priori, the speed with which people detect a shape that changes location should
+vary depending on the cognitive load.
+Specifically, reaction time (RT) should be slower when cognitive load is higher.
+
+What kinds of comparisons could we make, and how do we encode these in our
+statistical model?
+One comparison might be to compare low to none, then high to none.
+Another could be to compare low to none, then high to *low*.
+Yet another could be to compare low to none, then high to *low and none* together.
+Or, we could compare each level to the average across the conditions.[^dfnote]
+Specifying these different comparisons, which will really just amount to differences in
+group means, is our goal here.
+
+In our example, what if we went found that our high cognitive load condition
+wasn't high enough?
+What if we needed to add an extra-high level?
+We could add a comparison of extra-high to none, or compare extra-high to high.
+Or, we could compare extra-high to none plus low plus high together.
+Ideally, if we're going for pairwise comparisons from a reference level,
+successive differences between levels, or some kind of nested set of comparisons,
+we would want to be able to specify this consistently.
+
+ [^dfnote]: Technically, due to degrees of freedom, we'd compare only 2 of the
+ 3 levels to the average.
+
+
+Throughout this vignette and package, I refer to different **contrast schemes**,
+which I define as *an encoding of a principled set of comparisons for an arbitrary number of factor levels*.
+The important bit here is the *arbitrary* number part such that if the goal
+is to take pairwise comparisons from a reference level, then adding a new level
+should only amount to encoding an additional pairwise comparison to the same
+reference level.
+I'll contrast this approach to a more manual approach to contrast coding, where
+you would explicitly write out, in code, every single comparison for every
+single factor you want to make.
+Consider if we added a new three-level predictor crossed with our four level
+example from before (we'll call the new predictor *group* with levels A, B, C).
+If we also just wanted to do pairwise comparisons, a scheme approach would
+encode *pairwise comparisons* for cognitive load and *pairwise comparisons*
+for the new factor.
+The manual approach would say to encode low-none, high-none, and extra high-none;
+then, encode B-A, and C-A.
+If we introduce a new group D later, we have to remember to go in and specify 
+D-A too.
+
+So, while the manual approach is maximally explicit about exactly what we want
+to compare, it's also more things to write out and more chances that we make a
+mistake while implementing it.
+Given that contrasts are specified using matrices in R, the chances of a mistake
+are high.
+Accordingly, R provides a few functions that implement common contrast schemes
+such as `contr.treatment` and `contr.sum`, which return matrices given a number 
+of levels.
+However, there's some trickiness with them.
+Below is a quick list of some issues this package attempts to circumvent; if
+you're familiar with contrast coding from your own work, some of this may sound
+familiar and some of it may surprise you.
+If you're not sure what I mean by something, hang tight and they'll be explained
+more later in the vignette.
+
+ - When setting contrasts to a factor that differ from the R session's default
+ contrasts, the labels for the comparisons in the output of the statistical model
+ are reset. This requires the researcher to keep track of which numeric indices
+ (1, 2, etc.) correspond to which comparisons---which also requires keeping
+ track of the alphabetical order of the levels. Alternatively, the researcher
+ can set the comparison labels using `dim()`, `dimnames()`, or `colnames()`.
+ In my experience, I rarely see people in my field do this, and so I believe it
+ would be naive to expect people to suddenly (learn how to and) start doing so.
+ - The reference level for the default contrasts, `contr.treatment`, place the
+ reference level as the first level alphabetically while `contr.sum` places the
+ reference level as the LAST level alphabetically. To verify for yourself, try
+ running `contr.treatment(5)` and `contr.sum(5)`. respectively, the reference
+ levels are identifiable by the rows containing either all 0s or all -1s.
+ - Related to the above, when people want to use $\pm.5$ for their contrasts
+ for a two-level factor, it is not uncommon to see something like 
+ `-contr.sum(2)/2`. However, this ***does not generalize*** when the number of
+ levels is not 2.
+ - `contr.helmert` returns unscaled matrices, giving effect estimates that need
+ to be manually scaled. Tests of statistical significance are still meaningful,
+ but interpreting the magnitude of effects using matrices from this function
+ are likely to be incorrect if not scaled manually.
+ - Quite a few contrasts simplify to $\pm.5$ when there are two levels. For
+ example, helmert coding and backward difference coding both give +.5 and -.5.
+ But, if we were to add a third level to these, the values for the newly added
+ comparison are NOT the same. Accordingly, if we're not explicit about what the
+ **goal** of the comparisons are (nested comparisons vs successive comparisons)
+ then future researchers following up on our work might attempt to use the same
+ contrast scheme but not understand what the new comparison is.
+
+
+
+
 ## Motivation 
 
 The default contrast scheme for factors in R is **treatment coding**, which tests
@@ -526,8 +643,8 @@ lm(price ~ clarity, data = diamonds1) |>
   broom::tidy()
 
 # Decomposing the contrasts to create new columns for the first three trends
-# also works well (decompose_contrasts is still experimental)
-diamonds2 <- decompose_contrasts(diamonds, extract_from = "clarity")
+# also works well
+diamonds2 <- decompose_contrasts(diamonds, ~ clarity)
 lm(price ~ clarity.L + clarity.Q, data = diamonds2) |> 
   broom::tidy()
 ```
@@ -546,7 +663,9 @@ invisible(set_contrasts(diamonds, clarity ~ contr.poly - 4:7))
 
 This is some newer functionality to gain some quick insight into the factors used
 in your dataset. It uses the same syntax as `enlist_contrasts` and `set_contrasts`
-and provides a dataframe with some useful information.
+and provides a dataframe with some useful information. Note however that
+`glimpse_contrasts` doesn't change the dataframe itself, so you'll usually need
+to pair this with a call to `set_contrasts`. Note the warning here.
 
 ```{r}
 tstdf <- mtcars
