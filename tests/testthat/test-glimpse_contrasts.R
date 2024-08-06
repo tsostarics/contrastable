@@ -8,12 +8,12 @@ test_that("Intercept interpretation works", {
 test_that("Glimpse works", {
   tstdf <- mtcars
   tstdf$cyl <- factor(tstdf$cyl)
-  tst <- glimpse_contrasts(tstdf,
-    carb ~ contr.poly - 3:5,
-    gear ~ scaled_sum_code + 5,
-    minimal = FALSE,
-    verbose = FALSE
-  )
+  tst <- suppressWarnings(glimpse_contrasts(tstdf,
+                                            carb ~ contr.poly - 3:5,
+                                            gear ~ scaled_sum_code + 5,
+                                            minimal = FALSE,
+                                            verbose = FALSE))
+
   expect_equal(tst$factor, c("carb", "gear", "cyl"))
   expect_equal(tst$n, c(6, 3, 3), ignore_attr = TRUE) # need unname
   expect_equal(tst$scheme, c("contr.poly", "scaled_sum_code", "contr.treatment"), ignore_attr = TRUE) # need unname
@@ -31,13 +31,13 @@ test_that("Glimpse with variables works", {
   b <- 4
   c <- 5
   mat <- scaled_sum_code(3)
-  tst <- glimpse_contrasts(tstdf,
-    carb ~ contr.poly - a:c,
-    gear ~ mat + c * b,
-    cyl ~ scaled_sum_code + b * b,
-    minimal = FALSE,
-    verbose = FALSE
-  )
+  tst <- suppressWarnings(glimpse_contrasts(tstdf,
+                                            carb ~ contr.poly - a:c,
+                                            gear ~ mat + c * b,
+                                            cyl ~ scaled_sum_code + b * b,
+                                            minimal = FALSE,
+                                            verbose = FALSE))
+
   expect_equal(tst$scheme, c("contr.poly", "custom", "scaled_sum_code"))
   expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"),
                ignore_attr = TRUE)
@@ -80,7 +80,8 @@ test_that("List output works", {
     cyl ~ helmert_code,
     gear ~ orth_polynomial_code
   )
-  glimpse_list <- glimpse_contrasts(mtcars,
+  my_data <- set_contrasts(mtcars, schemes,verbose = FALSE)
+  glimpse_list <- glimpse_contrasts(my_data,
                                     schemes,
                                     return_list = TRUE,
                                     verbose = FALSE)
@@ -101,3 +102,55 @@ test_that("One level factor glimpse works", {
   expect_equal(glimpse$explicitly_set, c(FALSE, NA))
   expect_equal(glimpse$factor, c("twolevel", "onelevel"))
 })
+
+test_that(".warn_if_mismatched_contrasts works", {
+
+  my_data <- mtcars
+  my_data$cyl <- factor(my_data$cyl)
+  clist <- list(cyl ~ helmert_code)
+
+  # (1) no warning, default
+  expect_no_warning(glimpse_contrasts(my_data))
+
+  # (2) warning that contrast matrices dont match
+  expect_warning(glimpse_contrasts(my_data, clist),
+                 "Contrasts for factors in `my_data` don't match matrices in formulas:[ \n]+- cyl")
+
+
+  # (3) warning that labels dont match (but matrices are fine)
+  contrasts(my_data$cyl) <- helmert_code(3)
+  expect_warning(glimpse_contrasts(my_data, clist),
+                 "Comparison labels for contrasts in `my_data` don't match:[ \n]+- cyl	\\(expected `<6, <8` but found ``\\)")
+
+  # (4) no warnings so long as the contrasts in clist ARE set to my_data
+  my_data <- set_contrasts(my_data, clist)
+  glimpse_contrasts(my_data, clist)
+
+  # (5) warning that carb isn't a factor
+  clist <- list(cyl ~ helmert_code, carb ~ helmert_code)
+  expect_warning(glimpse_contrasts(my_data, clist),
+                 "These vars in `my_data` are not factors:[ \n]+- carb")
+
+  my_data <- mtcars
+  my_data$am <- factor(my_data$am)
+  # (6) check that the manually set labels show up correctly
+  expect_warning(glimpse_contrasts(my_data, am ~ treatment_code + 0 | c("diffA")),
+                 c("\\(expected `diffA` but found `1`\\)"))
+
+  clist <- list(cyl ~ helmert_code,
+                am ~ treatment_code + 0 | c("diffA"))
+  my_data$cyl <- factor(my_data$cyl)
+  my_data$am <- factor(my_data$am)
+
+  # (7) check that symbol handling works correctly
+  expect_warning(glimpse_contrasts(my_data, clist),
+                 "my_data <- set_contrasts\\(my_data, clist\\)")
+
+  # (8) check that formula formatting works correctly
+  expect_warning(glimpse_contrasts(my_data,
+                                   cyl ~ helmert_code,
+                                   am ~ treatment_code + 0 | c("diffA")),
+                 "my_data <- set_contrasts\\(my_data,[ \n]+cyl ~ helmert_code,am ~ treatment_code + 0 | c\\(\"diffA\"\\)")          # (5) double warning
+
+})
+

@@ -18,7 +18,7 @@
 #'   included in the output? Default is FALSE to omit
 #' @param minimal Logical, default TRUE, whether to omit the orthogonal,
 #'   centered, dropped_trends, and explicitly_set columns from the output table
-#' @param verbose Logical, defaults to FALSE, whether messages should be printed
+#' @param verbose Logical, defaults to TRUE, whether messages should be printed
 #'
 #' @inherit enlist_contrasts details
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
@@ -34,16 +34,22 @@ glimpse_contrasts <- function(model_data,
                               show_one_level_factors = FALSE,
                               minimal = TRUE,
                               verbose = FALSE) {
-  formulas <- purrr::list_flatten(rlang::dots_list(...)) # outer names warning?
+  formulas <- purrr::list_flatten(rlang::dots_list(...))
+
+  # Get symbols passed to ... and model_data for .warn_if_mismatched_contrasts
+  # ensyms(...) when ... is not a symbol will throw an error, in which case we
+  # can just use "..." as in the function definition
+  dots_names <- tryCatch(as.character(rlang::ensyms(...)), error = \(e) "...")
+  model_data_name <- as.character(rlang::ensym(model_data))
 
   # If no formulas are provided but we want to glimpse all factors, use
   # glimpse_default_factors and return early. If all.factors is FALSE, then
   # we're going to get an error from enlist_contrasts anyways
   if (identical(formulas, list()) && show_all_factors) {
     glimpse <- .glimpse_default_factors(model_data,
-      set_factors = c(),
-      show_one_level_factors,
-      verbose
+                                        set_factors = c(),
+                                        show_one_level_factors,
+                                        verbose
     )
 
     if (add_namespace) {
@@ -64,6 +70,15 @@ glimpse_contrasts <- function(model_data,
   contrast_list <- enlist_contrasts(model_data, ..., "verbose" = verbose)
   params <- lapply(formulas, .make_parameters)
 
+
+  # Need to check whether the contrasts on the data frame are the same as
+  # what was provided by the formulas
+  .warn_if_mismatched_contrasts(model_data,
+                                contrast_list,
+                                model_data_name,
+                                dots_names,
+                                formulas)
+
   # Ignore explicitly set factors that actually only have one level
   is_onelevel_factor <-
     vapply(
@@ -82,9 +97,9 @@ glimpse_contrasts <- function(model_data,
   scheme_labels <- .get_scheme_labels(params, formulas)
   reference_levels <- .get_reference_levels(contrast_list, params, formulas)
   intercept_interpretations <- vapply(contrast_list,
-    interpret_intercept,
-    character(1),
-    USE.NAMES = FALSE
+                                      interpret_intercept,
+                                      character(1),
+                                      USE.NAMES = FALSE
   )
 
   orthogonal_contrasts <- is_orthogonal(contrast_list)
@@ -151,28 +166,28 @@ glimpse_contrasts <- function(model_data,
 
 .add_namespace <- function(scheme_names) {
   vapply(scheme_names,
-    \(n) {
-      namespace <- gsub("package:", "", utils::find(n), perl = TRUE)
-      separator <- "::"
-      if (identical(namespace, character(0))) {
-        namespace <- ""
-        separator <- ""
-      }
+         \(n) {
+           namespace <- gsub("package:", "", utils::find(n), perl = TRUE)
+           separator <- "::"
+           if (identical(namespace, character(0))) {
+             namespace <- ""
+             separator <- ""
+           }
 
-      paste0(namespace, separator, n)
-    }, character(1),
-    USE.NAMES = FALSE
+           paste0(namespace, separator, n)
+         }, character(1),
+         USE.NAMES = FALSE
   )
 }
 
 .clean_schemes <- function(scheme_labels) {
   vapply(scheme_labels,
-    function(x) {
-      x <- gsub("contr\\.poly", "orth_polynomial", x)
-      gsub("(^contr\\.)|(_code$)", "", x)
-    },
-    character(1),
-    USE.NAMES = FALSE
+         function(x) {
+           x <- gsub("contr\\.poly", "orth_polynomial", x)
+           gsub("(^contr\\.)|(_code$)", "", x)
+         },
+         character(1),
+         USE.NAMES = FALSE
   )
 }
 
@@ -212,8 +227,8 @@ glimpse_contrasts <- function(model_data,
 
   # Extract the number of levels levels for each factor
   factor_sizes <- vapply(unset_factors,
-    function(x) nlevels(model_data[[x]]),
-    FUN.VALUE = integer(1)
+                         function(x) nlevels(model_data[[x]]),
+                         FUN.VALUE = integer(1)
   )
 
   # Extract the names of the levels for each factor
@@ -222,8 +237,8 @@ glimpse_contrasts <- function(model_data,
   # Since the unset factors are using the default contrasts, look up what the
   # defaults are in the options
   schemes_to_use <- ifelse(is_ordered_factor[unset_factors],
-    options("contrasts")[[1]]["ordered"],
-    options("contrasts")[[1]]["unordered"]
+                           options("contrasts")[[1]]["ordered"],
+                           options("contrasts")[[1]]["unordered"]
   )
 
   # For most users, the reference level for unordered factors will use
@@ -235,9 +250,9 @@ glimpse_contrasts <- function(model_data,
 
   # Interpret each contrast matrix, then check if they're orthogonal or centered
   intercept_interpretations <- vapply(default_contrasts,
-    interpret_intercept,
-    character(1),
-    USE.NAMES = FALSE
+                                      interpret_intercept,
+                                      character(1),
+                                      USE.NAMES = FALSE
   )
   orthogonal_contrasts <- is_orthogonal(default_contrasts)
   centered_contrasts <- is_centered(default_contrasts)
@@ -522,4 +537,108 @@ glimpse_contrasts <- function(model_data,
     },
     character(1)
   )
+}
+
+.warn_if_mismatched_contrasts <- function(model_data,
+                                          contrast_list,
+                                          model_data_name,
+                                          dots_names,
+                                          formulas) {
+  # set_contrasts will coerce non-factors but glimpse_contrasts will not
+  var_is_factor <-
+    vapply(names(contrast_list),
+           \(varname) is.factor(model_data[[varname]]),
+           logical(1), USE.NAMES = TRUE)
+
+  # If there are no issues we won't give the user a reminder of how to use
+  # set_contrasts with the correct arguments
+  remind_about_set_contrasts <- FALSE
+
+  # We'll build up each warning message separately then concatenate any needed
+  # ones at the end so we only need to send one warning
+  WARN_non_factor <- NULL
+  WARN_mismatched_contrasts <- NULL
+  WARN_mismatched_labels <- NULL
+  WARN_reminder <- NULL
+
+  if (any(!var_is_factor)) {
+    non_factor_vars <- paste0(" - ", names(contrast_list)[!var_is_factor], collapse = "\n")
+    WARN_non_factor <- glue::glue("These vars in `{model_data_name}` are not factors:\n{non_factor_vars}")
+    remind_about_set_contrasts <- TRUE
+  }
+
+  # TODO: This can be refactored to only iterate once over everything
+  doesnt_match_set_contrasts <-
+    vapply(names(contrast_list[var_is_factor]),
+           \(varname) {
+             !identical(unname(contrasts(model_data[[varname]])),
+                        unname(contrast_list[[varname]]))
+           }, logical(1), USE.NAMES = TRUE)
+
+  labels_dont_match <-
+    vapply(names(contrast_list[var_is_factor]),
+           \(varname) {
+             !identical(colnames(contrasts(model_data[[varname]])),
+                        colnames(contrast_list[[varname]]))
+           }, logical(1), USE.NAMES = TRUE)
+
+  if (any(doesnt_match_set_contrasts) | any(labels_dont_match)) {
+    # Get which variables have mismatching matrices XOR mismatching labels
+    # (practically speaking mismatching matrices will entail mismatching labels)
+    mismatched_varnames <- names(which(doesnt_match_set_contrasts))
+    mismatched_labels <- names(labels_dont_match)[labels_dont_match & !doesnt_match_set_contrasts]
+
+    remind_about_set_contrasts <- TRUE
+
+    if (!identical(mismatched_varnames, character(0))) {
+      mismatched_varnames <- paste0(" - ", mismatched_varnames, collapse = "\n")
+      WARN_mismatched_contrasts <-
+        glue::glue("Contrasts for factors in `{model_data_name}` don't match matrices in formulas:\n{mismatched_varnames}")
+    }
+
+    if (!identical(mismatched_labels, character(0))) {
+      # For each variable with only mismatching labels, look up what the
+      # expected (via formulas) and actual comparison labels are
+      warning_lines <-
+        vapply(mismatched_labels,
+               \(varname) {
+                 expected_labels <- paste0(colnames(contrast_list[[varname]]), collapse = ", ")
+                 set_labels <- paste0(colnames(contrasts(model_data[[varname]])), collapse = ", ")
+
+                 paste0(" - ", varname, "\t(expected `",expected_labels, "` but found `", set_labels, "`)")
+               }, character(1))
+
+      mismatched_labels <- paste0(warning_lines, collapse = "\n")
+      WARN_mismatched_labels <-
+        glue::glue("Comparison labels for contrasts in `{model_data_name}` don't match:\n{mismatched_labels}")
+    }
+
+  }
+
+  if (remind_about_set_contrasts) {
+    # If the user typed out formulas manually, then we need to expand the ...
+    if (dots_names[1] == "...") {
+      padding <- strrep(" ", nchar(model_data_name) + 18L) # nchar(" <- set_contrasts(")
+      initial_newlines <- c("\n", strrep("", length(formulas) -1)) # need an extra \n on the first formula
+      dots_names <-
+        paste0(initial_newlines,
+               padding,
+               # as.character(formula) gives a character vector of length 3,
+               # format.formula() will give a single string
+               vapply(formulas, format, character(1)),
+               collapse = ",\n")
+    }
+    WARN_reminder <- glue::glue("To fix, be sure to run:\n{model_data_name} <- set_contrasts({model_data_name}, {dots_names})")
+  }
+
+  # Any NULLs won't be included; if all are none the length will be 0
+  warning_messages <- c(WARN_non_factor,
+                        WARN_mismatched_contrasts,
+                        WARN_mismatched_labels,
+                        WARN_reminder)
+
+  if (length(warning_messages) > 0) {
+    warning(paste0(warning_messages, collapse = "\n"))
+  }
+
 }
