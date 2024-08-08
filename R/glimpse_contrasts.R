@@ -371,8 +371,11 @@ glimpse_contrasts <- function(model_data,
 #' @param factor_names Names of the factors, also the names of the contrast list
 #' @param factor_sizes Number of levels for each factor
 #' @param which_ordered Which of the factors are ordered
+#' @param schemes_to_use Character vector of schemes, if any don't match the
+#' default for a factor, it will be replaced wtih ??? in th eoutput
 #'
-#' @return Warns if non default contrasts are set
+#' @return Warns if non default contrasts are set, returns schemes_to_use with
+#' modifications if necessary
 .warn_if_nondefault <- function(contrast_list,
                                 factor_names,
                                 factor_sizes,
