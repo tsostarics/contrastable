@@ -221,9 +221,9 @@ use_contrasts.matrix <- function(factor_col,
   if (given_matrix_size[1] != factor_size[1] &&
       given_matrix_size[2] != factor_size[2]) {
     stop(
-      "Matrix given to code_by is size",
+      "Matrix given to code_by is size ",
       paste(given_matrix_size, collapse = "x"),
-      "but factor_col contrast matrix is size",
+      " but factor_col contrast matrix is size ",
       paste(factor_size, collapse = "x"), "."
     )
   }
