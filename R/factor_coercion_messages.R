@@ -11,8 +11,8 @@
 #' @return Nothing, sends a message
 .msg_if_ordered_reset <- function(model_data, vars_in_model) {
   which_are_ordered <- vapply(model_data[vars_in_model], is.ordered, TRUE)
-  any_ordered <- any(which_are_ordered)
-  if (any_ordered) {
+
+  if (any(which_are_ordered)) {
     or_default <- crayon::red(options("contrasts")[[1L]]["ordered"])
     ordered_names <-
       crayon::red(

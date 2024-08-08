@@ -154,3 +154,27 @@ test_that(".warn_if_mismatched_contrasts works", {
 
 })
 
+
+test_that("Reset label to ??? if nondefault", {
+  tstdf <- mtcars
+  tstdf$cyl <- factor(tstdf$cyl)
+  contrasts(tstdf$cyl) <- sum_code(3)
+
+  tst <- suppressWarnings(glimpse_contrasts(tstdf,
+                                            verbose = FALSE))
+
+  expect_equal(tst$scheme[[1]], "???")
+})
+
+test_that("Reference levels reported correctly", {
+  tstdf <- data.frame(a = factor(c("a", "b", "c")), # contr.treatment default ref = a
+                      b = factor(c("a", "b", "c")), # will make ref = b
+                      c = factor(c("a", "b", "c"))) # will be NA via helmert coding
+
+  tst <- suppressWarnings(glimpse_contrasts(tstdf,
+                                            b ~ sum_code + "b",
+                                            c ~ helmert_code,
+                                            verbose = FALSE))
+
+  expect_equal(tst$reference, c("b", NA, "a"))
+})

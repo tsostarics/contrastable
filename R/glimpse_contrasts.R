@@ -95,7 +95,7 @@ glimpse_contrasts <- function(model_data,
   factor_sizes <- vapply(contrast_list, nrow, 1L, USE.NAMES = FALSE)
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
-  reference_levels <- .get_reference_levels(contrast_list, params, formulas)
+  reference_levels <- .get_reference_levels(contrast_list)
   intercept_interpretations <- vapply(contrast_list,
                                       interpret_intercept,
                                       character(1),
@@ -260,10 +260,15 @@ glimpse_contrasts <- function(model_data,
   # Trends are never dropped w/ R's defaults
   dropped_trends <- rep(NA, length(unset_factors))
 
-  .warn_if_nondefault(default_contrasts,
-                      unset_factors,
-                      factor_sizes,
-                      is_ordered_factor)
+  # Check if any factors have not been specified in the call but are
+  # different from the defaults. Reporting the default scheme is misleading,
+  # so we will warn the user and change the scheme to ???
+  schemes_to_use <-
+    .warn_if_nondefault(default_contrasts,
+                        unset_factors,
+                        factor_sizes,
+                        is_ordered_factor,
+                        schemes_to_use)
 
   glimpse <- tibble::tibble(
     "factor" = unset_factors,
@@ -371,7 +376,8 @@ glimpse_contrasts <- function(model_data,
 .warn_if_nondefault <- function(contrast_list,
                                 factor_names,
                                 factor_sizes,
-                                which_ordered) {
+                                which_ordered,
+                                schemes_to_use) {
   indices <- seq_along(factor_sizes)
   factor_sizes <- unname(factor_sizes)
   ord_fx <- str2lang(options("contrasts")[[1]][["ordered"]])
@@ -395,7 +401,7 @@ glimpse_contrasts <- function(model_data,
     )
 
   if (sum(same_as_default) == length(factor_names)) {
-    return(invisible(1))
+    return(schemes_to_use)
   }
 
   unord_str <- crayon::blue(as.character(unord_fx))
@@ -414,8 +420,12 @@ glimpse_contrasts <- function(model_data,
   )
   nondefaults <- paste(paste(" - ", nondefaults, sep = ""), collapse = "\n")
 
+  schemes_to_use[!same_as_default] <- "???"
+
   warning(glue::glue("Unset factors do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.
              {nondefaults}"))
+
+  schemes_to_use
 }
 
 .get_dropped_trends <- function(params, formulas) {
