@@ -2,15 +2,15 @@
 title: "contrasts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{contrasts}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+ %\VignetteIndexEntry{contrasts}
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteEncoding{UTF-8}
 ---
-
+  
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+collapse = TRUE,
+comment = "#>"
 )
 ```
 
@@ -34,23 +34,17 @@ reading the following:
 - [How to capitalize on a priori contrasts in linear (mixed) models: A tutorial](https://www.sciencedirect.com/science/article/pii/S0749596X19300695)
 - [Regresion modeling for linguistic data (preprint)](https://osf.io/pnumg/)
 
-There is a very small overview of hypothesis matrices in the second to last
-section, but I will not provide a discussion of orthogonality as it relates
-to contrasts.
+I also have a few blog posts about contrast coding; if you need further
+explanation of contrasts and more working examples beyond this vignette, read
+the first one below:
+
+ - [Introduction to Contrasts using Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
+ - [https://tsostaricsblog.netlify.app/posts/helmert/](On Helmert Coding)
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(contrastable)
 library(dplyr)
 library(MASS)
-mdl_data <- 
-  mtcars |> 
-  as_tibble() |> 
-  mutate(cyl = factor(cyl), 
-         twolevel = round(runif(n()),0),
-         twolevel = ifelse(twolevel == 1, "a", "b"),
-         twolevel = factor(twolevel),
-         gear = factor(gear),
-         carb = factor(carb))
 ```
 
 ## Introduction to contrasts
@@ -88,8 +82,7 @@ One comparison might be to compare low to none, then high to none.
 Another could be to compare low to none, then high to *low*.
 Yet another could be to compare low to none, then high to *low and none* together.
 Or, we could compare each level to the average across the conditions.[^dfnote]
-Specifying these different comparisons, which will really just amount to differences in
-group means, is our goal here.
+Specifying these different comparisons, which will really just amount to differences in group means, is our goal here.
 
 In our example, what if we went found that our high cognitive load condition
 wasn't high enough?
@@ -98,10 +91,10 @@ We could add a comparison of extra-high to none, or compare extra-high to high.
 Or, we could compare extra-high to none plus low plus high together.
 Ideally, if we're going for pairwise comparisons from a reference level,
 successive differences between levels, or some kind of nested set of comparisons,
-we would want to be able to specify this consistently.
+we would want to be able to specify this consistently without needing to revisit every instance of specifying our comparisons just to accommodate the new level.
 
- [^dfnote]: Technically, due to degrees of freedom, we'd compare only 2 of the
- 3 levels to the average.
+[^dfnote]: Technically, due to degrees of freedom, we'd compare only 2 of the
+3 levels to the average.
 
 
 Throughout this vignette and package, I refer to different **contrast schemes**,
@@ -135,673 +128,521 @@ However, there's some trickiness with them.
 Below is a quick list of some issues this package attempts to circumvent; if
 you're familiar with contrast coding from your own work, some of this may sound
 familiar and some of it may surprise you.
-If you're not sure what I mean by something, hang tight and they'll be explained
-more later in the vignette.
 
- - When setting contrasts to a factor that differ from the R session's default
- contrasts, the labels for the comparisons in the output of the statistical model
- are reset. This requires the researcher to keep track of which numeric indices
- (1, 2, etc.) correspond to which comparisons---which also requires keeping
- track of the alphabetical order of the levels. Alternatively, the researcher
- can set the comparison labels using `dim()`, `dimnames()`, or `colnames()`.
- In my experience, I rarely see people in my field do this, and so I believe it
- would be naive to expect people to suddenly (learn how to and) start doing so.
- - The reference level for the default contrasts, `contr.treatment`, place the
- reference level as the first level alphabetically while `contr.sum` places the
- reference level as the LAST level alphabetically. To verify for yourself, try
- running `contr.treatment(5)` and `contr.sum(5)`. respectively, the reference
- levels are identifiable by the rows containing either all 0s or all -1s.
- - Related to the above, when people want to use $\pm.5$ for their contrasts
- for a two-level factor, it is not uncommon to see something like 
- `-contr.sum(2)/2`. However, this ***does not generalize*** when the number of
- levels is not 2.
- - `contr.helmert` returns unscaled matrices, giving effect estimates that need
- to be manually scaled. Tests of statistical significance are still meaningful,
- but interpreting the magnitude of effects using matrices from this function
- are likely to be incorrect if not scaled manually.
- - Quite a few contrasts simplify to $\pm.5$ when there are two levels. For
- example, helmert coding and backward difference coding both give +.5 and -.5.
- But, if we were to add a third level to these, the values for the newly added
- comparison are NOT the same. Accordingly, if we're not explicit about what the
- **goal** of the comparisons are (nested comparisons vs successive comparisons)
- then future researchers following up on our work might attempt to use the same
- contrast scheme but not understand what the new comparison is.
+- When setting contrasts to a factor that differ from the R session's default
+contrasts, the labels for the comparisons in the output of the statistical model
+are reset. This requires the researcher to keep track of which numeric indices
+(1, 2, etc.) correspond to which comparisons---which also requires keeping
+track of the alphabetical order of the levels. Alternatively, the researcher
+can set the comparison labels using `dim()`, `dimnames()`, or `colnames()`.
+In my experience, I rarely see people in my field do this, and so I believe it
+would be naive to expect people to suddenly (learn how to and) start doing so.
+- The default contrast scheme, `contr.treatment`, places the
+reference level as the first level alphabetically while `contr.sum` places the
+reference level as the LAST level alphabetically. To verify for yourself, try
+running `contr.treatment(5)` and `contr.sum(5)`. respectively, the reference
+levels are identifiable by the rows containing either all 0s or all -1s.
+- Related to the above, when people want to use $\pm.5$ for their contrasts
+for a two-level factor, it is not uncommon to see something like 
+`-contr.sum(2)/2`. However, this ***does not generalize*** when the number of
+levels is greater than 2, i.e,. `-contr.sum(3)/2` will not give you what you expect.
+- `contr.helmert` returns unscaled matrices, giving effect estimates that need
+to be manually scaled. Tests of statistical significance are still meaningful,
+but interpreting the magnitude of effects using matrices from this function
+are likely to be incorrect if not scaled manually.
+- Quite a few contrasts simplify to $\pm.5$ when there are two levels. For
+example, helmert coding and backward difference coding both give +.5 and -.5.
+But, if we were to add a third level to these, the values for the newly added
+comparison are NOT the same. Accordingly, if we're not explicit about what the
+**goal** of the comparisons are (nested comparisons vs successive comparisons)
+then future researchers following up on our work might attempt to use the same
+contrast scheme but not understand what the new comparison is.
 
+## Motivation
 
-
-
-## Motivation 
-
-The default contrast scheme for factors in R is **treatment coding**, which tests
-the difference between each level of a factor and the level set as the reference 
-level. Often this doesn't correspond to hypotheses we want to test, so we need to 
-change it ourselves.
+I'm going to use the mtcars dataset just to have something to work with.
+We'll convert a bunch of the columns to factors up front.
 
 ```{r}
-contrasts(mdl_data$twolevel)
-contrasts(mdl_data$carb)
-```
-
-Typically we would change these manually using `contrasts<-`, for example
-this would implement R's built in sum coding for a 6 level factor.
-
-```{r}
-contrasts(mdl_data$carb) <- contr.sum(6)
-contrasts(mdl_data$carb)
-```
-
-Compare this contrast matrix to the treatment coded matrix previously shown
-for this factor. There are two things to note here. First, in the treatment
-coded matrix the *first row* corresponding to level 1 was all 0, denoting 1 as
-the reference level, but here the reference level is actually level 8, which has
-all -1s. This may not be what you intended.
-Second, the **column names have changed**. The column names represent the labels
-for the comparisons we're making with our contrast matrix. In the treatment
-coded matrix, the labels are `c(2, 3, 4, 6, 8)`, which would be shown in the
-coefficient names in a model summary. In the matrix from `contr.sum(6)`, they're
-not the same. Notably, what would correspond to the comparison for level 6 would
-be displayed as `carb5` in our model output! We'd like to have meaningful labels
-that make it easier to interpret.
-
-Occasionally people will mention that there's a "standard", "tradition", or
-"convention" that `coef1` corresponds to something. This isn't really the case,
-it's only a "convention" because people are unknowingly erasing or not setting
-the labels themselves. There's no reason to need to keep track of what 1 represents
-for all your categorical variables in your head, as you'll likely make a mistake.
-
-```{r reset, echo = FALSE}
 mdl_data <- 
   mtcars |> 
   as_tibble() |> 
   mutate(cyl = factor(cyl), 
-         twolevel = round(runif(n()),0),
-         twolevel = ifelse(twolevel == 1, "a", "b"),
-         twolevel = factor(twolevel),
+         twolevel = factor(rep(c("a", "b"),times = nrow(mtcars)/2)),
          gear = factor(gear),
          carb = factor(carb))
 ```
 
-## Contrast coding 
-
-The basis for this package is the `use_contrasts()` function, which takes
-a factor vector (i.e., a factor column in a dataframe) and a desired contrast 
-scheme and returns a new contrast matrix.
-The contrast scheme can be passed as either a function that generates contrast
-matrices, such as `contr.sum`, or a matrix you've created yourself. In the next
-section I will outline additional functionality that allows you to more quickly
-set contrasts to your data, but for the time being this section will discuss
-what the general output you can get would look like.
-
-Here we use `contr.sum` to get a contrast matrix using the `carb` column.
+We can inspect the contrasts for the factors using `contrasts()`, which will use
+the default contrasts for unordered factors
 
 ```{r}
-use_contrasts(mdl_data$carb, contr.sum)
+options("contrasts") # Show defaults for unordered and ordered
+contrasts(mdl_data$twolevel)
+contrasts(mdl_data$carb) # Note the reference level
 ```
 
-There are two things to note here. First, the comparison labels have been retained.
-This makes model interpretation easier. Second, the reference level has been
-set to the first level alphabetically, rather than the last level. This is
-the default behavior, inherited from R's normal alphabetical ordering, but can 
-be set to whatever you want.
+We can see that the levels for `carb` are reflected in the coefficient labels:
 
 ```{r}
-use_contrasts(mdl_data$carb, contr.sum, reference_level = 4)
+summary(lm(mpg ~ carb, data = mdl_data))
 ```
 
-Note how the comparison labels have also changed appropriately.
-
-The setting of reference levels only applies to schemes that utilize a reference
-level. These include the following functions (R's default functions use a `.` while
-this package's functions use `_`s)
-
-- `contr.sum` and `sum_code`: compare each non-reference level to the grand mean
-- `contr.treatment` and `treatment_code`: compare each level to the reference level (intercept = mean of reference level)
-- `scaled_sum_code`: compare each level to the reference level (intercept = grand mean)
-
-The following schemes depend on a particular order of factors. By default,
-R orders levels alphabetically. If this isn't what you want, use `levels<-` to
-change the ordering manually *before* applying contrast coding.
-
-- `forward_difference_code`: compare each level k to level k+1 (eg 1-2, 2-3)
-- `backward_difference_code`: compare each level k to level k-1 (eg 3-2, 2-1)
-- `helmert_code` and `contr.helmert`: compare each level k to the mean of all levels below if (eg <2, <3). 
-However, note that `contr.helmert` uses an unscaled contrast matrix, returning values that need to be manually scaled.
-The statistical tests are exactly the same as `helmert_code`, but the magnitudes in the mean differences will be lower than they actually are. 
-- `reverse_helmert_code`: compare each level k to the mean of all levels above it (eg >1, >2)
-
-
-Orthogonal polynomial contrasts with `contr.poly`  and `orth_polynomial_code`
-are typically used to identify
-trends in ordinal predictors. In fact, just as `contr.treatment` is the default
-contrast setting for unordered factors in R, `contr.poly` is the default for
-ordered factors. You can view the default settings using `options()`, but
-in general I do not recommend changing the defaults and relying on them.
+But if we changed the contrasts ourselves those helpful labels go away and are
+replaced with numeric indices. Note that the level names were originally
+also numbers, so it would be easy to get mixed up at this point.
 
 ```{r}
-options('contrasts')
+mdl_data2 <- mdl_data
+contrasts(mdl_data2$carb) <- contr.sum(6)
+
+contrasts(mdl_data2$carb) # Note the reference level
+summary(lm(mpg ~ carb, data = mdl_data2))
 ```
 
-Nonetheless, orthogonal polynomial contrasts aren't used for group comparisons,
-rather looking for polynomial trends across ordered scores assigned to each level,
-so the "comparison" labels are different. But this isn't
-an issue, and will still work as expected.
+## Usage
+
+Now I'll introduce the main workhorse of this package: the `set_contrasts`
+function.
+This function features a special syntax to quickly set contrast schemes.
+I'll introduce features one at a time.
+
+First, we'll set `carb` to use sum coding as we did before.
+We do this using two-sided formulas, where the left hand side of the formula
+is a column in our dataset and the right hand side includes information about
+the contrasts we want to set.
+For example, this takes the form `varname ~ code_by`.
+Below, we specify that we want `carb` to use contrasts generated by the `sum_code`
+function.
+Two things to note: `set_contrasts` will ***automatically*** coerce specified 
+columns into factors, so you don't need to worry about calling `factor()` on
+columns first.
+Note that the function will also give messages about other factors that you
+haven't set explicitly.
 
 ```{r}
-use_contrasts(mdl_data$carb, contr.poly)
+mdl_data3 <- set_contrasts(mdl_data, carb ~ sum_code)
+
+contrasts(mdl_data2$carb) # matrix from before
+contrasts(mdl_data3$carb) # new matrix, note the column names
 ```
 
-## Setting contrasts en masse
-
-This section will outline the main functionality of this package: setting
-multiple contrast schemes quickly. This can be done by either creating a list
-of contrasts to give to the `contrasts` argument in model-fitting functions or
-by setting them directly to the dataframe.
-
-### Utilizing `contrasts` argument in model functions
-
-Rather than manually setting the contrasts on the data frame itself, you can
-use the contrasts argument in functions like `lm`, which take a named
-list of contrast matrices where the names correspond to factor predictors. This
-package provides a function `enlist_contrasts` to take advantage of this. Make
-sure your model fitting function supports this argument, as `brm` does not use this
-(see the next section).
+Note that, unlike last time, the reference level is now the first level
+alphabetically and the labels are retained (compare the contrast matrices)
+For schemes that have a singular reference level, setting contrasts with
+`set_contrasts` will always set the reference level to the first level 
+alphabetically.
+Currently, the reference level for `carb` is `1`.
+If we want to change the reference level, we use the `+` operator in our formula.
+The change to the formula looks like `varname ~ code_by + reference`.
+Let's change it to `3`:
 
 ```{r}
-my_contrasts <- 
-  enlist_contrasts(mdl_data,
-                   cyl ~ contr.sum + 6, # Set the reference level with + ___
-                   twolevel ~ scaled_sum_code + "a",
-                   gear ~ forward_difference_code,
-                   carb ~ helmert_code)
+mdl_data4 <- set_contrasts(mdl_data, carb ~ sum_code + "3")  
 
-my_model <- lm(mpg ~ cyl + twolevel + gear + carb, 
-               data = mdl_data,  
-               contrasts = my_contrasts)
-
-summary(my_model)
+contrasts(mdl_data4$carb)
 ```
 
-The left hand side of each formula in `enlist_contrasts` should be the unquoted
-name of a factor column, and the right hand side should be of the following:
-
-- An unquoted function name that generates contrast matrices
-- ***OR*** An unquoted variable name that's assigned to a contrast matrix
-- ***OR*** A `matrix()` call, which will be captured and evaluated
-- ***AND*** An optional reference level when applicable, following a `+`. String
-names should be quoted, if the label happens to be numeric you can leave the number
-unquoted. You can also use an unquoted variable name that contains the reference
-level.
-- ***AND*** An optional specification for which level to use as the intercept following
-a `*`. Same
-syntax as the reference level, see section titled "Changing Underlying Intercept"
-- ***AND*** If you use polynomial contrasts, an optional sequence (integer vector)
-of which trends you would like to drop following a `-`. Typically of the form 
-`- a:b` where a and b are integers (eg `- 3:5` to drop cubic through 5th power
-trends)
-0 ***AND*** an optional vector of labels to use for the comparisons following
-a `|`, which must be the last operator on the RHS if used. 
-
-When using this method you should set contrasts for all factors. You'll receive
-a message if you don't set one or more, along with what the default contrasts
-are as specified by `options('contrasts')` for both ordered and unordered factors.
-While not shown in this vignette, these are also color coded (blue for unordered,
-red for ordered) in the console.
+Note that when using sum coding, the intercept will be the mean of the group
+means:
 
 ```{r}
-contrast_list <- enlist_contrasts(mdl_data, carb ~ helmert_code)
+# mean of group means:
+group_means <- summarize(mdl_data4, grp_mean = mean(mpg), .by = "carb")
+group_means
+mean(group_means$grp_mean)
+
+# model coefficients
+coef(lm(mpg ~ carb, data = mdl_data4))
 ```
 
-### Setting multiple contrasts on dataframe
-
-As previously mentioned, the `brm` function from the `brms` package (used to
-fit bayesian models) does not have a `contrasts` argument. This means we need
-to set the contrasts on the dataframe itself. But, this doesn't mean we need
-to revert to multiple `contrasts<-` lines. We can use `set_contrasts`, which
-uses the same syntax as `enlist_contrasts` but returns a new copy of the dataframe
-where the contrast schemes are applied accordingly. The usual warnings and
-messages still apply.
+Let's say, hypothetically, we wanted to get differences of each comparison
+level to the grand mean, but we also wanted the intercept to be not the
+grand mean but the mean of our reference level?
+We can set this using the `*` operator:
+`varname ~ code_by + reference * intercept`.
 
 ```{r}
-mdl_data2 <- 
-  set_contrasts(mdl_data,
-                cyl ~ contr.sum + 6,
-                twolevel ~ scaled_sum_code + "a",
-                gear ~ forward_difference_code,
-                carb ~ helmert_code)
+mdl_data5 <- set_contrasts(mdl_data, carb ~ sum_code + 3 * 3)
 
-# Compare treatment coding to helmert coding (note these are different dfs)
-contrasts(mdl_data$carb)
-contrasts(mdl_data2$carb) |> fractions()
+contrasts(mdl_data5$carb)
+coef(lm(mpg ~ carb, data = mdl_data5))
 ```
 
-One other thing to know is that when calling `get_prior` or setting priors for
-coefficients in general, `brms` actually changes the names slightly when prepping
-the model for running in stan. For example, using backward difference coding gives
-coefficient names like `2-1`, but this gets changed to `2M1`. If you're doing
-programmatic setting of priors, it's something to keep in mind. You can also
-use `|` to set the names to something yourself.
-
-## Note about 2 level factors
-
-Coding factors with only 2 levels is a bit tricky conceptually because there
-is only one possible comparison you can make: level A to level B. Thus, many of 
-the different coding schemes end up being mathematically equivalent.
+Finally, let's say we wanted labels that were a bit more clear about what the
+comparisons are here.
+We can set the label names ourselves using the `|` operator:
+`varname ~ code_by + reference * intercept | labels`
 
 ```{r}
-helmert_code(2) # Compare k to >k
-scaled_sum_code(2) # Compare k to reference level
-forward_difference_code(2) # Compare k to k+1
+mdl_data6 <- set_contrasts(mdl_data, 
+                           carb ~ sum_code + 3 * 3 | c("1-3",
+                                                       "2-3",
+                                                       "4-3",
+                                                       "6-3",
+                                                       "8-3"))
+
+contrasts(mdl_data5$carb)
+coef(lm(mpg ~ carb, data = mdl_data6))
 ```
 
-In many introductions to contrast coding, the motivation for using `+/-.5` is
-something like this:
-
-- `0, 1` from `contr.treatment(2)` puts the intercept at the reference level, 
-which we don't always want
-- `-1, 1` from `-contr.sum(2)` keeps the same reference level and the intercept 
-is now the grand mean, but this tests half the difference between levels (i.e.,
-the distance between a level and the intercept)
-- `-.5, .5` from `-contr.sum(2)/2` scales the estimate so it tests the full 
-difference between levels.
-
-All of this is true, but it leads to an issue when naively extending this line
-of thinking beyond 2 levels. That is, one might be tempted to use the following
-matrix for "sum coding a 4 level factor"
+Here's what it would look like if you tried to manually do this yourself.
+It's highly unlikely you would correctly specify every single value
+and every single label correctly on the first go (I actually messed up myself
+while writing out the matrix).
 
 ```{r}
--contr.sum(4)/2
+mdl_data7 <- mdl_data
+
+my_contrasts <- matrix(c(2, 1, 0, 1, 1, 1, 
+                         1, 2, 0, 1, 1, 1, 
+                         1, 1, 0, 2, 1, 1, 
+                         1, 1, 0, 1, 2, 1,
+                         1, 1, 0, 1, 1, 2),
+                       nrow = 6)
+dimnames(my_contrasts) <- 
+  list(
+    c("1", "2", "3", "4", "6", "8"), 
+    c("1-3", "2-3", "4-3", "6-3", "8-3")
+  )
+
+
+contrasts(mdl_data7$carb) <- my_contrasts
+contrasts(mdl_data7$carb)
 ```
 
-Yet, this contrast matrix ***does not*** test the hypotheses that $\mu_1=\mu_4$
-and $\mu_2=\mu_4$ and $\mu_3=\mu_1$ in the same way that the 2 level matrix tested
-$\mu_1=\mu_2$. Rather, it tests the hypothesis that 
-$1.5\mu_1 =.5\mu_2+.5\mu_3 + .5\mu_4$ etc. To actually compare, and test the 
-difference between, each level and the reference level, you need to use the 
-following matrix, which this package provides a helper for:
+To see how this can get even more error prone, consider a contrast matrix like
+the one below.
+Personally I would not trust myself to get the matrix correct, and if I ever
+had to add a level to the design it would be obscene to try and edit it.
 
 ```{r}
-scaled_sum_code(4) |> MASS::fractions()
+mdl_data8 <- set_contrasts(mdl_data, carb ~ helmert_code * 4)
+
+MASS::fractions(contrasts(mdl_data8$carb))
 ```
 
-We can verify this by looking at the hypothesis matrices.
+The work would compound when we have multiple factors, but with the 
+`set_contrasts` function we can specify what our desired scheme is easily:
 
 ```{r}
-# Not what we want
-matrix(c(1,1,1,1,-contr.sum(4)/2), nrow = 4) |>
-  t() |> solve() |> fractions()
+mdl_data9 <- set_contrasts(mdl_data,
+                           carb ~ helmert_code * 4,
+                           cyl ~ scaled_sum_code + 4,
+                           twolevel ~ scaled_sum_code + "a",
+                           gear ~ helmert_code)
 
-# Actually what we want
-matrix(c(1,1,1,1,scaled_sum_code(4)), nrow = 4) |>
-  t() |> solve() |> fractions()
+MASS::fractions(contrasts(mdl_data9$carb))
+MASS::fractions(contrasts(mdl_data9$cyl))
+MASS::fractions(contrasts(mdl_data9$twolevel))
+MASS::fractions(contrasts(mdl_data9$gear))
 ```
 
-Rather than thinking about "testing half the difference," framing things in terms
-of the underlying hypothesis matrix being tested is more generalizable. Assume
-level 1 is `A` (and is the reference level) and level 2 is `B` in these
-descriptions:
+Practically speaking, the most common things you'll be doing is setting
+a contrast scheme and maybe changing the reference level, so the `+` operator
+is very important.
 
-- `0, 1` from `contr.treatment(2)` puts the intercept at the reference level
-and tests the difference $\mu_B-\mu_A$. Each comparison tests a distance from
-the reference level. We use the term *treatment coding*.
-- `-1, 1` from `-contr.sum(2)` puts the intercept at the grand mean 
-($GM=\frac{\mu_A+\mu_B}{2}$) and tests the difference $\mu_B - GM$. Each comparison
-tests a distance from the grand mean. We use the term *sum coding*
-- `-.5, .5` from `-contr.sum(2)/2` puts the intercept at the grand mean and 
-tests the difference $\mu_B - \mu_A$. Each comparison tests a distance from
-the reference level. We use the term *scaled sum coding*.
+### enlist_contrasts
 
-It's worth noting that the terms "sum coding" and "scaled sum coding" are
-***not*** consistent across disciplines. Other terms that are used are simple
-coding, deviation coding, effects coding, sum to zero coding, and contrast coding. When
-referring specifically to coding factors with 2 levels, sometimes just the numbers
-are used as in 0/1 coding, -1/1 coding, -.5/+.5 coding. I recommend that you
-choose a term from your discipline and stick to it, but also provide the exact
-contrast or hypothesis matrices in an appendix, preregistration, or
-supplementary material.
-
-## Changing Underlying Intercept
-
-I know I said I wouldn't give a discussion on how contrasts are derived, but 
-there's one additional functionality that kind of necessitates
-describing the process a little. We know that contrast matrices have $k$ rows
-and $k-1$ columns for our $k-1$ comparisons (derived from $k-1$ degrees of
-freedom). But models also give an intercept term: where does that come from?
-Moreover, why is it conveniently the grand mean for basically everything but
-treatment coding? What if I wanted a particular coding scheme for my level
-comparisons, but the intercept representing the mean of my highest level rather
-than the grand mean (which might not be meaningful)? Is this possible?
-
-First, recall that scaled sum coding puts the intercept at the grand mean and
-the comparisons are between the reference level and the level being compared.
+A related function is the `enlist_contrasts` function, which follows the same
+exact rules as `set_contrasts` but will return a list of contrasts instead of
+setting the contrasts to the data itself.
+Henceforth, when I'm not going to use the dataframe in an example, I'll just use
+this to show the contrast matrices.
 
 ```{r}
-fractions(scaled_sum_code(4))
+enlist_contrasts(mdl_data,
+                 carb ~ helmert_code * 4,
+                 cyl ~ scaled_sum_code + 4)
 ```
 
-The intercept in this case is actually represented by an omitted column of 1s
 
-```{r}
-matrix(c(rep(1,4),
-         scaled_sum_code(4)),
-       nrow = 4) |> fractions()
-```
+### Contrast functions
 
-Why are there fractions though? If I'm comparing level 1 to level 2, why aren't
-the others 0? Why aren't they just 0 compared to 1, like in treatment coding? This
-intuition is actually valid; not at the level of the contrasts but at the level
-of the hypotheses you want to test. Turns out those hypotheses actually underlie
-this matrix, and linear algebra transformations can be used to go between the two.
-For more details, see the paper on capitalizing on a priori contrasts. For now
-just know that we can take the inverse of the transpose of a matrix to go between
-the two (sometimes the transpose is omitted depending on the author, which means
-you'd go back and forth between interpreting columns or rows as comparisons).
+I showed a few functions that generate contrasts like `sum_code` and
+`scaled_sum_code` and `helmert_code`.
+Below is a list of functions provided by this package:
 
-```{r}
-contrast_matrix <- 
-  matrix(c(rep(1,4),
-           scaled_sum_code(4)),
-         nrow = 4)
-
-hypothesis_matrix <- solve(t(contrast_matrix))
-
-fractions(hypothesis_matrix)
-```
-
-This gives us our hypothesis matrix, and we can tell from the first column that
-the intercept is the grand mean because each level contributes to a single value.
-That is, the sum of the means of our 4 levels, divided by 4, is the grand mean;
-hence the weight of each mean is 1/4. Our comparisons show that we're comparing
-the fourth level (all -1s) to the 1st, 2nd, and 3rd levels for our three 
-comparisons. This is maybe more transparent than the 3/4 and -1/4s in the contrast
+- `treatment_code`: Pairwise comparisons to a reference level, intercept equals
+the reference level (equivalent to `contr.treatment`)
+- `sum_code`: Comparisons to the grand mean, intercept is the grand mean 
+(equivalent to `contr.sum`, but reference level is the first level)
+- `scaled_sum_code`: Pairwise comparisons to a reference level, intercept
+equals the grand mean
+- `helmert_code`: Nested comparisons starting from the first level. Note
+this is NOT equivalent to `contr.helmert`, as the latter gives an unscaled
 matrix.
+- `reverse_helmert_code`: Nested comparisons starting from the last level.
+- `backward_difference_code`: Successive differences. For levels A, B, C,
+gives the differences B-A and C-B
+- `forward_difference_code`: Successive differences. For levels A, B, C,
+gives the differences A-B and B-C.
+- `cumulative_split_code`: Dichotomous differences. For levels A, B, C, D,
+gives the differences A-(B+C+D), (A+B)-(C+D), (A+B+C)-D.
+- `orth_polynomial_code`: Orthogonal polynomial coding, equivalent to
+`contr.poly`.
+- `raw_polynomial_code`: Raw polynomial coding, I do not recommend using this
+unless you know what you're getting into.
+- `polynomial_code`: An alias for `orthogonal_polynomial_code`
 
-However, consider if we didn't want the grand mean. What if we wanted the
-intercept to be a particular level's mean, say our reference level of 4? Rather
-than having each level contribute to the intercept, we just want 1. So we can use
-this matrix:
-
-```{r}
-hypothesis_matrix2 <- hypothesis_matrix
-hypothesis_matrix2[,1] <- c(0,0,0,1)
-hypothesis_matrix2
-```
-
-Think critically here: Our intercept is now the mean of level 4, the other levels
-don't contribute to it. Each comparison is now the difference between a level and
-the reference level. If that's the case, we should have just recreated treatment
-coding! But we need to convert from our hypothesis matrix to the contrast matrix.
-Remind yourself what the contrast matrix from treatment coding should look 
-like before proceeding (hint: lots of 0s and 1s).
-
-```{r}
-# Inverse of the transpose, remove the first column to get contrasts
-maybe_treatment_contrasts <- solve(t(hypothesis_matrix2))[,2:4]
-
-# I'm manually reordering to make the reference level the 4th level here
-definitely_treatment_contrasts <- unname(contr.treatment(4)[c(2,3,4,1),])
-
-maybe_treatment_contrasts
-definitely_treatment_contrasts
-
-# Moment of truth: Are they the same?!
-all(maybe_treatment_contrasts == definitely_treatment_contrasts)
-```
-
-And indeed we recreated treatment coding by changing the underlying hypothesis
-matrix. That was so much work to get something already available. Consider
-a harder case of forward difference coding with the intercept changed.
+You can also use contrast functions from any other package so long as the
+first argument is the number of levels used to generate the matrix.
+However, again, if there's a singular level used for the reference level, this
+will always be set to the first level regardless of what the original matrix was.
 
 ```{r}
-forward_contrasts <- forward_difference_code(6)
-forward_hypotheses <- 
-  matrix(c(rep(1,6), forward_contrasts), nrow = 6) |> t() |> solve()
-
-fractions(forward_contrasts)
-fractions(forward_hypotheses)
+# all equivalent to carb ~ sum_code
+foo <- sum_code
+enlist_contrasts(mdl_data, carb ~ contr.sum)
+enlist_contrasts(mdl_data, carb ~ sum_code)
+enlist_contrasts(mdl_data, carb ~ foo)
 ```
 
-Now we'll change the intercept to level 6.
+If you want to suppress this behavior, you can use the wrapper `as_is`.
+Note this will also result in not setting the labels for you: it will use
+the generated matrix as-is.
+This is useful if you explicitly create a matrix and
+want to make sure the reference level isn't shifted around.
 
 ```{r}
-new_forward_hypotheses <- forward_hypotheses
-new_forward_hypotheses[,1] <- c(0,0,0,0,0,1)
-new_forward_hypotheses
-
-new_forward_contrasts <- solve(t(new_forward_hypotheses))[,2:6]
-new_forward_contrasts
+enlist_contrasts(mdl_data, carb ~ as_is(contr.sum))
 ```
 
-The matrix changed pretty substantially compared to before, even though all
-we changed was the intercept. This still required quite a few steps to just
-change the level we want to be the intercept. Thankfully `enlist_contrasts`
-and related functions `set_contrasts`, `use_contrasts`, and `use_contrast_function`
-have an argument to change this more simply. 
-
-The syntax for `enlist_contrasts` and `set_contrasts` requires putting a `*`
-before the name of the level you want to use. If you're using a reference level,
-you can also specify that with `+` as usual. You can also use both, but specifying
-a reference level is only applicable to schemes where that's meaningful, like
-in `contr.treatment`, `contr.sum`, and `scaled_sum_code`. Recall from our earlier
-derivation that scaled sum coding with the intercept specified as the reference
-level is equivalent to treatment coding, which should be evident here.
+One last quick note is that you can keep the parentheses with the function,
+so if your tab-autocomplete puts parentheses you don't have to worry about it.
 
 ```{r}
-enlist_contrasts(mdl_data, 
-                 carb ~ forward_difference_code * 8,
-                 gear ~ scaled_sum_code + 4 * 4)
+enlist_contrasts(mdl_data, carb ~ contr.sum())
 ```
 
-Using the singular `use_contrast` just requires specifying the `reference_level`
-and `set_intercept` arguments as needed.
+However, the function does need to exist; the following won't run:
+
+```{r,eval = FALSE}
+foo <- contr.sum(6) # foo is a matrix
+enlist_contrasts(mdl_data, carb ~ foo()) # foo is not a function
+```
+
+
+### Other ways to set contrasts
+
+You can also set contrasts using things other than a function.
+Specifically, you can pass the following classes to `code_by` in the two-sided
+formulas:
+
+- `array`
+- `matrix`
+- `hypr`
+- `function` (must return a contrast matrix, cannot be an anonymous function)
+- `symbol` (must evaluate to a contrast matrix though)
+
+If you're using a custom matrix for a tricky analysis, then you can specify
+the matrix yourself and then pass it to set_contrasts:
 
 ```{r}
-use_contrasts(mdl_data$gear, 
-              scaled_sum_code, 
-              reference_level = 4, 
-              set_intercept = 4)
+my_matrix <- contr.sum(6)/2
+enlist_contrasts(mdl_data, carb ~ my_matrix)
 ```
 
-This functionality should only be used when you're using a function to generate
-contrasts. Currently, I don't allow for multiple levels to be used as the intercept
-(e.g., only 2 of 4 levels). If you really think you need to do that, you probably
-have a good handle on contrasts and hypothesis matrices, so you should specify
-the matrix manually yourself and use that as an argument. If you think you need
-to do that but you *don't* have a good handle on contrasts and hypothesis matrices,
-you should go back and read the paper cited at the top of this vignette again.
-Remember that when setting matrices yourself, you should specify the row names
-to be your factor levels and your column names to be informative comparison 
-labels.
-
-## Dropping trends from polynomials
-
-When using polynomial contrasts you can drop higher level trends for the sake
-of parsimony. However, even when using
-orthogonal polynomials, your estimates for each trend can differ depending on
-whether higher trends are included. If you do want to remove higher level trends
-though, you can use the `-` operator in the contrast formula. Let's use the
-`diamonds` data set as an example.
+You can also specify a list of formulas and pass that to different functions.
 
 ```{r}
-library(ggplot2,diamonds) # load just the diamonds dataset
+my_contrasts <- list(carb ~ contr.sum, gear ~ scaled_sum_code)
 
-# Clarity has 8 levels, so we'll remove anything higher than the cubic trend
-my_contrasts <- enlist_contrasts(diamonds,
-                                 clarity ~ contr.poly - 4:7)
-
-# Higher trends removed
-lm(price ~ clarity, data = diamonds, contrasts = my_contrasts) |> 
-  broom::tidy()
-
-# Higher trends retained
-lm(price ~ clarity, data = diamonds) |> 
-  broom::tidy()
-
-# Trying to manually remove trends on the contrast in the data set doesn't work
-diamonds1 <- diamonds
-contrasts(diamonds1$clarity) <- contr.poly(8)[,1:3]
-lm(price ~ clarity, data = diamonds1) |> 
-  broom::tidy()
-
-# Decomposing the contrasts to create new columns for the first three trends
-# also works well
-diamonds2 <- decompose_contrasts(diamonds, ~ clarity)
-lm(price ~ clarity.L + clarity.Q, data = diamonds2) |> 
-  broom::tidy()
+enlist_contrasts(mdl_data, my_contrasts)
+mdl_data12 <- set_contrasts(mdl_data, my_contrasts)
 ```
 
-Note how when we tried to remove the trends on the factor column 
-`diamonds1$clarity` it doesn't work *and* it messes up the labels for the terms.
-This also means that you cannot drop trends with `set_contrasts`, and it will
-throw a warning that it will ignore that argument when it's used:
+This functionality is very important for the next function I'll discuss.
+
+### glimpse_contrasts
+
+It can be very useful to get a summary of the different factors and their
+contrasts in your dataset.
+The `glimpse_contrasts` function does this for you by passing it your dataset
+and your contrasts.
 
 ```{r}
-# Just show the messages, not the output
-invisible(set_contrasts(diamonds, clarity ~ contr.poly - 4:7))
+my_contrasts <- list(carb ~ contr.sum,
+                     gear ~ treatment_code + 4,
+                     twolevel ~ scaled_sum_code * "b",
+                     cyl ~ helmert_code)
+mdl_data$twolevel
+
+enlist_contrasts(mdl_data, cyl ~ scaled_sum_code + 6 * 6)
+
+mdl_data13 <- set_contrasts(mdl_data, my_contrasts)
+
+glimpse_contrasts(mdl_data13, my_contrasts)
 ```
 
-# Glimpse Contrasts
-
-This is some newer functionality to gain some quick insight into the factors used
-in your dataset. It uses the same syntax as `enlist_contrasts` and `set_contrasts`
-and provides a dataframe with some useful information. Note however that
-`glimpse_contrasts` doesn't change the dataframe itself, so you'll usually need
-to pair this with a call to `set_contrasts`. Note the warning here.
+Note that if you haven't actually set your contrasts to the dataset, you'll
+receive a series of warnings:
 
 ```{r}
-tstdf <- mtcars
-tstdf$cyl <- factor(tstdf$cyl)
-contrast_info <- glimpse_contrasts(tstdf, 
-                                   vs ~ contr.treatment,
-                                   am ~ scaled_sum_code + 1,
-                                   gear ~ helmert_code,
-                                   carb ~ contr.poly,
-                                   show_all_factors = TRUE)
-
-contrast_info
+glimpse_contrasts(mdl_data, my_contrasts)
 ```
 
-In this table we can easily reference what contrast scheme we used, what its
-reference level is when applicable, and how it may affect the interpretation
-of the intercept. Here, the intercept is to be interpreted as the average unit
-(whatever that is for your model) at level `0` of `vs` and level `4` of `cyl`,
-while it's marginalized across the other predictors. Note that while helmert
-and reverse helmert schemes don't have a reference level per se, the reference
-level shown in the table helps to show what the starting point is in case you
-forget which direction it's going. Here, the levels are `3, 4, 5` and comparisons
-start at `5`, which means they'll be going down: `4-5` then `3-(4,5)`.
-
-We can also see if any are orthogonal or not and whether we
-explicitly set them or if R used the system defaults. Note that you shouldn't
-call `glimpse_contrasts` on a dataframe you've already constructed with
-`set_contrasts`. You might think that using this would require you to copy
-and paste all the formulas twice, once to `enlist/set_contrasts` and again
-to `glimpse_contrasts`, but you can invoke `enlist_contrasts` from `glimpse_contrasts`
-using the `return.list` argument if you want to do it in one go. Doing so
-will return a list where the first item is the glimpse dataframe and the
-second is the list of named contrast matrices that can be passed to a model
-fitting function.
+You can also specify the formulas directly, like with `set_contrasts` and
+`enlist_contrasts`--- but usually you'll want to have a list of formulas and
+pass this to the different functions.
+Note how we retyped everything we typed above just to get the summary table.
 
 ```{r}
-contrast_info <- glimpse_contrasts(tstdf, 
-                                   vs ~ contr.treatment,
-                                   am ~ scaled_sum_code + 1,
-                                   gear ~ helmert_code,
-                                   carb ~ contr.poly,
-                                   show_all_factors = TRUE,
-                                   return_list = TRUE)
-
-my_contrasts <- contrast_info$contrasts
-contrast_glimpse <- contrast_info$glimpse
+glimpse_contrasts(mdl_data13, 
+                  carb ~ contr.sum,
+                  gear ~ treatment_code + 4,
+                  twolevel ~ scaled_sum_code * "b",
+                  cyl ~ helmert_code)
 ```
 
-Alternatively, you can specify the contrast formulas in a list and save
-that to a variable, then pass that around to the different functions.
+If you don't provide any contrast information, `glimpse_contrasts` will assume
+that factors should be using their default contrasts.
+If the contrasts are not the same as the defaults, you'll receive warnings:
 
 ```{r}
-schemes <- list(vs ~ contr.treatment,
-                am ~ scaled_sum_code + 1,
-                gear ~ helmert_code,
-                carb ~ contr.poly)
-
-contrast_glimpse <- glimpse_contrasts(tstdf, schemes)
-contrast_glimpse # Review if needed
-tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
+glimpse_contrasts(mdl_data)  # no warnings
+glimpse_contrasts(mdl_data13) # warnings
 ```
 
-
-We can also explicitly add the namespace for the function we used.
+If there are mismatches between the data and the contrasts specified by the
+formulas, you'll also get warnings:
 
 ```{r}
-contrast_info <- glimpse_contrasts(tstdf, schemes, add_namespace = TRUE)
-contrast_info
+glimpse_contrasts(mdl_data, 
+                  carb ~ contr.sum, 
+                  gear ~ treatment_code * 4,
+                  cyl ~ contr.treatment | c('diff1', 'diff2'))
 ```
 
-# Setting comparison names manually
+Remember that `set_contrasts` will automatically coerce dataframe columns into
+factors when specifying a contrast, but `glimpse_contrasts` does *not* because
+it does not modify the provided dataframe.
 
-This functionality has been mentioned before in this vignette but this 
-section will focus on it explicitly. 
+### Note on polynomial contrasts
 
-Consider a factor with the following levels: s, sh, n, t. With four levels there 
-are of course three degrees of freedom for three comparisons. One comparison that 
-could be made is comparing each level with the plosive t using the following matrix:
+There is an additional operator for the formulas that only applies to polynomial
+contrasts.
+For background, polynomial contrasts encode polynomial "trends" across the
+levels of a factor.
+So, testing for a linear-like trend, a quadratic-like trend, etc.
+One thing you *can* do, though I don't necessarily *recommend* it is removing
+higher-order trends.
+For instance, if you have 8 levels but don't want to bother with polynomials
+over degree 3 (even though you'll get up to degree 7 for "free").
+In this situation you can use the `-` operator:
+`varname ~ code_by + reference * intercept - low:high | labels`
 
 ```{r}
-phone_df <- data.frame(phone = factor(c('S', 'SH','N', 'T'),
-                                      levels = c('S', 'SH','N', 'T')))
-
-enlist_contrasts(phone_df, 
-                 phone ~ scaled_sum_code + "T")
+enlist_contrasts(mdl_data, carb ~ contr.poly)
+enlist_contrasts(mdl_data, carb ~ contr.poly - 3:5)
 ```
 
-The column names automatically created here make sense for these and are easy to 
-interpret in model summary coefficients of the form `phoneN`, `phoneS`, `phoneSH` 
-However, another option would be to use helmert coding, yielding this matrix:
+Note that you can ONLY use this with `enlist_contrasts` and `glimpse_contrasts`.
+This is because if you remove columns from a contrast matrix, R will fill them
+back with something else.
 
 ```{r}
-enlist_contrasts(phone_df, 
-                 phone ~ helmert_code)
+mdl_data14 <- set_contrasts(mdl_data, carb ~ contr.sum)
+contrasts(mdl_data14$carb)
+contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[,1:2]
+contrasts(mdl_data14$carb)
 ```
 
-This scheme tests the difference between s vs sh (Compact vs Diffuse sibilants),
-then between s & sh vs n (Sibilants vs Nasals), then s & sh & n vs t (Alveolar
-Continuants vs Stops, or non-stops vs stops). However, the labels aren't
-entirely transparent for those comparisons and are read literally as "values
-less than sh", "values less than n" when this variable isn't technically ordinal
-in nature. It would be more useful easier to interpret if we set more
-informative labels to get coefficients like `phoneCompactvsDiffuse`,
-`phoneSibvsNas`, `phoneStopvsCont`. We can do this with using `set_contrasts` and 
-its related functions using the `|` operator when setting contrast schemes.
+What do these values correspond to?
+If we check out the hypothesis matrix, we can see that it seems like it's trying
+to encode 0 but with some floating point error:
 
 ```{r}
-# Note you can add a line break after (or before, really) the | for readability
-enlist_contrasts(phone_df, 
-                 phone ~ helmert_code | 
-                   c("CompactvsDiffuse","SibvsNas", "StopvsCont"))
+MASS::fractions(
+  contrastable:::.convert_matrix(
+    contrasts(mdl_data14$carb)
+  )
+)
 ```
 
-One thing to note is that some model fitting functions will shorten parameter
-names in certain settings. For example, if you use `lmer` and do something like
-this:
+This is why I don't recommend actually using the `-` operator.
+If you use something like `lm` to fit functions, you can use the output
+from `enlist_contrasts` as the argument to `contrasts`.
+Although, I'm pretty sure the model matrix will just add in these values anyways.
+If you try to use the `-` operator with `set_contrasts` you'll get a warning,
+and the `-` operator will be ignored:
 
-```{r, eval=FALSE}
-# Not run to avoid loading lme4
-library(lme4)
-library(contrastable)
-mdl_data <- set_contrasts(mtcars, cyl ~ sum_code |
-                            c("longlonglonglonglongname",'shortname'))
-lmer(mpg ~ cyl + (1|gear), data = mdl_data) |> summary()
+```{r}
+mdl_data15 <- set_contrasts(mdl_data, carb ~ polynomial_code - 3:5)
 ```
 
-While not run here, the output of the fixed effects table in the summary
-will show the full names of the parameters. In the variance-covariance matrix,
-the row names get shortened to `cyllnglngln` and `cylshortnam`. The column
-names become `(Intr)` and `cyllng`.
+## Typical patterns
 
-# Conclusion
 
-Hopefully this vignette highlighted some useful functionality available in this
-package. It does presuppose that you know a bit about what each scheme does. But,
-looking at the documentation for each function provides a bit of help about
-how to interpret fixed effects, eg `?scaled_sum_code`. The interpretation
-of interaction terms is more complicated and beyond the scope of this vignette,
-so choose your contrasts and models wisely!
+There are two general patterns you'll take in analyses with this package:
+
+### Pattern 1: No glimpsing
+
+Here's a general usage pattern when you don't want to use `glimpse_contrasts`.
+
+```{r}
+raw_data <- mtcars # load raw data from a csv or something here
+
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(carb ~ sum_code) # set contrasts at the very end
+
+mdl <- lm(mpg ~ carb, data = final_data) # run model with contrasts set
+```
+
+### Pattern 2: With information about contrasts
+
+Here's a usage pattern if you wanted to, say, publish the contrast matrices
+or report the glimpse table in a publication or preregistration:
+
+```{r}
+raw_data <- mtcars # load raw data from a csv or something here
+
+# specify contrasts up front
+my_contrasts <- list(carb ~ sum_code,
+                     cyl  ~ scaled_sum_code,
+                     gear ~ sum_code)
+
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(my_contrasts) # set contrasts at the very end
+
+# Show the matrices we're using
+enlist_contrasts(final_data, my_contrasts)
+
+# Show a summary
+glimpse_contrasts(final_data, my_contrasts)
+
+# Fit the model with contrasts set
+mdl <- lm(mpg ~ carb, data = final_data)
+```
+
+If you want to show fractions instead of decimals, use `MASS::fractions` with
+each element of the list of contrasts:
+
+```{r}
+enlist_contrasts(final_data, my_contrasts) |> 
+  lapply(MASS::fractions)
+```
+
+If you use the `targets` package, you can set up the list of contrasts as its
+own target, then pass that to other targets so that your analyses will be rerun
+whenever you change the contrasts (though this shouldn't happen frequently).
+
+## Conclusion
+
+I discussed the main functions in this package and the special syntax that
+is implemented to set contrasts.
+If you want additional examples, see my blog posts below:
+
+
+ - [Introduction to Contrasts using Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
+ - [https://tsostaricsblog.netlify.app/posts/helmert/](On Helmert Coding)
+ 
+If you need additional information regarding the various warnings and messages
+this package throws, you can check out the `warnings` vignette in this package.
+
