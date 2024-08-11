@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Tidy contrast coding utilities
-Version: 0.2.0.9001
+Version: 0.2.1
 Year: 2024
 Author: Thomas Sostarics
 Maintainer: Thomas Sostarics <tsostarics@gmail.com>
