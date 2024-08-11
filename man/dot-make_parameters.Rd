@@ -8,6 +8,7 @@
   formula,
   params = list(factor_col = NA, code_by = NA, reference_level = NA, intercept_level =
     NA, drop_trends = NA, labels = NULL, as_is = FALSE),
+  env = NULL,
   EMBEDDED = FALSE
 )
 }
@@ -15,6 +16,10 @@
 \item{formula}{Formula given by user}
 
 \item{params}{Parameter accumulator}
+
+\item{env}{Environment for the formula, on the first recursion this will be
+pulled from \code{formula} and then passed to subsequent recursions. Needed to
+check whether a function is actually a function.}
 
 \item{EMBEDDED}{Whether the current operation is embedded in another, helps
 to handle operator precedence with *}

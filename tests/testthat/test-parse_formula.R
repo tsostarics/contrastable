@@ -103,3 +103,4 @@ test_that("Formula parsing with functions works", {
   expect_equal(params_allops, reference_allops)
   expect_equal(params_noops, reference_noops)
 })
+
