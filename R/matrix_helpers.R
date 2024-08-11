@@ -5,7 +5,13 @@
 }
 
 .hypotheses_to_contrasts <- function(hypothesis_matrix) {
-  solve(t(hypothesis_matrix))[, -1]
+  result <- solve(t(hypothesis_matrix))[, -1]
+
+  # Should only happen for 2 level factors
+  if (!is.matrix(result))
+    result <- matrix(result)
+
+  result
 }
 
 # nocov start
