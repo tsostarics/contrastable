@@ -15,7 +15,8 @@ experimental](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://
 <!-- badges: end -->
 
 This package provides utilities to set different common contrast coding
-schemes for use with regression models.
+schemes for use with regression models. Detailed usage is available in
+the `contrasts` vignette with `vignette('contrasts', 'contrastable')`.
 
 ## Installation
 
@@ -32,7 +33,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
-package version 0.2.0.
+package version 0.2.1.
 
 A BibTeX entry for LaTeX users is
 
@@ -40,7 +41,7 @@ A BibTeX entry for LaTeX users is
         author = {Thomas Sostarics},
         title = {{contrastable}: Contrast Coding Utilities in {R}},
         year = {2024},
-        note = {R package version 0.2.0},
+        note = {R package version 0.2.1},
         url = {https://github.com/tsostarics/contrastable},
         doi = {10.5281/zenodo.11869427},
       }
@@ -75,7 +76,7 @@ Other examples:
 I also recommend writing out, potentially in a footnote, what the
 comparisons are.
 
-God: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Good: “We use the contrastable package’s `sum_code()` function (+1/-1,
 Sostarics 2024).”
 
 Better: “We use the contrastable package’s `sum_code()` function (+1/-1,
@@ -129,27 +130,27 @@ functions.
 ``` r
 # Get a list of the contrasts we've explicitly set
 enlist_contrasts(mtcars, contrast_schemes)
-#> Converting to factors: cyl carb vs
-#> $cyl
-#>            4          8
-#> 4  0.6666667 -0.3333333
-#> 6 -0.3333333 -0.3333333
-#> 8 -0.3333333  0.6666667
-#> 
-#> $carb
-#>     <2         <3    <4   <6         <8
-#> 1 -0.5 -0.3333333 -0.25 -0.2 -0.1666667
-#> 2  0.5 -0.3333333 -0.25 -0.2 -0.1666667
-#> 3  0.0  0.6666667 -0.25 -0.2 -0.1666667
-#> 4  0.0  0.0000000  0.75 -0.2 -0.1666667
-#> 6  0.0  0.0000000  0.00  0.8 -0.1666667
-#> 8  0.0  0.0000000  0.00  0.0  0.8333333
-#> 
-#> $vs
-#>   0
-#> 0 1
-#> 1 0
 ```
+
+    #> $cyl
+    #>   4    8   
+    #> 4  2/3 -1/3
+    #> 6 -1/3 -1/3
+    #> 8 -1/3  2/3
+    #> 
+    #> $carb
+    #>   <2   <3   <4   <6   <8  
+    #> 1 -1/2 -1/3 -1/4 -1/5 -1/6
+    #> 2  1/2 -1/3 -1/4 -1/5 -1/6
+    #> 3    0  2/3 -1/4 -1/5 -1/6
+    #> 4    0    0  3/4 -1/5 -1/6
+    #> 6    0    0    0  4/5 -1/6
+    #> 8    0    0    0    0  5/6
+    #> 
+    #> $vs
+    #>   0
+    #> 0 1
+    #> 1 0
 
 `set_contrasts` can be used to set the contrasts onto the dataframe
 itself, which is needed when a modeling function lacks a `contrasts`
@@ -170,13 +171,8 @@ MASS::fractions(contrasts(my_data$carb))
 #> 8    0    0    0    0  5/6
 ```
 
-Functions will give various messages and warnings such as:
-
-- When non-factor columns are coerced to factors
-- When ordered factors are set to non-polynomial contrasts
-- When a factor with only one level is detected
-- When a factor is not explicitly set
-- and more
-
-Detailed usage is available in the `contrasts` vignette with
-`vignette('contrasts', 'contrastable')`.
+The functions in this package aim to be helpful when potential mistakes
+are made and transparent when things happen behind the scenes (e.g.,
+automatic factor coercion). You can check out descriptions of various
+messages and warnings in the `warnings` vignette with
+`vignette('warnings', 'contrastable')`.

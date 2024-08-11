@@ -27,6 +27,8 @@ knitr::opts_chunk$set(
 
 This package provides utilities to set different common contrast coding schemes
 for use with regression models.
+Detailed usage is available in the `contrasts` vignette with 
+`vignette('contrasts', 'contrastable')`.
 
 
 ## Installation
@@ -42,7 +44,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 
 To cite contrastable in publications, please use
 
-Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R package version 0.2.0.
+Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R package version 0.2.1.
 
 A BibTeX entry for LaTeX users is
 
@@ -51,7 +53,7 @@ A BibTeX entry for LaTeX users is
     author = {Thomas Sostarics},
     title = {{contrastable}: Contrast Coding Utilities in {R}},
     year = {2024},
-    note = {R package version 0.2.0},
+    note = {R package version 0.2.1},
     url = {https://github.com/tsostarics/contrastable},
     doi = {10.5281/zenodo.11869427},
   }
@@ -82,7 +84,7 @@ Other examples:
  
 I also recommend writing out, potentially in a footnote, what the comparisons are.
 
-God: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024)."
+Good: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024)."
 
 Better: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024).
 This contrast scheme encodes differences between each comparison level and the grand mean."
@@ -102,7 +104,7 @@ my_data$gear <- ordered(my_data$gear) # Set as ordered factor in dataframe
 We can use `glimpse_contrasts` to get information about
 the factors and diagnostics about the scheme we have set.
 
-```{r, message = TRUE}
+```{r, message = TRUE, warning=FALSE}
 # Specify the contrast schemes we want, factor conversion done automatically
 # Set reference level with + and intercept with *
 contrast_schemes <- list(
@@ -125,10 +127,15 @@ glimpse_contrasts(my_data,
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling functions.
 
-```{r, message = TRUE}
+```{r, eval = FALSE, echo = TRUE}
 # Get a list of the contrasts we've explicitly set
 enlist_contrasts(mtcars, contrast_schemes)
 ```
+
+```{r, echo = FALSE}
+lapply(enlist_contrasts(mtcars, contrast_schemes), MASS::fractions)
+```
+
 
 `set_contrasts` can be used to set the contrasts onto the dataframe itself,
 which is needed when a modeling function lacks a `contrasts` argument.
@@ -139,14 +146,10 @@ my_data <- set_contrasts(my_data, contrast_schemes)
 MASS::fractions(contrasts(my_data$carb))
 ```
 
-Functions will give various messages and warnings such as:
-
- - When non-factor columns are coerced to factors
- - When ordered factors are set to non-polynomial contrasts
- - When a factor with only one level is detected
- - When a factor is not explicitly set
- - and more
+The functions in this package aim to be helpful when potential mistakes are
+made and transparent when things happen behind the scenes (e.g., automatic
+factor coercion).
+You can check out descriptions of various messages and warnings in the
+`warnings` vignette with `vignette('warnings', 'contrastable')`.
 
 
-Detailed usage is available in the `contrasts` vignette with 
-`vignette('contrasts', 'contrastable')`.
