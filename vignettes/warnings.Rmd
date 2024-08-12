@@ -24,7 +24,8 @@ vignette: >
   one to write.
   
 ```{r setup, message=FALSE, warning=FALSE}
-  library(contrastable)
+library(contrastable)
+library(rlang)
 ```
 
 ## Common Messages
@@ -273,20 +274,84 @@ glimpse_contrasts(my_data, contrast_list)
 ## Errors
 
 Here are some common errors, though not all of them are errors from contrastable per se.
+The errors below will be shown as messages using this helper:
 
-An error is thrown if trying to use a matrix that's a different size from what the contrast matrix should be.
+```{r}
+show_error <- 
+  function(call) {
+    tryCatch(eval(rlang::enexpr(call)),
+             error = \(e) {
+               message("Error: ", conditionMessage(e))
+               invisible(NULL)
+             })
+  }
+```
+
+You'll receive an error if you use a matrix that's a different size from what the contrast matrix should be.
 Specifically, contrasts matrices for a factor with n levels should be size
 `nx(n-1)`.
 
-```{r,results='hide', eval = FALSE}
+```{r}
 my_matrix <- sum_code(4)
-set_contrasts(mtcars, cyl ~ my_matrix) # cyl has 3 levels, not 4
+show_error(set_contrasts(mtcars, cyl ~ my_matrix)) # cyl has 3 levels, not 4
 ```
 
 
 You'll receive an error if you try to set the reference level (or intercept) to a level that doesn't exist in the factor.
 
-```{r,results='hide', eval=FALSE}
-set_contrasts(mtcars, cyl ~ sum_code + 100)
-set_contrasts(mtcars, cyl ~ sum_code * "blah")
+```{r}
+show_error(set_contrasts(mtcars, cyl ~ sum_code + 100))
+show_error(set_contrasts(mtcars, cyl ~ sum_code * "blah"))
 ```
+
+You'll receive an error if you accidentally use `=` instead of `~`
+
+```{r}
+show_error(set_contrasts(mtcars, cyl = sum_code))
+```
+
+You'll receive an error if you accidentally specify contrasts for the same
+variable more than once:
+
+```{r}
+show_error(set_contrasts(mtcars,
+                         cyl ~ sum_code, 
+                         cyl ~ scaled_sum_code))
+
+show_error(set_contrasts(mtcars, 
+                         cyl + gear ~ sum_code,
+                         cyl ~ scaled_sum_code))
+
+show_error(set_contrasts(mtcars, 
+                         where(is.numeric) ~ sum_code, 
+                         cyl ~ scaled_sum_code))
+
+these_vars <- c("cyl", "gear")
+
+show_error(set_contrasts(mtcars, 
+                         all_of(these_vars) ~ sum_code, 
+                         where(is.numeric) ~ scaled_sum_code))
+```
+
+You'll receive an error if you accidentally forget to pass the dataframe:
+
+```{r}
+show_error(set_contrasts(cyl ~ sum_code))
+```
+
+You'll receive an error if you forget to pass any contrasts formulas:
+
+```{r}
+show_error(set_contrasts(mtcars))
+```
+
+Variables with only one level will be ignored, but you'll receive an error
+if there are no remaining variables with more than one level (i.e., if you
+*only* specify one-level factors).
+Note that you'll still get the warning message.
+
+```{r}
+show_error(set_contrasts(data.frame(a = factor(1)),
+                         a ~ sum_code))
+```
+

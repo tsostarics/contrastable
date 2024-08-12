@@ -5,7 +5,7 @@ bibentry(
   author = "Thomas Sostarics",
   title = "{contrastable}: Contrast Coding Utilities in {R}",
   year = "2024",
-  note = "R package version 0.2.0",
+  note = "R package version 0.3.0",
   url = "https://github.com/tsostarics/contrastable",
   doi = "10.5281/zenodo.11869427"
 )

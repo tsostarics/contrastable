@@ -44,19 +44,20 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 
 To cite contrastable in publications, please use
 
-Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R package version 0.2.1.
+Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. 
+R package version 0.3.0.
 
 A BibTeX entry for LaTeX users is
 
 ```
 @Manual{,
-    author = {Thomas Sostarics},
-    title = {{contrastable}: Contrast Coding Utilities in {R}},
-    year = {2024},
-    note = {R package version 0.2.1},
-    url = {https://github.com/tsostarics/contrastable},
-    doi = {10.5281/zenodo.11869427},
-  }
+author = {Thomas Sostarics},
+title = {{contrastable}: Contrast Coding Utilities in {R}},
+year = {2024},
+note = {R package version 0.3.0},
+url = {https://github.com/tsostarics/contrastable},
+doi = {10.5281/zenodo.11869427},
+}
 ```
 
 In-text citations should reference the package and ideally which contrast 
@@ -72,16 +73,16 @@ is to remove ambiguity of "sum code" using the specific numbers)
 
 Other examples:
 
- - Contrasts were set using the `scaled_sum_code()` function from the contrastable
- package (Sostarics 2024).
- - We use the contrastable package (Sostarics 2024) for contrast coding our
- categorical variables; details of the contrasts for each model are provided in
- the appendix. (be sure to do the latter!)
- - Below are the contrast matrices returned by the `helmert_code()` and
- `scaled_sum_code()` functions from the contrastable R package (Sostarics 2024)
- - We use the `set_contrasts()` and `sum_code()` functions from the contrastable package
- (Sostarics 2024) to sum code (+1/-1) our variables
- 
+- Contrasts were set using the `scaled_sum_code()` function from the contrastable
+package (Sostarics 2024).
+- We use the contrastable package (Sostarics 2024) for contrast coding our
+categorical variables; details of the contrasts for each model are provided in
+the appendix. (be sure to do the latter!)
+- Below are the contrast matrices returned by the `helmert_code()` and
+`scaled_sum_code()` functions from the contrastable R package (Sostarics 2024)
+- We use the `set_contrasts()` and `sum_code()` functions from the contrastable package
+(Sostarics 2024) to sum code (+1/-1) our variables
+
 I also recommend writing out, potentially in a footnote, what the comparisons are.
 
 Good: "We use the contrastable package's `sum_code()` function (+1/-1, Sostarics 2024)."
@@ -116,9 +117,9 @@ contrast_schemes <- list(
 # Get information about our contrasts, even those we didn't explicitly set
 # (gear is ordered, and so uses contr.poly by default)
 glimpse_contrasts(my_data,
-  contrast_schemes,
-  add_namespace = TRUE,
-  show_all_factors = TRUE
+                  contrast_schemes,
+                  add_namespace = TRUE,
+                  show_all_factors = TRUE
 ) |>
   knitr::kable()
 ```
@@ -144,6 +145,22 @@ which is needed when a modeling function lacks a `contrasts` argument.
 # Set contrasts to dataframe itself
 my_data <- set_contrasts(my_data, contrast_schemes)
 MASS::fractions(contrasts(my_data$carb))
+```
+
+You can also set multiple contrasts at once using `{tidyselect}` functionality.
+
+```{r}
+my_data2 <- 
+  data.frame(a = gl(2,10),
+             b = gl(5,2, ordered = TRUE),
+             c = gl(5,2),
+             d = 1:10,
+             e = 11:20)
+
+enlist_contrasts(my_data2,
+                 where(is.ordered) ~ polynomial_code,
+                 where(is.unordered) ~ helmert_code,
+                 d + e ~ sum_code)
 ```
 
 The functions in this package aim to be helpful when potential mistakes are

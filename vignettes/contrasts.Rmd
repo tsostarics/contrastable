@@ -163,7 +163,7 @@ contrast scheme but not understand what the new comparison is.
 I'm going to use the mtcars dataset just to have something to work with.
 We'll convert a bunch of the columns to factors up front.
 
-```{r}
+```{r mdl-data}
 mdl_data <- 
   mtcars |> 
   as_tibble() |> 
@@ -176,7 +176,7 @@ mdl_data <-
 We can inspect the contrasts for the factors using `contrasts()`, which will use
 the default contrasts for unordered factors
 
-```{r}
+```{r inspect-contrasts}
 options("contrasts") # Show defaults for unordered and ordered
 contrasts(mdl_data$twolevel)
 contrasts(mdl_data$carb) # Note the reference level
@@ -184,7 +184,7 @@ contrasts(mdl_data$carb) # Note the reference level
 
 We can see that the levels for `carb` are reflected in the coefficient labels:
 
-```{r}
+```{r default-model-summary}
 summary(lm(mpg ~ carb, data = mdl_data))
 ```
 
@@ -192,7 +192,7 @@ But if we changed the contrasts ourselves those helpful labels go away and are
 replaced with numeric indices. Note that the level names were originally
 also numbers, so it would be easy to get mixed up at this point.
 
-```{r}
+```{r manual-change-contrasts}
 mdl_data2 <- mdl_data
 contrasts(mdl_data2$carb) <- contr.sum(6)
 
@@ -220,7 +220,7 @@ columns first.
 Note that the function will also give messages about other factors that you
 haven't set explicitly.
 
-```{r}
+```{r intro-set-contrasts}
 mdl_data3 <- set_contrasts(mdl_data, carb ~ sum_code)
 
 contrasts(mdl_data2$carb) # matrix from before
@@ -237,7 +237,7 @@ If we want to change the reference level, we use the `+` operator in our formula
 The change to the formula looks like `varname ~ code_by + reference`.
 Let's change it to `3`:
 
-```{r}
+```{r set-reference}
 mdl_data4 <- set_contrasts(mdl_data, carb ~ sum_code + "3")  
 
 contrasts(mdl_data4$carb)
@@ -246,7 +246,7 @@ contrasts(mdl_data4$carb)
 Note that when using sum coding, the intercept will be the mean of the group
 means:
 
-```{r}
+```{r intercept-example}
 # mean of group means:
 group_means <- summarize(mdl_data4, grp_mean = mean(mpg), .by = "carb")
 group_means
@@ -262,7 +262,7 @@ grand mean but the mean of our reference level?
 We can set this using the `*` operator:
 `varname ~ code_by + reference * intercept`.
 
-```{r}
+```{r set-intercept}
 mdl_data5 <- set_contrasts(mdl_data, carb ~ sum_code + 3 * 3)
 
 contrasts(mdl_data5$carb)
@@ -274,7 +274,7 @@ comparisons are here.
 We can set the label names ourselves using the `|` operator:
 `varname ~ code_by + reference * intercept | labels`
 
-```{r}
+```{r set-labels}
 mdl_data6 <- set_contrasts(mdl_data, 
                            carb ~ sum_code + 3 * 3 | c("1-3",
                                                        "2-3",
@@ -291,7 +291,7 @@ It's highly unlikely you would correctly specify every single value
 and every single label correctly on the first go (I actually messed up myself
 while writing out the matrix).
 
-```{r}
+```{r manual-matrix}
 mdl_data7 <- mdl_data
 
 my_contrasts <- matrix(c(2, 1, 0, 1, 1, 1, 
@@ -316,7 +316,7 @@ the one below.
 Personally I would not trust myself to get the matrix correct, and if I ever
 had to add a level to the design it would be obscene to try and edit it.
 
-```{r}
+```{r matrix-example-fractions}
 mdl_data8 <- set_contrasts(mdl_data, carb ~ helmert_code * 4)
 
 MASS::fractions(contrasts(mdl_data8$carb))
@@ -325,7 +325,7 @@ MASS::fractions(contrasts(mdl_data8$carb))
 The work would compound when we have multiple factors, but with the 
 `set_contrasts` function we can specify what our desired scheme is easily:
 
-```{r}
+```{r set-contrasts-multiple-vars}
 mdl_data9 <- set_contrasts(mdl_data,
                            carb ~ helmert_code * 4,
                            cyl ~ scaled_sum_code + 4,
@@ -350,7 +350,7 @@ setting the contrasts to the data itself.
 Henceforth, when I'm not going to use the dataframe in an example, I'll just use
 this to show the contrast matrices.
 
-```{r}
+```{r intro-enlist-contrasts}
 enlist_contrasts(mdl_data,
                  carb ~ helmert_code * 4,
                  cyl ~ scaled_sum_code + 4)
@@ -390,7 +390,7 @@ first argument is the number of levels used to generate the matrix.
 However, again, if there's a singular level used for the reference level, this
 will always be set to the first level regardless of what the original matrix was.
 
-```{r}
+```{r example-functions}
 # all equivalent to carb ~ sum_code
 foo <- sum_code
 enlist_contrasts(mdl_data, carb ~ contr.sum)
@@ -404,24 +404,70 @@ the generated matrix as-is.
 This is useful if you explicitly create a matrix and
 want to make sure the reference level isn't shifted around.
 
-```{r}
+```{r example-as-is}
 enlist_contrasts(mdl_data, carb ~ as_is(contr.sum))
 ```
 
 One last quick note is that you can keep the parentheses with the function,
 so if your tab-autocomplete puts parentheses you don't have to worry about it.
 
-```{r}
+```{r parentheses-handling}
 enlist_contrasts(mdl_data, carb ~ contr.sum())
 ```
 
 However, the function does need to exist; the following won't run:
 
-```{r,eval = FALSE}
+```{r function-must-exist,eval = FALSE}
 foo <- contr.sum(6) # foo is a matrix
 enlist_contrasts(mdl_data, carb ~ foo()) # foo is not a function
 ```
 
+### tidyselect functions
+
+If you know you're going to use the same scheme for multiple variables, but
+don't need to set the reference level or labels for any one in particular, you
+can use tidyselect functionality to set multiple contrasts.
+I'll show a few examples of how to do this.
+
+First, you can specify multiple variables on the left hand side using the `+`
+operator.
+
+```{r lhs-plus}
+# equivalent to: enlist_contrasts(mdl_data, cyl ~ sum_code, gear ~ sum_code)
+enlist_contrasts(mdl_data, cyl + gear ~ sum_code)
+```
+
+You can also use selecting functions like the below:
+
+```{r tidyselect-where}
+enlist_contrasts(mdl_data, where(is.factor) ~ sum_code)
+# see also enlist_contrasts(mdl_data, where(is.unordered) ~ sum_code)
+# see also enlist_contrasts(mdl_data, where(is.numeric) ~ sum_code)
+```
+
+This also lets you programmatically set contrasts like so:
+
+```{r tidyselect-all-of}
+these_vars <- c("cyl", "gear")
+enlist_contrasts(mdl_data, all_of(these_vars) ~ sum_code)
+```
+
+However, you have to ensure that no variables are duplicated. The following
+are not allowed regardless of whether the right right hand sides evaluate to
+the same contrast schemes.
+
+```{r tidyselect-forbidden, eval = FALSE}
+enlist_contrasts(mdl_data, 
+                 cyl ~ sum_code, 
+                 where(is.factor) ~ sum_code) # cyl is a factor for mdl_data
+
+enlist_contrasts(mdl_data, 
+                 cyl ~ sum_code, 
+                 cyl + gear ~ sum_code) # cyl can't be specified twice
+```
+
+You can check out the tidyselect package for more information.
+`is.unordered` is provided in this package as an analogue to `is.ordered`.
 
 ### Other ways to set contrasts
 
@@ -438,14 +484,14 @@ formulas:
 If you're using a custom matrix for a tricky analysis, then you can specify
 the matrix yourself and then pass it to set_contrasts:
 
-```{r}
+```{r use-matrix}
 my_matrix <- contr.sum(6)/2
 enlist_contrasts(mdl_data, carb ~ my_matrix)
 ```
 
 You can also specify a list of formulas and pass that to different functions.
 
-```{r}
+```{r use-list}
 my_contrasts <- list(carb ~ contr.sum, gear ~ scaled_sum_code)
 
 enlist_contrasts(mdl_data, my_contrasts)
@@ -461,7 +507,7 @@ contrasts in your dataset.
 The `glimpse_contrasts` function does this for you by passing it your dataset
 and your contrasts.
 
-```{r}
+```{r intro-glimpse-contrasts}
 my_contrasts <- list(carb ~ contr.sum,
                      gear ~ treatment_code + 4,
                      twolevel ~ scaled_sum_code * "b",
@@ -478,7 +524,7 @@ glimpse_contrasts(mdl_data13, my_contrasts)
 Note that if you haven't actually set your contrasts to the dataset, you'll
 receive a series of warnings:
 
-```{r}
+```{r glimpse-warnings}
 glimpse_contrasts(mdl_data, my_contrasts)
 ```
 
@@ -487,7 +533,7 @@ You can also specify the formulas directly, like with `set_contrasts` and
 pass this to the different functions.
 Note how we retyped everything we typed above just to get the summary table.
 
-```{r}
+```{r glimpse-manual}
 glimpse_contrasts(mdl_data13, 
                   carb ~ contr.sum,
                   gear ~ treatment_code + 4,
@@ -499,7 +545,7 @@ If you don't provide any contrast information, `glimpse_contrasts` will assume
 that factors should be using their default contrasts.
 If the contrasts are not the same as the defaults, you'll receive warnings:
 
-```{r}
+```{r glimpse-check-default}
 glimpse_contrasts(mdl_data)  # no warnings
 glimpse_contrasts(mdl_data13) # warnings
 ```
@@ -507,7 +553,7 @@ glimpse_contrasts(mdl_data13) # warnings
 If there are mismatches between the data and the contrasts specified by the
 formulas, you'll also get warnings:
 
-```{r}
+```{r glimpse-mismatch-warnings}
 glimpse_contrasts(mdl_data, 
                   carb ~ contr.sum, 
                   gear ~ treatment_code * 4,
@@ -532,7 +578,7 @@ over degree 3 (even though you'll get up to degree 7 for "free").
 In this situation you can use the `-` operator:
 `varname ~ code_by + reference * intercept - low:high | labels`
 
-```{r}
+```{r drop-trends}
 enlist_contrasts(mdl_data, carb ~ contr.poly)
 enlist_contrasts(mdl_data, carb ~ contr.poly - 3:5)
 ```
@@ -541,7 +587,7 @@ Note that you can ONLY use this with `enlist_contrasts` and `glimpse_contrasts`.
 This is because if you remove columns from a contrast matrix, R will fill them
 back with something else.
 
-```{r}
+```{r drop-trends-reinstated-matrix}
 mdl_data14 <- set_contrasts(mdl_data, carb ~ contr.sum)
 contrasts(mdl_data14$carb)
 contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[,1:2]
@@ -552,7 +598,7 @@ What do these values correspond to?
 If we check out the hypothesis matrix, we can see that it seems like it's trying
 to encode 0 but with some floating point error:
 
-```{r}
+```{r drop-trends-hypotheses-floats}
 MASS::fractions(
   contrastable:::.convert_matrix(
     contrasts(mdl_data14$carb)
@@ -567,7 +613,7 @@ Although, I'm pretty sure the model matrix will just add in these values anyways
 If you try to use the `-` operator with `set_contrasts` you'll get a warning,
 and the `-` operator will be ignored:
 
-```{r}
+```{r drop-trends-set-contrasts-incompatible}
 mdl_data15 <- set_contrasts(mdl_data, carb ~ polynomial_code - 3:5)
 ```
 
@@ -580,7 +626,7 @@ There are two general patterns you'll take in analyses with this package:
 
 Here's a general usage pattern when you don't want to use `glimpse_contrasts`.
 
-```{r}
+```{r usage-pattern-1}
 raw_data <- mtcars # load raw data from a csv or something here
 
 # wrangle data for your final model
@@ -597,7 +643,7 @@ mdl <- lm(mpg ~ carb, data = final_data) # run model with contrasts set
 Here's a usage pattern if you wanted to, say, publish the contrast matrices
 or report the glimpse table in a publication or preregistration:
 
-```{r}
+```{r usage-pattern-2}
 raw_data <- mtcars # load raw data from a csv or something here
 
 # specify contrasts up front
@@ -624,7 +670,7 @@ mdl <- lm(mpg ~ carb, data = final_data)
 If you want to show fractions instead of decimals, use `MASS::fractions` with
 each element of the list of contrasts:
 
-```{r}
+```{r fractions-usage}
 enlist_contrasts(final_data, my_contrasts) |> 
   lapply(MASS::fractions)
 ```

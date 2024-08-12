@@ -38,13 +38,13 @@ package version 0.2.1.
 A BibTeX entry for LaTeX users is
 
     @Manual{,
-        author = {Thomas Sostarics},
-        title = {{contrastable}: Contrast Coding Utilities in {R}},
-        year = {2024},
-        note = {R package version 0.2.1},
-        url = {https://github.com/tsostarics/contrastable},
-        doi = {10.5281/zenodo.11869427},
-      }
+    author = {Thomas Sostarics},
+    title = {{contrastable}: Contrast Coding Utilities in {R}},
+    year = {2024},
+    note = {R package version 0.2.1},
+    url = {https://github.com/tsostarics/contrastable},
+    doi = {10.5281/zenodo.11869427},
+    }
 
 In-text citations should reference the package and ideally which
 contrast functions were used to avoid ambiguity.
@@ -109,9 +109,9 @@ contrast_schemes <- list(
 # Get information about our contrasts, even those we didn't explicitly set
 # (gear is ordered, and so uses contr.poly by default)
 glimpse_contrasts(my_data,
-  contrast_schemes,
-  add_namespace = TRUE,
-  show_all_factors = TRUE
+                  contrast_schemes,
+                  add_namespace = TRUE,
+                  show_all_factors = TRUE
 ) |>
   knitr::kable()
 ```
@@ -169,6 +169,69 @@ MASS::fractions(contrasts(my_data$carb))
 #> 4    0    0  3/4 -1/5 -1/6
 #> 6    0    0    0  4/5 -1/6
 #> 8    0    0    0    0  5/6
+```
+
+You can also set multiple contrasts at once using `{tidyselect}`
+functionality.
+
+``` r
+my_data2 <- 
+  data.frame(a = gl(2,10),
+             b = gl(5,2, ordered = TRUE),
+             c = gl(5,2),
+             d = 1:10,
+             e = 11:20)
+
+enlist_contrasts(my_data2,
+                 where(is.ordered) ~ polynomial_code,
+                 where(is.unordered) ~ helmert_code,
+                 d + e ~ sum_code)
+#> $b
+#>              .L         .Q            .C         ^4
+#> 1 -6.324555e-01  0.5345225 -3.162278e-01  0.1195229
+#> 2 -3.162278e-01 -0.2672612  6.324555e-01 -0.4780914
+#> 3 -3.510833e-17 -0.5345225  1.755417e-16  0.7171372
+#> 4  3.162278e-01 -0.2672612 -6.324555e-01 -0.4780914
+#> 5  6.324555e-01  0.5345225  3.162278e-01  0.1195229
+#> 
+#> $a
+#>      2
+#> 1 -0.5
+#> 2  0.5
+#> 
+#> $c
+#>     <2         <3    <4   <5
+#> 1 -0.5 -0.3333333 -0.25 -0.2
+#> 2  0.5 -0.3333333 -0.25 -0.2
+#> 3  0.0  0.6666667 -0.25 -0.2
+#> 4  0.0  0.0000000  0.75 -0.2
+#> 5  0.0  0.0000000  0.00  0.8
+#> 
+#> $d
+#>     2  3  4  5  6  7  8  9 10
+#> 1  -1 -1 -1 -1 -1 -1 -1 -1 -1
+#> 2   1  0  0  0  0  0  0  0  0
+#> 3   0  1  0  0  0  0  0  0  0
+#> 4   0  0  1  0  0  0  0  0  0
+#> 5   0  0  0  1  0  0  0  0  0
+#> 6   0  0  0  0  1  0  0  0  0
+#> 7   0  0  0  0  0  1  0  0  0
+#> 8   0  0  0  0  0  0  1  0  0
+#> 9   0  0  0  0  0  0  0  1  0
+#> 10  0  0  0  0  0  0  0  0  1
+#> 
+#> $e
+#>    12 13 14 15 16 17 18 19 20
+#> 11 -1 -1 -1 -1 -1 -1 -1 -1 -1
+#> 12  1  0  0  0  0  0  0  0  0
+#> 13  0  1  0  0  0  0  0  0  0
+#> 14  0  0  1  0  0  0  0  0  0
+#> 15  0  0  0  1  0  0  0  0  0
+#> 16  0  0  0  0  1  0  0  0  0
+#> 17  0  0  0  0  0  1  0  0  0
+#> 18  0  0  0  0  0  0  1  0  0
+#> 19  0  0  0  0  0  0  0  1  0
+#> 20  0  0  0  0  0  0  0  0  1
 ```
 
 The functions in this package aim to be helpful when potential mistakes

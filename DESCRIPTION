@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Tidy contrast coding utilities
-Version: 0.2.1
+Version: 0.3.0
 Year: 2024
 Author: Thomas Sostarics
 Maintainer: Thomas Sostarics <tsostarics@gmail.com>
@@ -18,7 +18,8 @@ Imports:
     rlang (>= 0.1.2),
     stats,
     stringr,
-    tibble
+    tibble,
+    tidyselect
 RoxygenNote: 7.3.1
 Suggests: 
     scales,
