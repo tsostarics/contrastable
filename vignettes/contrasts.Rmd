@@ -617,6 +617,72 @@ and the `-` operator will be ignored:
 mdl_data15 <- set_contrasts(mdl_data, carb ~ polynomial_code - 3:5)
 ```
 
+## decompose_contrasts
+
+This is somewhat related to the `-` operator described above, but has more uses.
+When considering a factor with 3 levels, you'll end up with two coefficients in
+your model.
+In other words, a single factor is "decomposed" behind the scenes into multiple
+numeric predictors for the model matrix.
+Sometimes it can be helpful to work directly with these decomposed predictors.
+For example, interactions in GAM models with `mgcv` can often be a pain to work
+with, and sometimes it's easier to just group the interaction of two predictors
+into a series of individual predictors.
+However, doing the matrix multiplication one at a time (or trying to 
+conceptualize how the matrices fit together) can be difficult, especially when
+R's model matrix functionality can do it for us.
+`decompose_contrasts` provides an interface to do such decomposition.
+
+
+```{r}
+mdl_data16 <- 
+  mdl_data |> 
+  set_contrasts(cyl ~ helmert_code,
+                gear ~ helmert_code) |> 
+  decompose_contrasts(~ cyl * gear) 
+
+# Look at the decomposed contrast columns
+mdl_data16 |> 
+  dplyr::select(matches("^cyl|gear")) |> 
+  head()
+```
+
+The column names take the name from the labels, so these may not always be
+easy to work with when there are special characters.
+You can wrangle these or use something like the `{janitor}` package as needed.
+
+Here's a comparison of using the `cyl` predictor normally (which gives us
+two coefficients), and specifying the comparisons separately after decomposing
+the contrasts:
+
+```{r}
+coef(lm(mpg ~ cyl, data = mdl_data16))
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+coef(lm(mpg ~ cyl * gear, data = mdl_data16))
+coef(lm(mpg ~ 
+          `cyl<6` + `cyl<8` + 
+          `gear<4` + `gear<5` + 
+          `cyl<6:gear<4` + 
+          `cyl<8:gear<4` + 
+          `cyl<6:gear<5` +
+          `cyl<8:gear<5`, data = mdl_data16))
+```
+
+If we *really* wanted to, we could use just one of the comparisons, but note
+that this may give misleading results:
+
+```{r}
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+coef(lm(mpg ~ `cyl<6`, data = mdl_data16)) # not the same estimate as the above
+```
+
+
+This function can be especially valuable for pedagogical purposes, as it
+shows how the qualitative labels in the factor data is converted into numeric
+values for the model to work with.
+
+
+
 ## Typical patterns
 
 
