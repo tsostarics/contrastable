@@ -50,6 +50,9 @@ output/summary of a statistical model. Note that for \link[brms]{brm},
 instances of \code{-} (a minus sign) are replaced with \code{M}.
 }
 
+You can also specify multiple variables on the left hand side of a formula
+using tidyselect helpers. See examples for more information.
+
 Typically model functions like lm will have a contrasts argument where you
 can set the contrasts at model run time, rather than having to manually
 change the contrasts on the underlying factor columns in your data. This

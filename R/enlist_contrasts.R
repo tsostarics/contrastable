@@ -28,6 +28,9 @@
 #' output/summary of a statistical model. Note that for \link[brms]{brm},
 #' instances of `-` (a minus sign) are replaced with `M`.
 #'
+#' You can also specify multiple variables on the left hand side of a formula
+#' using tidyselect helpers. See examples for more information.
+#'
 #' Typically model functions like lm will have a contrasts argument where you
 #' can set the contrasts at model run time, rather than having to manually
 #' change the contrasts on the underlying factor columns in your data. This
@@ -121,6 +124,24 @@
 #' enlist_contrasts(my_df,  my_contrasts)
 #' enlist_contrasts(mtcars, my_contrasts)
 #'
+#' \dontrun{
+#' # Use tidyselect helpers to set multiple variables at once
+#' # These are all equivalent
+#' enlist_contrasts(mtcars, cyl ~ sum_code, gear ~ sum_code)
+#' enlist_contrasts(mtcars, cyl + gear ~ sum_code)
+#' enlist_contrasts(mtcars, c(cyl, gear) ~ sum_code)
+#' enlist_contrasts(mtcars, all_of(c('cyl', 'gear')) ~ sum_code)
+#' these_vars <- c("cyl", "gear")
+#' enlist_contrasts(mtcars, all_of(these_vars) ~ sum_code)
+#'
+#' # You can also do something like this:
+#' enlist_contrasts(mtcars, where(is.numeric) ~ sum_code)
+#'
+#' # Each variable name must only be set ONCE, eg these will fail:
+#' enlist_contrasts(mtcars, cyl ~ sum_code, cyl ~ scaled_sum_code)
+#' enlist_contrasts(mtcars, cyl ~ sum_code, all_of(these_vars) ~ scaled_sum_code)
+#' enlist_contrasts(mtcars, cyl ~ sum_code, where(is.numeric) ~ scaled_sum_code)
+#'}
 enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
   # Needs to be done before model_data is first evaluated
   df_symbol <- rlang::as_label(rlang::enquo(model_data))
@@ -142,40 +163,8 @@ enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
     stop("No contrast formulas provided")
   }
 
-
-  # Extract which factor columns are attempting to be set
-  lhs_variables <-
-    tryCatch(
-      vapply(formulas,
-             function(x) as.character(rlang::f_lhs(x)),
-             "char",
-             USE.NAMES = FALSE
-      ),
-      error = function(c) {
-        err <- conditionMessage(c)
-        if (!grepl("must be a formula", err)) {
-          stop(c)
-        }
-        stop(
-          paste(err,
-                "Did you use = instead of ~ when setting the contrast?",
-                sep = "\n")
-        )
-      }
-    )
-
-  ## TODO: add tidyselect functionality for variable names on the left hand side
-  stopifnot(
-    "Only one variable on the left hand side currently supported" =
-      length(lhs_variables) == length(formulas)
-  )
-
-  vars_in_model <- lhs_variables %in% names(model_data)
-
-  if (any(!vars_in_model)) {
-    variables <- paste(lhs_variables[!vars_in_model], collapse = ", ")
-    stop(paste0("Columns not found in ", df_symbol, ": ", variables))
-  }
+  formulas <- .expand_formulas(formulas, model_data)
+  lhs_variables <- names(formulas)
 
   model_data <- .convert_to_factors(model_data, lhs_variables, verbose)
 
@@ -193,7 +182,7 @@ enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
   .warn_if_onelevel(lhs_variables[is_onelevel_factor])
 
   formulas <- formulas[!is_onelevel_factor]
-  vars_in_model <- vars_in_model[!is_onelevel_factor]
+  # vars_in_model <- vars_in_model[!is_onelevel_factor]
   lhs_variables <- lhs_variables[!is_onelevel_factor]
 
   if (length(formulas) == 0) {

@@ -68,6 +68,12 @@ glimpse_contrasts <- function(model_data,
   # We do need to compute the contrast matrices so we can get information
   # about orthogonality, centering, etc.
   contrast_list <- enlist_contrasts(model_data, ..., "verbose" = verbose)
+
+  # The formulas need to be expanded to extract the parameters correctly,
+  # but we still need the unexpanded formulas provided by the user so we
+  # can give a more parsimonious warning if there are mismatches
+  unexpanded_formulas <- formulas
+  formulas <- .expand_formulas(unexpanded_formulas, model_data)
   params <- lapply(formulas, .make_parameters)
 
 
@@ -77,7 +83,7 @@ glimpse_contrasts <- function(model_data,
                                 contrast_list,
                                 model_data_name,
                                 dots_names,
-                                formulas)
+                                unexpanded_formulas)
 
   # Ignore explicitly set factors that actually only have one level
   is_onelevel_factor <-

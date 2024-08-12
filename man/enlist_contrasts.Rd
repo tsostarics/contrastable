@@ -48,6 +48,9 @@ output/summary of a statistical model. Note that for \link[brms]{brm},
 instances of \code{-} (a minus sign) are replaced with \code{M}.
 }
 
+You can also specify multiple variables on the left hand side of a formula
+using tidyselect helpers. See examples for more information.
+
 Typically model functions like lm will have a contrasts argument where you
 can set the contrasts at model run time, rather than having to manually
 change the contrasts on the underlying factor columns in your data. This
@@ -129,6 +132,24 @@ my_contrasts <- list(gear ~ scaled_sum_code, carb ~ helmert_code)
 enlist_contrasts(my_df,  my_contrasts)
 enlist_contrasts(mtcars, my_contrasts)
 
+\dontrun{
+# Use tidyselect helpers to set multiple variables at once
+# These are all equivalent
+enlist_contrasts(mtcars, cyl ~ sum_code, gear ~ sum_code)
+enlist_contrasts(mtcars, cyl + gear ~ sum_code)
+enlist_contrasts(mtcars, c(cyl, gear) ~ sum_code)
+enlist_contrasts(mtcars, all_of(c('cyl', 'gear')) ~ sum_code)
+these_vars <- c("cyl", "gear")
+enlist_contrasts(mtcars, all_of(these_vars) ~ sum_code)
+
+# You can also do something like this:
+enlist_contrasts(mtcars, where(is.numeric) ~ sum_code)
+
+# Each variable name must only be set ONCE, eg these will fail:
+enlist_contrasts(mtcars, cyl ~ sum_code, cyl ~ scaled_sum_code)
+enlist_contrasts(mtcars, cyl ~ sum_code, all_of(these_vars) ~ scaled_sum_code)
+enlist_contrasts(mtcars, cyl ~ sum_code, where(is.numeric) ~ scaled_sum_code)
+}
 }
 \seealso{
 \code{\link[=set_contrasts]{set_contrasts()}}
