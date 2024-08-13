@@ -94,11 +94,12 @@
 #'
 #' @return nothing, just sends a message if needed
 .msg_if_remaining_factors <- function(model_data, specified_vars) {
-  which_are_factors <- .cols_where(model_data, is.factor, use_names = TRUE)
-  which_are_ordered <- .cols_where(model_data, is.ordered, use_names = TRUE)
+
+  which_are_factors  <- .cols_where(model_data, is.factor, use_names = TRUE)
+  which_are_ordered  <- .cols_where(model_data, is.ordered, use_names = TRUE)
   which_are_onelevel <- .cols_where(model_data, .is.onelevel, use_names = TRUE)
-  which_are_factors <- which_are_factors[!which_are_onelevel]
-  which_are_ordered <- which_are_ordered[!which_are_onelevel]
+  which_are_factors  <- which_are_factors[!which_are_onelevel]
+  which_are_ordered  <- which_are_ordered[!which_are_onelevel]
 
   # Filter named logical vector to be only those where TRUE
   factor_cols <- which_are_factors[which_are_factors]

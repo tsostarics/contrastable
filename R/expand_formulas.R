@@ -13,7 +13,7 @@
 .plus_to_c <- function(plus_expr) {
 
   is_plus <- tryCatch(identical(plus_expr[[1]],
-                                rlang::sym('+'),
+                                rlang::sym("+"),
                                 ignore.environment = TRUE),
                       error = \(e) FALSE)
   if (is_plus) {
@@ -21,7 +21,7 @@
 
     # Recurse into all arguments
     for (i in seq_along(plus_expr)[-1]) {
-      if (!is.function(plus_expr[[i]])){
+      if (!is.function(plus_expr[[i]])) {
         plus_expr[[i]] <- .plus_to_c(plus_expr[[i]])
       }
     }
@@ -46,20 +46,21 @@
   formulas <-
     lapply(formulas,
            \(formula) {
-             lhs <- tryCatch(rlang::f_lhs(formula),
+             lhs <-
+               tryCatch(rlang::f_lhs(formula),
 
-                             error = function(c) {
-                               err <- conditionMessage(c)
-                               if (!grepl("must be a formula", err)) {
-                                 stop(c)
-                               }
-                               stop(
-                                 paste(err,
-                                       "Did you use = instead of ~ when setting the contrast?",
-                                       sep = "\n")
-                               )
-                             }
-             )
+                        error = function(c) {
+                          err <- conditionMessage(c)
+                          if (!grepl("must be a formula", err)) {
+                            stop(c)
+                          }
+                          stop(
+                            paste(err,
+                                  "Did you use = instead of ~ when setting the contrast?",
+                                  sep = "\n")
+                          )
+                        }
+               )
 
              rhs <- rlang::f_rhs(formula)
              env <- rlang::f_env(formula)

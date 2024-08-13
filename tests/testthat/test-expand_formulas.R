@@ -2,13 +2,16 @@ test_that("tidyselect patterns work", {
   reference_value <- enlist_contrasts(mtcars,
                                       cyl ~ sum_code,
                                       gear ~ sum_code,
-                                      verbose=FALSE)
+                                      verbose = FALSE)
   expect_equal(reference_value,
-               enlist_contrasts(mtcars, cyl + gear ~ sum_code, verbose=FALSE))
+               enlist_contrasts(mtcars, cyl + gear ~ sum_code,
+                                verbose = FALSE))
   expect_equal(reference_value,
-               enlist_contrasts(mtcars, c(cyl, gear) ~ sum_code, verbose=FALSE))
+               enlist_contrasts(mtcars, c(cyl, gear) ~ sum_code,
+                                verbose = FALSE))
   expect_equal(reference_value,
-               enlist_contrasts(mtcars, all_of(c('cyl', 'gear')) ~ sum_code, verbose=FALSE))
+               enlist_contrasts(mtcars, all_of(c('cyl', 'gear')) ~ sum_code,
+                                verbose = FALSE))
 })
 
 test_that("environment handling with passed symbol works", {
@@ -38,6 +41,5 @@ test_that("tidyselect errors work", {
                                 cyl ~ sum_code,
                                 where(is.numeric) ~ sum_code),
                'Left hand side of multiple formulas')
-
 })
 

@@ -9,10 +9,10 @@ vignette: >
 
   
 ```{r, include = FALSE}
-  knitr::opts_chunk$set(
+ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-  )
+ )
 ```
   
   This vignette provides documentation for the different warnings and messages

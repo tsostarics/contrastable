@@ -24,8 +24,6 @@
 #' @return A dataframe is return.list is FALSE, a list with a dataframe and list
 #'   of named contrasts if TRUE.
 #' @export
-#'
-#' @importFrom tibble tibble
 glimpse_contrasts <- function(model_data,
                               ...,
                               return_list = FALSE,
@@ -117,10 +115,10 @@ glimpse_contrasts <- function(model_data,
   which_are_polynomials <- vapply(scheme_labels, .is_polynomial_scheme, TRUE)
   dropped_trends[!which_are_polynomials] <- NA
 
-  glimpse <- tibble::tibble(
+  glimpse <- data.frame(
     "factor" = set_factors,
     "n" = factor_sizes,
-    "level_names" = level_names,
+    "level_names" = I(level_names),
     "scheme" = scheme_labels,
     "reference" = reference_levels,
     "intercept" = intercept_interpretations,
@@ -276,17 +274,19 @@ glimpse_contrasts <- function(model_data,
                         is_ordered_factor,
                         schemes_to_use)
 
-  glimpse <- tibble::tibble(
+  explicitly_set <- if (length(unset_factors) == 0) logical(0) else FALSE
+
+  glimpse <- data.frame(
     "factor" = unset_factors,
     "n" = factor_sizes,
-    "level_names" = level_names,
+    "level_names" = I(level_names),
     "scheme" = schemes_to_use,
     "reference" = reference_levels,
     "intercept" = intercept_interpretations,
     "orthogonal" = orthogonal_contrasts,
     "centered" = centered_contrasts,
     "dropped_trends" = dropped_trends,
-    "explicitly_set" = FALSE
+    "explicitly_set" = explicitly_set
   )
 
   # If we want to show the one-level factors, add those rows in
@@ -313,7 +313,7 @@ glimpse_contrasts <- function(model_data,
 #' @param model_data Model data
 #' @param one_level_factors Which factors are one level
 #'
-#' @return A tibble with limited information about one level factors
+#' @return A data.frame with limited information about one level factors
 .make_placeholder_glimpse <- function(model_data, one_level_factors) {
   # Will be a list of 1-length character vectors to match list column type
   level_names <- lapply(
@@ -321,10 +321,10 @@ glimpse_contrasts <- function(model_data,
     function(x) levels(model_data[[x]])
   )
 
-  tibble::tibble(
+  data.frame(
     "factor" = one_level_factors,
     "n" = 1L,
-    "level_names" = level_names,
+    "level_names" = I(level_names),
     "scheme" = NA_character_,
     "reference" = NA_character_,
     "intercept" = NA_character_,
@@ -601,7 +601,7 @@ glimpse_contrasts <- function(model_data,
                         colnames(contrast_list[[varname]]))
            }, logical(1), USE.NAMES = TRUE)
 
-  if (any(doesnt_match_set_contrasts) | any(labels_dont_match)) {
+  if (any(doesnt_match_set_contrasts) || any(labels_dont_match)) {
     # Get which variables have mismatching matrices XOR mismatching labels
     # (practically speaking mismatching matrices will entail mismatching labels)
     mismatched_varnames <- names(which(doesnt_match_set_contrasts))
@@ -624,7 +624,7 @@ glimpse_contrasts <- function(model_data,
                  expected_labels <- paste0(colnames(contrast_list[[varname]]), collapse = ", ")
                  set_labels <- paste0(colnames(contrasts(model_data[[varname]])), collapse = ", ")
 
-                 paste0(" - ", varname, "\t(expected `",expected_labels, "` but found `", set_labels, "`)")
+                 paste0(" - ", varname, "\t(expected `", expected_labels, "` but found `", set_labels, "`)")
                }, character(1))
 
       mismatched_labels <- paste0(warning_lines, collapse = "\n")
@@ -636,9 +636,9 @@ glimpse_contrasts <- function(model_data,
 
   if (remind_about_set_contrasts) {
     # If the user typed out formulas manually, then we need to expand the ...
-    if (dots_names[1] == "...") {
+    if (dots_names[1L] == "...") {
       padding <- strrep(" ", nchar(model_data_name) + 18L) # nchar(" <- set_contrasts(")
-      initial_newlines <- c("\n", rep("", length(formulas) -1)) # need an extra \n on the first formula
+      initial_newlines <- c("\n", rep("", length(formulas) - 1L)) # need an extra \n on the first formula
       dots_names <-
         paste0(initial_newlines,
                padding,
@@ -657,7 +657,7 @@ glimpse_contrasts <- function(model_data,
                         WARN_reminder)
 
   if (length(warning_messages) > 0) {
-    warning(paste0(warning_messages, collapse = "\n"),call. = FALSE)
+    warning(paste0(warning_messages, collapse = "\n"), call. = FALSE)
   }
 
 }

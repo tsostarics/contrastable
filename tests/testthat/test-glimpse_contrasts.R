@@ -80,7 +80,7 @@ test_that("List output works", {
     cyl ~ helmert_code,
     gear ~ orth_polynomial_code
   )
-  my_data <- set_contrasts(mtcars, schemes,verbose = FALSE)
+  my_data <- set_contrasts(mtcars, schemes, verbose = FALSE)
   glimpse_list <- glimpse_contrasts(my_data,
                                     schemes,
                                     return_list = TRUE,
@@ -97,7 +97,8 @@ test_that("One level factor glimpse works", {
     twolevel = factor(c("a", "b"))
   )
 
-  glimpse <- glimpse_contrasts(tst, show_one_level_factors = TRUE, verbose = FALSE)
+  glimpse <-
+    glimpse_contrasts(tst, show_one_level_factors = TRUE, verbose = FALSE)
 
   expect_equal(glimpse$explicitly_set, c(FALSE, NA))
   expect_equal(glimpse$factor, c("twolevel", "onelevel"))
@@ -124,7 +125,7 @@ test_that(".warn_if_mismatched_contrasts works", {
 
   # (4) no warnings so long as the contrasts in clist ARE set to my_data
   my_data <- set_contrasts(my_data, clist)
-  glimpse_contrasts(my_data, clist)
+  expect_no_warning(glimpse_contrasts(my_data, clist))
 
   # (5) warning that carb isn't a factor
   clist <- list(cyl ~ helmert_code, carb ~ helmert_code)
@@ -150,7 +151,7 @@ test_that(".warn_if_mismatched_contrasts works", {
   expect_warning(glimpse_contrasts(my_data,
                                    cyl ~ helmert_code,
                                    am ~ treatment_code + 0 | c("diffA")),
-                 "my_data <- set_contrasts\\(my_data,[ \n]+cyl ~ helmert_code,am ~ treatment_code + 0 | c\\(\"diffA\"\\)")          # (5) double warning
+                 "my_data <- set_contrasts\\(my_data,[ \n]+cyl ~ helmert_code,am ~ treatment_code + 0 | c\\(\"diffA\"\\)")
 
 })
 

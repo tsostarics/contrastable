@@ -46,7 +46,7 @@ schemes that have a singular reference level such as
 \item \code{- A:B}: For polynomial coding schemes only, drop comparisons A through B.
 \item \verb{| c(...)}: Change the comparison labels for the contrast matrix to the
 character vector \code{c(...)} of length \code{n-1}. These labels will appear in the
-output/summary of a statistical model. Note that for \link[brms]{brm},
+output/summary of a statistical model. Note that for \code{brms::brm},
 instances of \code{-} (a minus sign) are replaced with \code{M}.
 }
 
@@ -62,7 +62,7 @@ function call, e.g., \code{lm(y~x, data = model_data, contrasts =
 enlist_contrasts(model_data, x~sum_code))}. Often, this will call
 \code{enlist_contrasts} twice, rather than just once.
 
-For some model fitting functions, like \link[brms]{brm}, there is no
+For some model fitting functions, like \code{brms::brm}, there is no
 contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
 set contrasts directly to the factors in a dataframe.
 

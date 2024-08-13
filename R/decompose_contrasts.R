@@ -64,7 +64,8 @@ decompose_contrasts <- function(model_data,
 
   # Remove the original columns as needed
   if (remove_original) {
-    original_varnames <-as.character(attr(stats::terms(extract), "variables")[-1])
+    original_varnames <-
+      as.character(attr(stats::terms(extract), "variables")[-1])
     model_data <- model_data[, !colnames(model_data) %in% original_varnames]
   }
 

@@ -20,7 +20,8 @@
 
 \item{code_by}{A function to be called, should return a contrast matrix}
 
-\item{reference_level}{The name of the level to use as the reference level, default NA}
+\item{reference_level}{The name of the level to use as the reference level,
+default NA}
 
 \item{set_intercept}{The intercept to use, default NA}
 

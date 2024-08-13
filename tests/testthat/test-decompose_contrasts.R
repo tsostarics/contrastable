@@ -21,13 +21,15 @@ test_that("Decomposing contrasts into new columns works", {
   test_extract_rename <- decompose_contrasts(tst, ~ cyl)
   test_extract_multifactors <- decompose_contrasts(tst, ~ cyl + carb)
   test_extract_remove_original <-
-    decompose_contrasts(tst, ~ cyl + carb,remove_original = TRUE)
+    decompose_contrasts(tst, ~ cyl + carb, remove_original = TRUE)
 
-  test_extract_intercept <- decompose_contrasts(tst, ~ cyl + carb,remove_intercept = FALSE)
+  test_extract_intercept <-
+    decompose_contrasts(tst, ~ cyl + carb, remove_intercept = FALSE)
 
   expect_true(all(c("cyl6-4", "cyl8-4") %in% colnames(test_extract_rename)))
-  expect_true(all(c("cyl6-4", "cyl8-4", paste0("carb", c(2,3,4,6,8))) %in% colnames(test_extract_multifactors)))
+  expect_true(all(c("cyl6-4", "cyl8-4", paste0("carb", c(2, 3, 4, 6, 8))) %in%
+                    colnames(test_extract_multifactors)))
   expect_true(all(!c("cyl", "carb") %in% colnames(test_extract_remove_original)))
-  expect_true('(Intercept)' %in% colnames(test_extract_intercept))
+  expect_true("(Intercept)" %in% colnames(test_extract_intercept))
 
 })

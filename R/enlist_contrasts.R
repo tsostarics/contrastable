@@ -25,7 +25,7 @@
 #'  - `- A:B`: For polynomial coding schemes only, drop comparisons A through B.
 #'  - `| c(...)`: Change the comparison labels for the contrast matrix to the
 #' character vector `c(...)` of length `n-1`. These labels will appear in the
-#' output/summary of a statistical model. Note that for \link[brms]{brm},
+#' output/summary of a statistical model. Note that for `brms::brm`,
 #' instances of `-` (a minus sign) are replaced with `M`.
 #'
 #' You can also specify multiple variables on the left hand side of a formula
@@ -40,7 +40,7 @@
 #' enlist_contrasts(model_data, x~sum_code))}. Often, this will call
 #' `enlist_contrasts` twice, rather than just once.
 #'
-#' For some model fitting functions, like \link[brms]{brm}, there is no
+#' For some model fitting functions, like `brms::brm`, there is no
 #' contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
 #' set contrasts directly to the factors in a dataframe.
 #'
@@ -143,8 +143,6 @@
 #' enlist_contrasts(mtcars, cyl ~ sum_code, where(is.numeric) ~ scaled_sum_code)
 #'}
 enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
-  # Needs to be done before model_data is first evaluated
-  df_symbol <- rlang::as_label(rlang::enquo(model_data))
 
   if (!inherits(model_data, "data.frame")) {
     if (inherits(model_data, "formula")) {
@@ -182,7 +180,6 @@ enlist_contrasts <- function(model_data, ..., verbose = TRUE) {
   .warn_if_onelevel(lhs_variables[is_onelevel_factor])
 
   formulas <- formulas[!is_onelevel_factor]
-  # vars_in_model <- vars_in_model[!is_onelevel_factor]
   lhs_variables <- lhs_variables[!is_onelevel_factor]
 
   if (length(formulas) == 0) {

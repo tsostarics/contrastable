@@ -12,7 +12,7 @@
 \item{one_level_factors}{Which factors are one level}
 }
 \value{
-A tibble with limited information about one level factors
+A data.frame with limited information about one level factors
 }
 \description{
 If the user wants factors with only one level included, this will create

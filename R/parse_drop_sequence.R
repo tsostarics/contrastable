@@ -8,10 +8,8 @@
 #' @param var_envir Environment to look up values if a and b are variable names
 #'
 #' @return A sequence of numbers
-#'
-#' @importFrom stringr str_match
 .parse_drop_sequence <- function(scheme_argument, var_envir) {
-  sequence_args <- stringr::str_match(scheme_argument, "(.+):(.+)")[, 2L:3L]
+  sequence_args <- regmatches(scheme_argument, regexec("(.*):(.*)", scheme_argument))[[1L]][-1L]
   # Strings like "3L" cannot be converted to numbers, L must be removed first
   sequence_args <- vapply(
     sequence_args,

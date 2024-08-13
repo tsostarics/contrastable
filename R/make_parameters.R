@@ -33,24 +33,30 @@
     env <- tryCatch(rlang::get_env(formula), error = \(e) NULL)
   }
 
-  if (identical(node, sym("~"))) {
-    params[["factor_col"]] <- cur_expr[[2L]] # LHS is factor name
-    params <- .make_parameters(cur_expr[[3L]], params, env)
-  } else if (.is_reserved_operator(node, "+")) {
-    params <- .process_addition(cur_expr, params, env)
-  } else if (.is_reserved_operator(node, "-")) {
-    params <- .process_subtraction(cur_expr, params, env)
-  } else if (.is_reserved_operator(node, "*")) {
-    params <- .process_multiplication(cur_expr, params,env, EMBEDDED)
-  } else if (.is_reserved_operator(node, "|")) {
-    params <- .process_labels(cur_expr, params, env)
-  } else {
-    params <- .process_whole(formula, params, env)
-  }
+  # Is the current node an operator for the package syntax? if so, process
+  # the arguments for that operator appropriately and continue recursing.
+  # if not, then we're at the top level and need to process the whole formula
+    switch(
+      .get_reserved_operator(node),
+      "~" = {params <- .process_tilde(cur_expr, params, env)},
+      "+" = {params <- .process_addition(cur_expr, params, env)},
+      "-" = {params <- .process_subtraction(cur_expr, params, env)},
+      "*" = {params <- .process_multiplication(cur_expr, params, env, EMBEDDED)},
+      "|" = {params <- .process_labels(cur_expr, params, env)},
+      {params <- .process_whole(formula, params, env)}
+    )
 
   params
 }
 
+.get_reserved_operator <- function(node) {
+  for (op_symbol in c("~","+", "-", "*", "|")) {
+    if (identical(node, sym(op_symbol)))
+      return(op_symbol)
+  }
+
+  "none"
+}
 
 .is_reserved_operator <- function(node, check_sym = NULL) {
   if (!missing(check_sym)) {
@@ -60,6 +66,13 @@
   }
 
   any(vapply(ops, function(x) identical(node, x), FUN.VALUE = TRUE))
+}
+
+
+.process_tilde <- function(cur_expr, params, env) {
+  params[["factor_col"]] <- cur_expr[[2L]]
+  params <- .make_parameters(cur_expr[[3L]], params, env)
+  params
 }
 
 
@@ -113,9 +126,10 @@
     formula <- formula[[2L]]
   }
 
+  # If we've been given what looks like a function, but the function doesn't
+  # actually exist in the calling environment, throw an error.
   if (is.call(formula)) {
     if (!is.function(get(formula[[1]], envir = env))) {
-      fx_name <- as.character(formula[[1]])
       stop("in ",
            format(formula),
            " : could not find function \"",

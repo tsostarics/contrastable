@@ -9,8 +9,8 @@ vignette: >
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -168,7 +168,7 @@ mdl_data <-
   mtcars |> 
   as_tibble() |> 
   mutate(cyl = factor(cyl), 
-         twolevel = factor(rep(c("a", "b"),times = nrow(mtcars)/2)),
+         twolevel = factor(rep(c("a", "b"), times = nrow(mtcars) / 2)),
          gear = factor(gear),
          carb = factor(carb))
 ```
@@ -485,7 +485,7 @@ If you're using a custom matrix for a tricky analysis, then you can specify
 the matrix yourself and then pass it to set_contrasts:
 
 ```{r use-matrix}
-my_matrix <- contr.sum(6)/2
+my_matrix <- contr.sum(6) / 2
 enlist_contrasts(mdl_data, carb ~ my_matrix)
 ```
 
@@ -557,7 +557,7 @@ formulas, you'll also get warnings:
 glimpse_contrasts(mdl_data, 
                   carb ~ contr.sum, 
                   gear ~ treatment_code * 4,
-                  cyl ~ contr.treatment | c('diff1', 'diff2'))
+                  cyl ~ contr.treatment | c("diff1", "diff2"))
 ```
 
 Remember that `set_contrasts` will automatically coerce dataframe columns into
@@ -665,7 +665,8 @@ coef(lm(mpg ~
           `cyl<6:gear<4` + 
           `cyl<8:gear<4` + 
           `cyl<6:gear<5` +
-          `cyl<8:gear<5`, data = mdl_data16))
+          `cyl<8:gear<5`, 
+        data = mdl_data16))
 ```
 
 If we *really* wanted to, we could use just one of the comparisons, but note

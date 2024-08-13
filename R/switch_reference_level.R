@@ -42,7 +42,7 @@
           comparison_order[comparison_order < old_reference],
           new_reference - 1,
           comparison_order[comparison_order >= old_reference &
-            comparison_order != (new_reference - 1)]
+                             comparison_order != (new_reference - 1)]
         )
     } else if (new_reference < old_reference) {
       comparison_order <- c(
@@ -61,7 +61,7 @@
                                         new_reference_label = NA,
                                         new_reference_index) {
   if (!is.na(new_reference_label) &&
-    identical(new_reference_index, integer(0))) {
+      identical(new_reference_index, integer(0))) {
     stop("Reference level not found in factor levels")
   }
 
@@ -86,16 +86,3 @@
 
   cmat
 }
-
-# Not using this for anything for the time being
-# .is_unscaled <- function(cmat) {
-#   determinant_value <-
-#     base::determinant(
-#       base::solve(
-#         .contrasts_to_hypotheses(cmat)
-#       ),
-#       logarithm = FALSE
-#     )
-#
-#   (abs(determinant_value[['modulus']]) - factorial(nrow(cmat))) < 1e-10
-# }
