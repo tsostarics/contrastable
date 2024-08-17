@@ -1,10 +1,17 @@
 #' Glimpse contrasts in dataframe
 #'
 #' Uses the same syntax as \link[contrastable]{enlist_contrasts} and
-#' \link[contrastable]{set_contrasts} Returns a summary table of the contrasts
+#' \link[contrastable]{set_contrasts}. Returns a summary table of the contrasts
 #' you've set. If you set `return.list=TRUE` then you can access a list of
 #' contrasts in the second element of the resulting list. The glimpse dataframe
 #' is the first element. `FALSE` will return just the glimpse data frame.
+#'
+#' @details
+#' Generally, `glimpse_contrasts` will give warnings about mismatches between
+#' the specified contrasts and what's actually set on the factors in a dataframe.
+#' The warnings will typically tell you how to resolve these mismatches.
+#' See the `contrasts` and `warnings` vignettes for more information.
+#'
 #'
 #' @param model_data Data to be passed to a model fitting function
 #' @param ... Series of formulas
@@ -21,9 +28,25 @@
 #' @param verbose Logical, defaults to TRUE, whether messages should be printed
 #'
 #' @inherit enlist_contrasts details
-#' @return A dataframe is return.list is FALSE, a list with a dataframe and list
+#' @return A dataframe if return.list is FALSE, a list with a dataframe and list
 #'   of named contrasts if TRUE.
 #' @export
+#'
+#' @examples
+#'
+#' my_contrasts <- list(cyl ~ sum_code, carb ~ helmert_code)
+#' my_data <- set_contrasts(mtcars, my_contrasts)
+#' my_data$gear <- factor(my_data$gear) # Make gear a factor manually
+#'
+#' # View information about contrasts; gear will use default for unordered
+#' glimpse_contrasts(my_data, my_contrasts)
+#'
+#' # Not passing the contrasts to `glimpse_contrasts` will show various warnings
+#' glimpse_contrasts(my_data)
+#'
+#' # A warning is thrown if the contrasts don't match what's on the dataset,
+#' # my_data$gear uses contr.treatment, not sum_code
+#' glimpse_contrasts(my_data, my_contrasts, gear ~ sum_code)
 glimpse_contrasts <- function(model_data,
                               ...,
                               return_list = FALSE,
@@ -168,6 +191,16 @@ glimpse_contrasts <- function(model_data,
   glimpse
 }
 
+#' Lookup namespace of contrast scheme function
+#'
+#' Given the name of a contrast scheme (ie the function name that creates
+#' the contrast matrix), lookup which namespace it belongs to and add it
+#' to the string. Used to report which packages are used in the glimpse table,
+#' e.g., stats, contrastable, bayesTestR
+#'
+#' @param scheme_names Character vector
+#'
+#' @return character vector of updated function names with namespaces
 .add_namespace <- function(scheme_names) {
   vapply(scheme_names,
          \(n) {
@@ -179,21 +212,12 @@ glimpse_contrasts <- function(model_data,
            }
 
            paste0(namespace, separator, n)
-         }, character(1),
-         USE.NAMES = FALSE
-  )
-}
-
-.clean_schemes <- function(scheme_labels) {
-  vapply(scheme_labels,
-         function(x) {
-           x <- gsub("contr\\.poly", "orth_polynomial", x)
-           gsub("(^contr\\.)|(_code$)", "", x)
          },
          character(1),
          USE.NAMES = FALSE
   )
 }
+
 
 #' Glimpse default factors
 #'
@@ -464,12 +488,22 @@ glimpse_contrasts <- function(model_data,
     }
 
     # If it's a function name like contr.poly then use the name of the function
-    function_used <- is.function(get(
-      scheme,
-      rlang::get_env(formulas[[i]])
-    ))
-    if (function_used) {
-      return(scheme)
+    is_namespaced <- grepl("::", scheme)
+
+    # If the user passes the namespace with the function then get(scheme, env)
+    # won't work if the namespace isn't loaded in the current R session.
+    # Instead we'll just always resolve the namespace when it's specified, then
+    # double check to make sure it's a function
+    if (is_namespaced) {
+      scheme_parts <- strsplit(scheme, ":::?")[[1]] # third : in case user tries an unexported function
+      scheme_fx <- getFromNamespace(scheme_parts[2],
+                                    scheme_parts[1],
+                                    envir = rlang::get_env(formulas[[i]]))
+      if (is.function(scheme_fx))
+        return(scheme)
+    } else {
+      if (is.function(get(scheme, rlang::get_env(formulas[[i]]))))
+        return(scheme)
     }
 
     # Else it's a variable name, which is taken to be custom
