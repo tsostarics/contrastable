@@ -22,7 +22,7 @@
 #'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
-#' mydf <- set_contrasts(mydf, forward_difference_code)
+#' mydf <- set_contrasts(mydf, grp ~ forward_difference_code)
 #'
 #' lm(resp ~ grp, data = mydf)
 forward_difference_code <- function(n) {
@@ -62,7 +62,7 @@ forward_difference_code <- function(n) {
 #'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
-#' mydf <- set_contrasts(mydf, backward_difference_code)
+#' mydf <- set_contrasts(mydf, grp ~ backward_difference_code)
 #'
 #' lm(resp ~ grp, data = mydf)
 backward_difference_code <- function(n) {

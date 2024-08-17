@@ -30,7 +30,7 @@
 #'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
-#' mydf <- set_contrasts(mydf, treatment_code)
+#' mydf <- set_contrasts(mydf, grp ~ treatment_code)
 #'
 #' lm(resp ~ grp, data = mydf)
 #'

@@ -65,7 +65,7 @@ mydf <- data.frame(
   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 )
 
-mydf <- set_contrasts(mydf, scaled_sum_code)
+mydf <- set_contrasts(mydf, grp ~ scaled_sum_code)
 
 lm(resp ~ grp, data = mydf)
 }

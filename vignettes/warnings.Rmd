@@ -96,8 +96,7 @@ Contrastable provides some flexibility in how contrasts are passed to formulas.
 Under the hood, methods are defined for the following object classes:
 
  - matrix
- - array
- - symbol
+ - symbol/name
  - function
  - hypr
  

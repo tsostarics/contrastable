@@ -81,7 +81,7 @@ use_contrasts.name <- function(factor_col,
                                  drop_trends = NA,
                                  labels = NULL,
                                  as_is = FALSE, ...) {
-  code_by <- get(code_by)
+  code_by <- get(code_by,envir = parent.frame())
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
   method_call[[1]] <- use_contrasts
@@ -89,44 +89,6 @@ use_contrasts.name <- function(factor_col,
 }
 
 
-#' Matrix handler for use_contrasts
-#' Passing a matrix uses the implicit array class, so just pass it off to the
-#' matrix method
-#'
-#' @param factor_col A factor vector, eg from df$factorVarName
-#' @param code_by A matrix to be used as the contrast matrix
-#' @param reference_level The level to use as the reference level, default NA
-#' @param set_intercept The intercept to use, default NA
-#' @param drop_trends The trends to drop, default NA
-#' @param labels A vector of labels to apply to the matrix column names, default
-#' @param as_is Logical, default FALSE, whether to leave the resulting matrix
-#' @param ... Additional arguments to be passed to `code_by()`
-#'
-#' @return A contrast coding matrix with labels and proper reference level
-#' @method use_contrasts array
-#' @export
-#'
-#' @examples
-#'
-#' # Works the same as use_contrasts.matrix
-#' contrast_matrix <- sum_code(4)
-#' use_contrasts.array(gl(4,1), contrast_matrix)
-use_contrasts.array <- function(factor_col,
-                                code_by = NA,
-                                reference_level = NA,
-                                set_intercept = NA,
-                                drop_trends = NA,
-                                labels = NULL,
-                                as_is = FALSE,
-                                ...) {
-  array_call <-  match.call()
-  if (!is.matrix(code_by))
-    array_call[['code_by']] <- as.matrix(code_by)
-
-  array_call[[1]] <- use_contrasts.matrix
-
-  eval(array_call)
-}
 
 #' Function handler for use_contrasts
 #'
