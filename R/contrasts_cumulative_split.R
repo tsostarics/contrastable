@@ -28,7 +28,7 @@
 #'
 #'
 #' set.seed(111)
-#' df <- data.frame(
+#' mydf <- data.frame(
 #'   grp = rep(c("a", "b", "c", "d"), each = 2000),
 #'   val = c(
 #'     rnorm(200, 2, 1),
@@ -40,7 +40,7 @@
 #'   set_contrasts(grp ~ cumulative_split_code |
 #'     c("a-rest", "ab-rest", "abc-rest"))
 #'
-#' lm(val ~ grp, data = df)
+#' lm(val ~ grp, data = mydf)
 #'
 cumulative_split_code <- function(n) {
   hypothesis_matrix <- matrix(0, nrow = n, ncol = n - 1)

@@ -28,18 +28,11 @@ Example interpretation for a 4 level factor:
 }
 \examples{
 mydf <- data.frame(
-  grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+  grp = gl(4,5),
   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 )
 
-mydf |>
-  dplyr::group_by(grp) |>
-  dplyr::summarize(mu = mean(resp)) |>
-  dplyr::ungroup() |>
-  dplyr::mutate(grand_mean = mean(mu))
+mydf <- set_contrasts(mydf, forward_difference_code)
 
-summary(lm(resp ~ grp,
-  data = mydf,
-  contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)
-))
+lm(resp ~ grp, data = mydf)
 }

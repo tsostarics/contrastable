@@ -39,3 +39,9 @@ A contrast coding matrix with labels and proper reference level
 \description{
 If a user provides a raw matrix, then use that matrix as the contrast matrix
 }
+\examples{
+
+contrast_matrix <- sum_code(4)
+use_contrasts(gl(4,1), contrast_matrix)
+
+}

@@ -36,3 +36,14 @@ reference level. However, in functions like
 \link[contrastable]{enlist_contrasts}, the reference level is automatically
 set to be the first level alphabetically.
 }
+\examples{
+mydf <- data.frame(
+  grp = gl(4,5),
+  resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
+)
+
+mydf <- set_contrasts(mydf, treatment_code)
+
+lm(resp ~ grp, data = mydf)
+
+}

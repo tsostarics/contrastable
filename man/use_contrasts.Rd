@@ -47,3 +47,18 @@ Reference level is automatically set to the row that's always negative.
 level should be specified in ...
 }
 }
+\examples{
+
+# Create a contrast matrix given some factor vector with the specified
+# reference level
+use_contrasts(gl(5,2), sum_code, reference_level = 3)
+
+# Set column labels; order for labels is the same as the column indices
+use_contrasts(gl(3,2), scaled_sum_code, labels = c("2-1", "3-1"))
+
+my_data <- mtcars
+my_data$gear <- factor(mtcars$gear)
+
+MASS::fractions(use_contrasts(my_data$gear, helmert_code))
+
+}

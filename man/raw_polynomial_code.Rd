@@ -25,3 +25,17 @@ where each polynomial may be correlated with the others. Normally you would
 use orthogonal polynomials, see \link[stats]{contr.poly} and
 \link[contrastable]{orth_polynomial_code}
 }
+\examples{
+mydf <- data.frame(
+  grp = rep(c("a", "b", "c", "d"), each = 2000),
+  val = c(
+    rnorm(200, 2, 1),
+    rnorm(200, 5, 1),
+    rnorm(200, 7.5, 1),
+    rnorm(200, 15, 1)
+  )
+) |>
+  set_contrasts(grp ~ raw_polynomial_code)
+
+stats::lm(val ~ grp, data = mydf)
+}

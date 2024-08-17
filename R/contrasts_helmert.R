@@ -22,20 +22,12 @@
 #' @examples
 #'
 #' mydf <- data.frame(
-#'   grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+#'   grp = gl(4,5),
 #'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
-#' mydf |>
-#'   dplyr::group_by(grp) |>
-#'   dplyr::summarize(mu = mean(resp)) |>
-#'   dplyr::ungroup() |>
-#'   dplyr::mutate(grand_mean = mean(mu))
-#'
-#' summary(lm(resp ~ grp,
-#'   data = mydf,
-#'   contrasts = enlist_contrasts(mydf, grp ~ helmert_code)
-#' ))
+#' mydf <- set_contrasts(mydf, grp ~ helmert_code)
+#' lm(resp ~ grp, data = mydf)
 helmert_code <- function(n) {
   apply(unname(stats::contr.helmert(n)), 2L, function(x) x / sum(x != 0))
 }
@@ -64,20 +56,12 @@ helmert_code <- function(n) {
 #' @examples
 #'
 #' mydf <- data.frame(
-#'   grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+#'   grp = gl(4,5),
 #'   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 #' )
 #'
-#' mydf |>
-#'   dplyr::group_by(grp) |>
-#'   dplyr::summarize(mu = mean(resp)) |>
-#'   dplyr::ungroup() |>
-#'   dplyr::mutate(grand_mean = mean(mu))
-#'
-#' summary(lm(resp ~ grp,
-#'   data = mydf,
-#'   contrasts = enlist_contrasts(mydf, grp ~ reverse_helmert_code)
-#' ))
+#' mydf <- set_contrasts(mydf, grp ~ reverse_helmert_code)
+#' lm(resp ~ grp, data = mydf)
 reverse_helmert_code <- function(n) {
   matrix(rev(helmert_code(n)), nrow = n)
 }

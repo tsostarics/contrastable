@@ -13,6 +13,22 @@
 #'
 #' @aliases polynomial_code
 #' @export
+#'
+#' @examples
+#'
+#' mydf <- data.frame(
+#'   grp = rep(c("a", "b", "c", "d"), each = 2000),
+#'   val = c(
+#'     rnorm(200, 2, 1),
+#'     rnorm(200, 5, 1),
+#'     rnorm(200, 7.5, 1),
+#'     rnorm(200, 15, 1)
+#'   )
+#' ) |>
+#'   set_contrasts(grp ~ polynomial_code)
+#'
+#' stats::lm(val ~ grp, data = mydf)
+#'
 orth_polynomial_code <- function(n) {
   stats::contr.poly(n)
 }
@@ -41,8 +57,22 @@ polynomial_code <- orth_polynomial_code
 #' @export
 #'
 #' @importFrom stats poly
+#'
+#' @examples
+#' mydf <- data.frame(
+#'   grp = rep(c("a", "b", "c", "d"), each = 2000),
+#'   val = c(
+#'     rnorm(200, 2, 1),
+#'     rnorm(200, 5, 1),
+#'     rnorm(200, 7.5, 1),
+#'     rnorm(200, 15, 1)
+#'   )
+#' ) |>
+#'   set_contrasts(grp ~ raw_polynomial_code)
+#'
+#' stats::lm(val ~ grp, data = mydf)
 raw_polynomial_code <- function(n) {
-  contrmat <- stats::poly(seq_len(n), n - 1, raw = TRUE)
+  contrmat <- poly(seq_len(n), n - 1, raw = TRUE)
   attr(contrmat, "degree") <- NULL
   contrmat
 }

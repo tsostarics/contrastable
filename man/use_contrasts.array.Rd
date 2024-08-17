@@ -42,3 +42,9 @@ Matrix handler for use_contrasts
 Passing a matrix uses the implicit array class, so just pass it off to the
 matrix method
 }
+\examples{
+
+# Works the same as use_contrasts.matrix
+contrast_matrix <- sum_code(4)
+use_contrasts.array(gl(4,1), contrast_matrix)
+}

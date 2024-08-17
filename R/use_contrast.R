@@ -20,6 +20,21 @@
 #'
 #' @return A contrast coding matrix with labels and proper reference level
 #' @export
+#'
+#' @examples
+#'
+#' # Create a contrast matrix given some factor vector with the specified
+#' # reference level
+#' use_contrasts(gl(5,2), sum_code, reference_level = 3)
+#'
+#' # Set column labels; order for labels is the same as the column indices
+#' use_contrasts(gl(3,2), scaled_sum_code, labels = c("2-1", "3-1"))
+#'
+#' my_data <- mtcars
+#' my_data$gear <- factor(mtcars$gear)
+#'
+#' MASS::fractions(use_contrasts(my_data$gear, helmert_code))
+#'
 use_contrasts <- function(factor_col,
                           code_by = NA,
                           reference_level = NA,
@@ -48,9 +63,18 @@ use_contrasts <- function(factor_col,
 #' @param drop_trends The trends to drop, default NA
 #'
 #' @return A contrast coding matrix with labels and proper reference level
-#' @method use_contrasts symbol
+#' @method use_contrasts name
 #' @export
-use_contrasts.symbol <- function(factor_col,
+#'
+#' @examples
+#'
+#' aliased_scheme <- sum_code
+#' contrast_scheme <- rlang::sym("aliased_scheme")
+#'
+#' # Result will be as if sum_code was used directly
+#' use_contrasts(gl(5,1), contrast_scheme)
+#'
+use_contrasts.name <- function(factor_col,
                                  code_by = NA,
                                  reference_level = NA,
                                  set_intercept = NA,
@@ -58,7 +82,10 @@ use_contrasts.symbol <- function(factor_col,
                                  labels = NULL,
                                  as_is = FALSE, ...) {
   code_by <- get(code_by)
-  UseMethod("use_contrasts", code_by)
+  method_call <- match.call()
+  method_call[["code_by"]] <- code_by
+  method_call[[1]] <- use_contrasts
+  eval(method_call)
 }
 
 
@@ -78,24 +105,27 @@ use_contrasts.symbol <- function(factor_col,
 #' @return A contrast coding matrix with labels and proper reference level
 #' @method use_contrasts array
 #' @export
+#'
+#' @examples
+#'
+#' # Works the same as use_contrasts.matrix
+#' contrast_matrix <- sum_code(4)
+#' use_contrasts.array(gl(4,1), contrast_matrix)
 use_contrasts.array <- function(factor_col,
-                                code_by = NA, reference_level = NA,
+                                code_by = NA,
+                                reference_level = NA,
                                 set_intercept = NA,
                                 drop_trends = NA,
                                 labels = NULL,
                                 as_is = FALSE,
                                 ...) {
-  # TODO: change this to use parent frame
-  use_contrasts.matrix(
-    factor_col,
-    code_by,
-    reference_level,
-    set_intercept,
-    drop_trends,
-    labels,
-    as_is,
-    ...
-  )
+  array_call <-  match.call()
+  if (!is.matrix(code_by))
+    array_call[['code_by']] <- as.matrix(code_by)
+
+  array_call[[1]] <- use_contrasts.matrix
+
+  eval(array_call)
 }
 
 #' Function handler for use_contrasts
@@ -116,6 +146,9 @@ use_contrasts.array <- function(factor_col,
 #' @return A contrast coding matrix with labels and proper reference level
 #' @method use_contrasts function
 #' @export
+#'
+#' @examples
+#' use_contrasts(gl(5,1), sum_code)
 use_contrasts.function <- function(factor_col,
                                    code_by = NA,
                                    reference_level = NA,
@@ -197,6 +230,12 @@ use_contrasts.function <- function(factor_col,
 #' @return A contrast coding matrix with labels and proper reference level
 #' @method use_contrasts matrix
 #' @export
+#'
+#' @examples
+#'
+#' contrast_matrix <- sum_code(4)
+#' use_contrasts(gl(4,1), contrast_matrix)
+#'
 use_contrasts.matrix <- function(factor_col,
                                  code_by = NA,
                                  reference_level = NA,
@@ -254,7 +293,7 @@ use_contrasts.matrix <- function(factor_col,
 #' If the user tries to use something we don't know how to work with, throw a
 #' warning that we'll be using the defaults from options().
 #'
-#' @param factor_col A factor vector, eg from df$factorVarName
+#' @param factor_col A factor vector, eg from `df$factorVarName`
 #' @param code_by Some object that's not a matrix or function. If NA, no warning
 #' will be thrown, and the default contrasts will be used. A warning will be
 #' thrown if it's not NA.
@@ -265,7 +304,8 @@ use_contrasts.matrix <- function(factor_col,
 #' @param set_intercept Not used
 #' @param drop_trends Not used
 #'
-#' @return Contrast matrix, using the ordered or unordered default from options()
+#' @return Contrast matrix, using the ordered or unordered default from
+#' `options()`
 #' @export
 use_contrasts.default <- function(factor_col,
                                   code_by = NA,
@@ -376,9 +416,6 @@ use_contrasts.hypr <- function(factor_col,
 
   contrast_matrix
 }
-
-
-
 
 # Extract parameters to coding function call from user-supplied dots
 .bundle_params <- function(factor_col, ...) {

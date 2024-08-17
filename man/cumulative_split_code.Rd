@@ -37,7 +37,7 @@ each group. The intercept is the grand mean.
 
 
 set.seed(111)
-df <- data.frame(
+mydf <- data.frame(
   grp = rep(c("a", "b", "c", "d"), each = 2000),
   val = c(
     rnorm(200, 2, 1),
@@ -49,6 +49,6 @@ df <- data.frame(
   set_contrasts(grp ~ cumulative_split_code |
     c("a-rest", "ab-rest", "abc-rest"))
 
-lm(val ~ grp, data = df)
+lm(val ~ grp, data = mydf)
 
 }

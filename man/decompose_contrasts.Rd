@@ -56,7 +56,7 @@ compute everything at once.
 }
 \examples{
 
-# Decomose contrasts for carb and gear columns into new columns, using
+# Decompose contrasts for carb and gear columns into new columns, using
 # the contrast labels used when setting the contrasts
 mtcars |>
   set_contrasts(

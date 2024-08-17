@@ -40,3 +40,6 @@ A contrast coding matrix with labels and proper reference level
 If the user provides a function, use the function and supplied arguments to
 create a contrast matrix
 }
+\examples{
+use_contrasts(gl(5,1), sum_code)
+}

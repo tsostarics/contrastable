@@ -16,7 +16,7 @@
 )
 }
 \arguments{
-\item{factor_col}{A factor vector, eg from df$factorVarName}
+\item{factor_col}{A factor vector, eg from \code{df$factorVarName}}
 
 \item{code_by}{Some object that's not a matrix or function. If NA, no warning
 will be thrown, and the default contrasts will be used. A warning will be
@@ -35,7 +35,8 @@ thrown if it's not NA.}
 \item{...}{Additional arguments, not used}
 }
 \value{
-Contrast matrix, using the ordered or unordered default from options()
+Contrast matrix, using the ordered or unordered default from
+\code{options()}
 }
 \description{
 If a user doesn't specify a contrast matrix, use the defaults from options().

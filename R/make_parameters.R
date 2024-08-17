@@ -49,6 +49,16 @@
   params
 }
 
+#' Check for reserved operators
+#'
+#' This is a helper for `.make_parameters`, which takes a symbol and checks
+#' whether it corresponds to one of the reserved operators for the package
+#' syntax.
+#'
+#' @param node A symbol, extracted from a formula
+#'
+#' @return If `node` is a reserved operator, then return the operator as a
+#' string. Otherwise return the string "none".
 .get_reserved_operator <- function(node) {
   for (op_symbol in c("~","+", "-", "*", "|")) {
     if (identical(node, sym(op_symbol)))
@@ -68,6 +78,8 @@
   any(vapply(ops, function(x) identical(node, x), FUN.VALUE = TRUE))
 }
 
+## Process each of the various operators and assign the relevant parameters
+## while recursing into the rest of the expression
 
 .process_tilde <- function(cur_expr, params, env) {
   params[["factor_col"]] <- cur_expr[[2L]]
@@ -110,7 +122,7 @@
   LHS <- cur_expr[[2L]]
   RHS <- cur_expr[[3L]]
   params[["intercept_level"]] <- RHS
-  # If we don't check whether * is embedded in - or + before recursing
+  # If we don't check whether * is embedded in - or + before recursing, then
   # we will overwrite code_by on accident
   if (!EMBEDDED) {
     params <- .make_parameters(LHS, params, env)

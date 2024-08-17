@@ -41,38 +41,31 @@ Example interpretation for a 4 level factor:
 Note: grp coefficient estimates are the same as with contr.treatment, but the
 intercept is changed to the grand mean instead of the mean of grp1.
 
-IMPORTANT: This coding scheme is NOT the same as \code{contr.sum/2} when the
-number of levels is GREATER than 2. When n=2, estimates with \code{contr.sum} can
-be interpreted as "half the distance between levels" but when k>2,
-\code{contr.sum} is to be interpreted as "the distance between this level and the
-GRAND MEAN". You may be tempted to use \code{contr.sum(n)/2}, but this tests the
-hypothesis that 3/2 times the mean of a level is equal to half the sum of the
-means of the other levels, i.e., \eqn{1.5\mu_1 - .5\mu_2 - .5\mu_3 - .5\mu_4
-= 0}, which is not likely to be what you're looking for.
+It's also important to note that this coding scheme is NOT the same as
+\code{contr.sum/2} when the number of levels is greater than 2. When n=2,
+estimates with \code{contr.sum} can be interpreted as "half the distance between
+levels" but when k>2, \code{contr.sum} is to be interpreted as "the distance
+between this level and the GRAND MEAN". You may be tempted to use
+\code{contr.sum(n)/2}, but this tests the hypothesis that 3/2 times the mean of a
+level is equal to half the sum of the means of the other levels, i.e.,
+\eqn{1.5\mu_1 - .5\mu_2 - .5\mu_3 - .5\mu_4 = 0}, which is not likely to be
+what you're looking for.
 }
 \examples{
 # Compare these two, note that contr.sum(4)/2 is not the same
 scaled_sum_code(4)
 contr.sum(4)
 
-# Here they happen to be equivalent (well, aside from the reference level
-# contr.sum uses)
+# Here they happen to be equivalent (modulo reference level)
 scaled_sum_code(2)
 contr.sum(2) / 2
 
 mydf <- data.frame(
-  grp = factor(c(rep("F1", 5), rep("F2", 5), rep("F3", 5), rep("F4", 5))),
+  grp = gl(4,5),
   resp = c(seq(1, 5), seq(5, 9), seq(10, 14), seq(15, 19))
 )
 
-mydf |>
-  dplyr::group_by(grp) |>
-  dplyr::summarize(mu = mean(resp)) |>
-  dplyr::ungroup() |>
-  dplyr::mutate(grand_mean = mean(mu))
+mydf <- set_contrasts(mydf, scaled_sum_code)
 
-summary(lm(resp ~ grp,
-  data = mydf,
-  contrasts = enlist_contrasts(mydf, grp ~ scaled_sum_code)
-))
+lm(resp ~ grp, data = mydf)
 }

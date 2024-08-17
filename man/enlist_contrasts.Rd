@@ -90,7 +90,7 @@ my_df$carb <- factor(my_df$carb)
 # and the right hand side is the contrast scheme you want to use
 enlist_contrasts(
   my_df,
-  gear ~ scaled_sum_code, # Using helpers from this package
+  gear ~ scaled_sum_code,
   carb ~ helmert_code
 )
 

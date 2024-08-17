@@ -24,3 +24,19 @@ For n levels of factors where k in 1:n, generate a matrix with n-1
 comparisons where each comparison looks for a polynomial trend of degree k
 where each polynomial is independent of the others.
 }
+\examples{
+
+mydf <- data.frame(
+  grp = rep(c("a", "b", "c", "d"), each = 2000),
+  val = c(
+    rnorm(200, 2, 1),
+    rnorm(200, 5, 1),
+    rnorm(200, 7.5, 1),
+    rnorm(200, 15, 1)
+  )
+) |>
+  set_contrasts(grp ~ polynomial_code)
+
+stats::lm(val ~ grp, data = mydf)
+
+}
