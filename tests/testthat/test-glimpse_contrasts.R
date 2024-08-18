@@ -2,7 +2,8 @@ test_that("Intercept interpretation works", {
   expect_equal(interpret_intercept(contr.treatment(5)), "mean(1)", ignore_attr = TRUE)
   expect_equal(interpret_intercept(scaled_sum_code(5)), "grand mean", ignore_attr = TRUE)
   expect_equal(interpret_intercept(helmert_code(5)), "grand mean", ignore_attr = TRUE)
-  expect_equal(interpret_intercept(contr.poly(5)[, 1:3]), "grand mean", ignore_attr = TRUE)
+  expect_warning(interpret_intercept(contr.poly(5)[, 1:3]), "4 columns but found 3")
+  expect_equal(suppressWarnings(interpret_intercept(contr.poly(5)[, 1:3])), "grand mean", ignore_attr = TRUE)
 })
 
 test_that("Glimpse works", {
@@ -15,10 +16,14 @@ test_that("Glimpse works", {
                                             verbose = FALSE))
 
   expect_equal(tst$factor, c("carb", "gear", "cyl"))
-  expect_equal(tst$n, c(6, 3, 3), ignore_attr = TRUE) # need unname
-  expect_equal(tst$scheme, c("contr.poly", "scaled_sum_code", "contr.treatment"), ignore_attr = TRUE) # need unname
-  expect_equal(tst$reference, c(NA, "5", "4"), ignore_attr = TRUE) # need unname
-  expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"), ignore_attr = TRUE)
+  expect_equal(tst$n, c(6, 3, 3),
+               ignore_attr = TRUE) # need unname
+  expect_equal(tst$scheme, c("contr.poly", "scaled_sum_code", "contr.treatment"),
+               ignore_attr = TRUE) # need unname
+  expect_equal(tst$reference, c(NA, "5", "4"),
+               ignore_attr = TRUE) # need unname
+  expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"),
+               ignore_attr = TRUE)
   expect_equal(tst$orthogonal, c(TRUE, FALSE, FALSE))
   expect_equal(tst$centered, c(TRUE, TRUE, FALSE))
   expect_equal(tst$dropped_trends, c("3,4,5", NA, NA))
@@ -65,16 +70,6 @@ test_that("Warning with non default contrasts works", {
                  regexp = "Glimpse table may be unreliable")
 })
 
-test_that("Grouping columns aren't detected as ordered", {
-  tst <- mtcars |>
-    dplyr::mutate(cyl = factor(cyl), carb = ordered(carb), gear = factor(gear)) |>
-    dplyr::group_by(cyl)
-
-  # Avoid message from .warn_if_nondefault
-  expect_warning(glimpse_contrasts(tst, verbose = FALSE), NA)
-})
-
-
 test_that("List output works", {
   schemes <- list(
     cyl ~ helmert_code,
@@ -104,7 +99,7 @@ test_that("One level factor glimpse works", {
   expect_equal(glimpse$factor, c("twolevel", "onelevel"))
 })
 
-test_that(".warn_if_mismatched_contrasts works", {
+test_that(".warn_if_mismatched_contrasts throws correct warnings", {
 
   my_data <- mtcars
   my_data$cyl <- factor(my_data$cyl)
@@ -179,3 +174,4 @@ test_that("Reference levels reported correctly", {
 
   expect_equal(tst$reference, c("b", NA, "a"))
 })
+

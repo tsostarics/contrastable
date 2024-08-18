@@ -111,15 +111,16 @@
     # Lookup default contrasts and color code accordingly
     uo_default <- crayon::blue(options("contrasts")[[1L]]["unordered"])
     or_default <- crayon::red(options("contrasts")[[1L]]["ordered"])
+
     varnames <-
       paste(
         vapply(
           names(remaining_factors),
           function(x) {
-            ifelse(which_are_ordered[x],
-              crayon::red(x),
-              crayon::blue(x)
-            )
+            if (which_are_ordered[x])
+              return(crayon::red(x))
+            else
+              return(crayon::blue(x))
           },
           character(1)
         ),

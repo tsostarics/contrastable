@@ -1,5 +1,5 @@
 test_that("Decomposing interactions works", {
-  tst <- set_contrasts(mtcars[1:5,],
+  tst <- set_contrasts(mtcars[1:5, ],
                        cyl ~ scaled_sum_code,
                        carb ~ scaled_sum_code,
                        verbose = FALSE)

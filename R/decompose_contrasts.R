@@ -49,6 +49,13 @@
 #'   ) |>
 #'   decompose_contrasts(~ carb + gear)
 #'
+#' # Decompose an interaction term between the two factors
+#' mtcars |>
+#'   set_contrasts(
+#'     carb ~ scaled_sum_code,
+#'     gear ~ contr.sum | c("4-mean", "5-mean")
+#'   ) |>
+#'   decompose_contrasts(~ carb * gear)
 #'
 #' @importFrom stats contrasts
 decompose_contrasts <- function(model_data,

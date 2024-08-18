@@ -1,13 +1,13 @@
 test_that("Orthogonality checks are correct", {
   tst_df <- data.frame(
-    a = gl(5,1),
-    b = gl(5,1),
-    c = gl(5,1),
-    d = gl(5,1),
-    e = gl(5,1),
-    f = gl(5,1),
-    g = gl(5,1),
-    h = gl(5,1)
+    a = gl(5, 1),
+    b = gl(5, 1),
+    c = gl(5, 1),
+    d = gl(5, 1),
+    e = gl(5, 1),
+    f = gl(5, 1),
+    g = gl(5, 1),
+    h = gl(5, 1)
   )
   orth_vector <-
     is_orthogonal(
@@ -42,9 +42,9 @@ test_that("Orthogonality checks are correct", {
 
 test_that("Two level factors return NA", {
   tst_df <- data.frame(
-    a = gl(2,1),
-    b = gl(2,1),
-    c = gl(2,1)
+    a = gl(2, 1),
+    b = gl(2, 1),
+    c = gl(2, 1)
   )
   orth_vector <-
     is_orthogonal(

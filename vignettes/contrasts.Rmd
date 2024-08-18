@@ -590,7 +590,7 @@ back with something else.
 ```{r drop-trends-reinstated-matrix}
 mdl_data14 <- set_contrasts(mdl_data, carb ~ contr.sum)
 contrasts(mdl_data14$carb)
-contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[,1:2]
+contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[, 1:2]
 contrasts(mdl_data14$carb)
 ```
 
