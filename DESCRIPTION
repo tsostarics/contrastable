@@ -2,12 +2,8 @@ Package: contrastable
 Type: Package
 Title: Contrast Coding Utilities
 Version: 0.3.0.9001
-Year: 2024
-Author: Thomas Sostarics
-Maintainer: Thomas Sostarics <tsostarics@gmail.com>
-Description: This package sets contrasts for factor variables
-    in regression analyses with an easy API for setting multiple
-    contrasts at once and explicitly setting reference levels.
+Authors@R: person("Sostarics", "Thomas", email = "tsostarics@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1178-7967"))
+Description: Quickly set contrasts for factors prior to regression analyses. Allows intended comparisons to be explicitly set and documented without user needing to directly manipulate matrices.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
