@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -8,250 +8,275 @@ knitr::opts_chunk$set(
 library(contrastable)
 library(dplyr)
 library(MASS)
+
+## ----mdl-data-----------------------------------------------------------------
 mdl_data <- 
-  mtcars %>% 
-  as_tibble() %>% 
+  mtcars |> 
+  as_tibble() |> 
   mutate(cyl = factor(cyl), 
-         twolevel = round(runif(n()),0),
-         twolevel = ifelse(twolevel == 1, "a", "b"),
-         twolevel = factor(twolevel),
+         twolevel = factor(rep(c("a", "b"), times = nrow(mtcars) / 2)),
          gear = factor(gear),
          carb = factor(carb))
 
-## -----------------------------------------------------------------------------
+## ----inspect-contrasts--------------------------------------------------------
+options("contrasts") # Show defaults for unordered and ordered
 contrasts(mdl_data$twolevel)
-contrasts(mdl_data$carb)
+contrasts(mdl_data$carb) # Note the reference level
+
+## ----default-model-summary----------------------------------------------------
+summary(lm(mpg ~ carb, data = mdl_data))
+
+## ----manual-change-contrasts--------------------------------------------------
+mdl_data2 <- mdl_data
+contrasts(mdl_data2$carb) <- contr.sum(6)
+
+contrasts(mdl_data2$carb) # Note the reference level
+summary(lm(mpg ~ carb, data = mdl_data2))
+
+## ----intro-set-contrasts------------------------------------------------------
+mdl_data3 <- set_contrasts(mdl_data, carb ~ sum_code)
+
+contrasts(mdl_data2$carb) # matrix from before
+contrasts(mdl_data3$carb) # new matrix, note the column names
+
+## ----set-reference------------------------------------------------------------
+mdl_data4 <- set_contrasts(mdl_data, carb ~ sum_code + "3")  
+
+contrasts(mdl_data4$carb)
+
+## ----intercept-example--------------------------------------------------------
+# mean of group means:
+group_means <- summarize(mdl_data4, grp_mean = mean(mpg), .by = "carb")
+group_means
+mean(group_means$grp_mean)
+
+# model coefficients
+coef(lm(mpg ~ carb, data = mdl_data4))
+
+## ----set-intercept------------------------------------------------------------
+mdl_data5 <- set_contrasts(mdl_data, carb ~ sum_code + 3 * 3)
+
+contrasts(mdl_data5$carb)
+coef(lm(mpg ~ carb, data = mdl_data5))
+
+## ----set-labels---------------------------------------------------------------
+mdl_data6 <- set_contrasts(mdl_data, 
+                           carb ~ sum_code + 3 * 3 | c("1-3",
+                                                       "2-3",
+                                                       "4-3",
+                                                       "6-3",
+                                                       "8-3"))
+
+contrasts(mdl_data5$carb)
+coef(lm(mpg ~ carb, data = mdl_data6))
+
+## ----manual-matrix------------------------------------------------------------
+mdl_data7 <- mdl_data
+
+my_contrasts <- matrix(c(2, 1, 0, 1, 1, 1, 
+                         1, 2, 0, 1, 1, 1, 
+                         1, 1, 0, 2, 1, 1, 
+                         1, 1, 0, 1, 2, 1,
+                         1, 1, 0, 1, 1, 2),
+                       nrow = 6)
+dimnames(my_contrasts) <- 
+  list(
+    c("1", "2", "3", "4", "6", "8"), 
+    c("1-3", "2-3", "4-3", "6-3", "8-3")
+  )
+
+
+contrasts(mdl_data7$carb) <- my_contrasts
+contrasts(mdl_data7$carb)
+
+## ----matrix-example-fractions-------------------------------------------------
+mdl_data8 <- set_contrasts(mdl_data, carb ~ helmert_code * 4)
+
+MASS::fractions(contrasts(mdl_data8$carb))
+
+## ----set-contrasts-multiple-vars----------------------------------------------
+mdl_data9 <- set_contrasts(mdl_data,
+                           carb ~ helmert_code * 4,
+                           cyl ~ scaled_sum_code + 4,
+                           twolevel ~ scaled_sum_code + "a",
+                           gear ~ helmert_code)
+
+MASS::fractions(contrasts(mdl_data9$carb))
+MASS::fractions(contrasts(mdl_data9$cyl))
+MASS::fractions(contrasts(mdl_data9$twolevel))
+MASS::fractions(contrasts(mdl_data9$gear))
+
+## ----intro-enlist-contrasts---------------------------------------------------
+enlist_contrasts(mdl_data,
+                 carb ~ helmert_code * 4,
+                 cyl ~ scaled_sum_code + 4)
+
+## ----example-functions--------------------------------------------------------
+# all equivalent to carb ~ sum_code
+foo <- sum_code
+enlist_contrasts(mdl_data, carb ~ contr.sum)
+enlist_contrasts(mdl_data, carb ~ sum_code)
+enlist_contrasts(mdl_data, carb ~ foo)
+
+## ----example-as-is------------------------------------------------------------
+enlist_contrasts(mdl_data, carb ~ as_is(contr.sum))
+
+## ----parentheses-handling-----------------------------------------------------
+enlist_contrasts(mdl_data, carb ~ contr.sum())
+
+## ----function-must-exist,eval = FALSE-----------------------------------------
+#  foo <- contr.sum(6) # foo is a matrix
+#  enlist_contrasts(mdl_data, carb ~ foo()) # foo is not a function
+
+## ----lhs-plus-----------------------------------------------------------------
+# equivalent to: enlist_contrasts(mdl_data, cyl ~ sum_code, gear ~ sum_code)
+enlist_contrasts(mdl_data, cyl + gear ~ sum_code)
+
+## ----tidyselect-where---------------------------------------------------------
+enlist_contrasts(mdl_data, where(is.factor) ~ sum_code)
+# see also enlist_contrasts(mdl_data, where(is.unordered) ~ sum_code)
+# see also enlist_contrasts(mdl_data, where(is.numeric) ~ sum_code)
+
+## ----tidyselect-all-of--------------------------------------------------------
+these_vars <- c("cyl", "gear")
+enlist_contrasts(mdl_data, all_of(these_vars) ~ sum_code)
+
+## ----tidyselect-forbidden, eval = FALSE---------------------------------------
+#  enlist_contrasts(mdl_data,
+#                   cyl ~ sum_code,
+#                   where(is.factor) ~ sum_code) # cyl is a factor for mdl_data
+#  
+#  enlist_contrasts(mdl_data,
+#                   cyl ~ sum_code,
+#                   cyl + gear ~ sum_code) # cyl can't be specified twice
+
+## ----use-matrix---------------------------------------------------------------
+my_matrix <- contr.sum(6) / 2
+enlist_contrasts(mdl_data, carb ~ my_matrix)
+
+## ----use-list-----------------------------------------------------------------
+my_contrasts <- list(carb ~ contr.sum, gear ~ scaled_sum_code)
+
+enlist_contrasts(mdl_data, my_contrasts)
+mdl_data12 <- set_contrasts(mdl_data, my_contrasts)
+
+## ----intro-glimpse-contrasts--------------------------------------------------
+my_contrasts <- list(carb ~ contr.sum,
+                     gear ~ treatment_code + 4,
+                     twolevel ~ scaled_sum_code * "b",
+                     cyl ~ helmert_code)
+mdl_data$twolevel
+
+enlist_contrasts(mdl_data, cyl ~ scaled_sum_code + 6 * 6)
+
+mdl_data13 <- set_contrasts(mdl_data, my_contrasts)
+
+glimpse_contrasts(mdl_data13, my_contrasts)
+
+## ----glimpse-warnings---------------------------------------------------------
+glimpse_contrasts(mdl_data, my_contrasts)
+
+## ----glimpse-manual-----------------------------------------------------------
+glimpse_contrasts(mdl_data13, 
+                  carb ~ contr.sum,
+                  gear ~ treatment_code + 4,
+                  twolevel ~ scaled_sum_code * "b",
+                  cyl ~ helmert_code)
+
+## ----glimpse-check-default----------------------------------------------------
+glimpse_contrasts(mdl_data)  # no warnings
+glimpse_contrasts(mdl_data13) # warnings
+
+## ----glimpse-mismatch-warnings------------------------------------------------
+glimpse_contrasts(mdl_data, 
+                  carb ~ contr.sum, 
+                  gear ~ treatment_code * 4,
+                  cyl ~ contr.treatment | c("diff1", "diff2"))
+
+## ----drop-trends--------------------------------------------------------------
+enlist_contrasts(mdl_data, carb ~ contr.poly)
+enlist_contrasts(mdl_data, carb ~ contr.poly - 3:5)
+
+## ----drop-trends-reinstated-matrix--------------------------------------------
+mdl_data14 <- set_contrasts(mdl_data, carb ~ contr.sum)
+contrasts(mdl_data14$carb)
+contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[, 1:2]
+contrasts(mdl_data14$carb)
+
+## ----drop-trends-hypotheses-floats--------------------------------------------
+MASS::fractions(
+  contrastable:::.convert_matrix(
+    contrasts(mdl_data14$carb)
+  )
+)
+
+## ----drop-trends-set-contrasts-incompatible-----------------------------------
+mdl_data15 <- set_contrasts(mdl_data, carb ~ polynomial_code - 3:5)
 
 ## -----------------------------------------------------------------------------
-contrasts(mdl_data$carb) <- contr.sum(6)
-contrasts(mdl_data$carb)
+mdl_data16 <- 
+  mdl_data |> 
+  set_contrasts(cyl ~ helmert_code,
+                gear ~ helmert_code) |> 
+  decompose_contrasts(~ cyl * gear) 
 
-## ----reset, echo = FALSE------------------------------------------------------
-mdl_data <- 
-  mtcars %>% 
-  as_tibble() %>% 
-  mutate(cyl = factor(cyl), 
-         twolevel = round(runif(n()),0),
-         twolevel = ifelse(twolevel == 1, "a", "b"),
-         twolevel = factor(twolevel),
-         gear = factor(gear),
-         carb = factor(carb))
+# Look at the decomposed contrast columns
+mdl_data16 |> 
+  dplyr::select(matches("^cyl|gear")) |> 
+  head()
 
 ## -----------------------------------------------------------------------------
-use_contrasts(mdl_data$carb, contr.sum)
+coef(lm(mpg ~ cyl, data = mdl_data16))
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+coef(lm(mpg ~ cyl * gear, data = mdl_data16))
+coef(lm(mpg ~ 
+          `cyl<6` + `cyl<8` + 
+          `gear<4` + `gear<5` + 
+          `cyl<6:gear<4` + 
+          `cyl<8:gear<4` + 
+          `cyl<6:gear<5` +
+          `cyl<8:gear<5`, 
+        data = mdl_data16))
 
 ## -----------------------------------------------------------------------------
-use_contrasts(mdl_data$carb, contr.sum, reference_level = 4)
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+coef(lm(mpg ~ `cyl<6`, data = mdl_data16)) # not the same estimate as the above
 
-## -----------------------------------------------------------------------------
-options('contrasts')
+## ----usage-pattern-1----------------------------------------------------------
+raw_data <- mtcars # load raw data from a csv or something here
 
-## -----------------------------------------------------------------------------
-use_contrasts(mdl_data$carb, contr.poly)
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(carb ~ sum_code) # set contrasts at the very end
 
-## -----------------------------------------------------------------------------
-my_contrasts <- 
-  enlist_contrasts(mdl_data,
-                   cyl ~ contr.sum + 6, # Set the reference level with + ___
-                   twolevel ~ scaled_sum_code + "a",
-                   gear ~ forward_difference_code,
-                   carb ~ helmert_code)
+mdl <- lm(mpg ~ carb, data = final_data) # run model with contrasts set
 
-my_model <- lm(mpg ~ cyl + twolevel + gear + carb, 
-               data = mdl_data,  
-               contrasts = my_contrasts)
+## ----usage-pattern-2----------------------------------------------------------
+raw_data <- mtcars # load raw data from a csv or something here
 
-summary(my_model)
+# specify contrasts up front
+my_contrasts <- list(carb ~ sum_code,
+                     cyl  ~ scaled_sum_code,
+                     gear ~ sum_code)
 
-## -----------------------------------------------------------------------------
-contrast_list <- enlist_contrasts(mdl_data, carb ~ helmert_code)
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(my_contrasts) # set contrasts at the very end
 
-## -----------------------------------------------------------------------------
-mdl_data2 <- 
-  set_contrasts(mdl_data,
-                cyl ~ contr.sum + 6,
-                twolevel ~ scaled_sum_code + "a",
-                gear ~ forward_difference_code,
-                carb ~ helmert_code)
+# Show the matrices we're using
+enlist_contrasts(final_data, my_contrasts)
 
-# Compare treatment coding to helmert coding (note these are different dfs)
-contrasts(mdl_data$carb)
-contrasts(mdl_data2$carb) %>% fractions()
+# Show a summary
+glimpse_contrasts(final_data, my_contrasts)
 
-## -----------------------------------------------------------------------------
-helmert_code(2) # Compare k to >k
-scaled_sum_code(2) # Compare k to reference level
-forward_difference_code(2) # Compare k to k+1
+# Fit the model with contrasts set
+mdl <- lm(mpg ~ carb, data = final_data)
 
-## -----------------------------------------------------------------------------
--contr.sum(4)/2
-
-## -----------------------------------------------------------------------------
-scaled_sum_code(4) %>% MASS::fractions()
-
-## -----------------------------------------------------------------------------
-# Not what we want
-matrix(c(1,1,1,1,-contr.sum(4)/2), nrow = 4) %>%
-  t() %>% solve() %>% fractions()
-
-# Actually what we want
-matrix(c(1,1,1,1,scaled_sum_code(4)), nrow = 4) %>%
-  t() %>% solve() %>% fractions()
-
-## -----------------------------------------------------------------------------
-fractions(scaled_sum_code(4))
-
-## -----------------------------------------------------------------------------
-matrix(c(rep(1,4),
-         scaled_sum_code(4)),
-       nrow = 4) %>% fractions()
-
-## -----------------------------------------------------------------------------
-contrast_matrix <- 
-  matrix(c(rep(1,4),
-           scaled_sum_code(4)),
-         nrow = 4)
-
-hypothesis_matrix <- solve(t(contrast_matrix))
-
-fractions(hypothesis_matrix)
-
-## -----------------------------------------------------------------------------
-hypothesis_matrix2 <- hypothesis_matrix
-hypothesis_matrix2[,1] <- c(0,0,0,1)
-hypothesis_matrix2
-
-## -----------------------------------------------------------------------------
-# Inverse of the transpose, remove the first column to get contrasts
-maybe_treatment_contrasts <- solve(t(hypothesis_matrix2))[,2:4]
-
-# I'm manually reordering to make the reference level the 4th level here
-definitely_treatment_contrasts <- unname(contr.treatment(4)[c(2,3,4,1),])
-
-maybe_treatment_contrasts
-definitely_treatment_contrasts
-
-# Moment of truth: Are they the same?!
-all(maybe_treatment_contrasts == definitely_treatment_contrasts)
-
-## -----------------------------------------------------------------------------
-forward_contrasts <- forward_difference_code(6)
-forward_hypotheses <- 
-  matrix(c(rep(1,6), forward_contrasts), nrow = 6) %>% t() %>% solve()
-
-fractions(forward_contrasts)
-fractions(forward_hypotheses)
-
-## -----------------------------------------------------------------------------
-new_forward_hypotheses <- forward_hypotheses
-new_forward_hypotheses[,1] <- c(0,0,0,0,0,1)
-new_forward_hypotheses
-
-new_forward_contrasts <- solve(t(new_forward_hypotheses))[,2:6]
-new_forward_contrasts
-
-## -----------------------------------------------------------------------------
-enlist_contrasts(mdl_data, 
-                 carb ~ forward_difference_code * 8,
-                 gear ~ scaled_sum_code + 4 * 4)
-
-## -----------------------------------------------------------------------------
-use_contrasts(mdl_data$gear, 
-              scaled_sum_code, 
-              reference_level = 4, 
-              set_intercept = 4)
-
-## -----------------------------------------------------------------------------
-library(ggplot2,diamonds) # load just the diamonds dataset
-
-# Clarity has 8 levels, so we'll remove anything higher than the cubic trend
-my_contrasts <- enlist_contrasts(diamonds,
-                                 clarity ~ contr.poly - 4:7)
-
-# Higher trends removed
-lm(price ~ clarity, data = diamonds, contrasts = my_contrasts) %>% 
-  broom::tidy()
-
-# Higher trends retained
-lm(price ~ clarity, data = diamonds) %>% 
-  broom::tidy()
-
-# Trying to manually remove trends on the contrast in the data set doesn't work
-diamonds1 <- diamonds
-contrasts(diamonds1$clarity) <- contr.poly(8)[,1:3]
-lm(price ~ clarity, data = diamonds1) %>% 
-  broom::tidy()
-
-# Decomposing the contrasts to create new columns for the first three trends
-# also works well (decompose_contrasts is still experimental)
-diamonds2 <- decompose_contrasts(diamonds, "clarity", 1:3)
-lm(price ~ clarity.L + clarity.Q + clarity.C, data = diamonds2) %>% 
-  broom::tidy()
-
-## -----------------------------------------------------------------------------
-# Just show the messages, not the output
-invisible(set_contrasts(diamonds, clarity ~ contr.poly - 4:7))
-
-## -----------------------------------------------------------------------------
-tstdf <- mtcars
-tstdf$cyl <- factor(tstdf$cyl)
-contrast_info <- glimpse_contrasts(tstdf, 
-                                   vs ~ contr.treatment,
-                                   am ~ scaled_sum_code + 1,
-                                   gear ~ helmert_code,
-                                   carb ~ contr.poly,
-                                   all.factors = TRUE)
-
-contrast_info
-
-## -----------------------------------------------------------------------------
-contrast_info <- glimpse_contrasts(tstdf, 
-                                   vs ~ contr.treatment,
-                                   am ~ scaled_sum_code + 1,
-                                   gear ~ helmert_code,
-                                   carb ~ contr.poly,
-                                   all.factors = TRUE,
-                                   return.list = TRUE)
-
-my_contrasts <- contrast_info$contrasts
-contrast_glimpse <- contrast_info$glimpse
-
-## -----------------------------------------------------------------------------
-schemes <- list(vs ~ contr.treatment,
-                am ~ scaled_sum_code + 1,
-                gear ~ helmert_code,
-                carb ~ contr.poly)
-
-contrast_glimpse <- glimpse_contrasts(tstdf, schemes)
-contrast_glimpse # Review if needed
-tstdf <- set_contrasts(tstdf, schemes, verbose = FALSE)
-
-## -----------------------------------------------------------------------------
-contrast_info <- glimpse_contrasts(tstdf, schemes, add_namespace = TRUE)
-contrast_info
-
-## -----------------------------------------------------------------------------
-phone_df <- data.frame(phone = factor(c('S', 'SH','N', 'T'),
-                                      levels = c('S', 'SH','N', 'T')))
-
-enlist_contrasts(phone_df, 
-                 phone ~ scaled_sum_code + "T")
-
-## -----------------------------------------------------------------------------
-enlist_contrasts(phone_df, 
-                 phone ~ helmert_code)
-
-## -----------------------------------------------------------------------------
-# Note you can add a line break after (or before, really) the | for readability
-enlist_contrasts(phone_df, 
-                 phone ~ helmert_code | 
-                   c("CompactvsDiffuse","SibvsNas", "StopvsCont"))
-
-## ---- eval=FALSE--------------------------------------------------------------
-#  # Not run to avoid loading lme4
-#  library(lme4)
-#  library(contrastable)
-#  mdl_data <- set_contrasts(mtcars, cyl ~ sum_code |
-#                              c("longlonglonglonglongname",'shortname'))
-#  lmer(mpg ~ cyl + (1|gear), data = mdl_data) %>% summary()
+## ----fractions-usage----------------------------------------------------------
+enlist_contrasts(final_data, my_contrasts) |> 
+  lapply(MASS::fractions)
 

@@ -30,7 +30,7 @@ This vignette will not go into detail how different contrast schemes are derived
 interpreted, but will describe some of the high level differences. I recommend
 reading the following:
 
-- [UCLA R Library Contrast Coding Systems for Categorical Variables](https://stats.idre.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/)
+- [UCLA R Library Contrast Coding Systems for Categorical Variables](https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/)
 - [How to capitalize on a priori contrasts in linear (mixed) models: A tutorial](https://www.sciencedirect.com/science/article/pii/S0749596X19300695)
 - [Regresion modeling for linguistic data (preprint)](https://osf.io/pnumg/)
 
