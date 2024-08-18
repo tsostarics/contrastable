@@ -123,7 +123,9 @@ The philosophy there is that *all* comparisons should be explicitly written down
 Accordingly, the special syntax this package provides is ignored when using
 hypr objects.
 
-```{r,results='hide'}
+Note that the examples here are set to not be run so that you're not forced to have the hypr package installed in order to install the package/build the vignette.
+
+```{r,eval=FALSE, results='hide'}
 library(hypr)
 my_data <- data.frame(foo = factor(c("A", "B", "C")))
 
@@ -132,10 +134,20 @@ hypr_object <- hypr::hypr(A ~ B, A ~ C)
 set_contrasts(my_data, foo ~ hypr_object + "B" * "B" - "C")
 ```
 
+```
+Warning messages:
+1: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+  reference_level ignored when using hypr object
+2: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+  set_intercept ignored when using hypr object
+3: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+  drop_trends ignored when using hypr object
+```
+
 hypr objects don't need access to the levels in a factor, so there's an opportunity for mismatches in level names to arise.
 The matrix might still work out to be what you intend, but this isn't guaranteed.
 
-```{r,results='hide'}
+```{r,eval=FALSE, results='hide'}
 my_data <- data.frame(foo = factor(c("A", "B", "C")))
 
 hypr_object <- hypr::hypr(varA ~ varB, varA ~ varC)
@@ -143,11 +155,18 @@ hypr_object <- hypr::hypr(varA ~ varB, varA ~ varC)
 set_contrasts(my_data, foo ~ hypr_object)$foo
 ```
 
+```
+Warning message:
+In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+  Levels in hypr object not found in factor column `foo`: varA, varB, varC
+Contrasts may be misspecified.
+```
+
 Generally, this package isn't really designed with the hypr-user in mind.
 But, so long as you're mindful of the level names and the number of levels, then you can plug in hypr objects freely in conjunction with other methods.
 This is helpful if you need to use a custom matrix for just one variable, but the rest can use "standard" contrasts.
 
-```{r,results='hide'}
+```{r,eval=FALSE,results='hide'}
 my_data <- data.frame(foo = factor(c("A", "B", "C")),
                       boo = factor(c("A", "B", "C")))
 
