@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Contrast Coding Utilities
-Version: 0.3.0.9000
+Version: 0.3.0.9001
 Year: 2024
 Author: Thomas Sostarics
 Maintainer: Thomas Sostarics <tsostarics@gmail.com>
