@@ -16,7 +16,7 @@
 #' interpret_intercept(contr.SAS(2)) # mean(2)
 #' interpret_intercept(contr.sum(2)) # grand mean
 #'
-#' # Here there's 3 levels but the intercept is either an unweighted
+#' # Here there are 3 levels but the intercept is either an unweighted
 #' # mean of 2 levels or a weighted mean of 2 levels
 #' unweighted_intercept <- solve(t(matrix(c(.5, .5, 0, -1, 1, 0, -1, 0, 1), nrow = 3)))[, 2:3]
 #' weighted_intercept <- solve(t(matrix(c(.8, .2, 0, -1, 1, 0, -1, 0, 1), nrow = 3)))[, 2:3]
@@ -29,8 +29,13 @@ interpret_intercept <- function(contr_mat) {
   # Account for polynomial contrasts with dropped trends, resulting in
   # non-square matrices
   if (ncol(contr_mat) < (.nlevels - 1)) {
+    warning(paste0("Expected contrast matrix to have ",
+                   .nlevels-1,
+                   " columns but found ",
+                   ncol(contr_mat)))
     return("grand mean")
   }
+
   intercept_column <- .contrasts_to_hypotheses(contr_mat, nrow(contr_mat))[, 1]
 
   # Check if grand mean (most common), round to avoid floating point errors
