@@ -38,12 +38,12 @@
   # if not, then we're at the top level and need to process the whole formula
     switch(
       .get_reserved_operator(node),
-      "~" = {params <- .process_tilde(cur_expr, params, env)},
-      "+" = {params <- .process_addition(cur_expr, params, env)},
-      "-" = {params <- .process_subtraction(cur_expr, params, env)},
-      "*" = {params <- .process_multiplication(cur_expr, params, env, EMBEDDED)},
+      "~" = {params <- .process_factor_col(cur_expr, params, env)},
+      "+" = {params <- .process_reference(cur_expr, params, env)},
+      "-" = {params <- .process_drop_trends(cur_expr, params, env)},
+      "*" = {params <- .process_intercept(cur_expr, params, env, EMBEDDED)},
       "|" = {params <- .process_labels(cur_expr, params, env)},
-      {params <- .process_whole(formula, params, env)}
+      {params <- .process_code_by(formula, params, env)}
     )
 
   params
@@ -81,14 +81,14 @@
 ## Process each of the various operators and assign the relevant parameters
 ## while recursing into the rest of the expression
 
-.process_tilde <- function(cur_expr, params, env) {
+.process_factor_col <- function(cur_expr, params, env) {
   params[["factor_col"]] <- cur_expr[[2L]]
   params <- .make_parameters(cur_expr[[3L]], params, env)
   params
 }
 
 
-.process_addition <- function(cur_expr, params, env) {
+.process_reference <- function(cur_expr, params, env) {
   LHS <- cur_expr[[2L]]
   RHS <- cur_expr[[3L]]
   r_has_child <- length(RHS) == 3
@@ -105,7 +105,7 @@
   params
 }
 
-.process_subtraction <- function(cur_expr, params, env) {
+.process_drop_trends <- function(cur_expr, params, env) {
   LHS <- cur_expr[[2L]]
   RHS <- cur_expr[[3L]]
   if (.is_reserved_operator(RHS[[1L]], "*")) {
@@ -118,7 +118,7 @@
   }
 }
 
-.process_multiplication <- function(cur_expr, params, env, EMBEDDED) {
+.process_intercept <- function(cur_expr, params, env, EMBEDDED) {
   LHS <- cur_expr[[2L]]
   RHS <- cur_expr[[3L]]
   params[["intercept_level"]] <- RHS
@@ -131,7 +131,7 @@
   params
 }
 
-.process_whole <- function(formula, params, env) {
+.process_code_by <- function(formula, params, env) {
   # Check if the formula contains as_is
   if (length(formula) > 1L && identical(formula[[1]], sym("as_is"))) {
     params[["as_is"]] <- TRUE
