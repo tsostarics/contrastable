@@ -73,6 +73,9 @@
 #' @seealso [set_contrasts()]
 #' @export
 #'
+#'@importFrom rlang expr enquo enquos sym syms := ensym ensyms f_rhs f_lhs
+#'new_formula get_env dots_list get_expr
+#'
 #' @examples
 #' my_df <- mtcars
 #' my_df$gear <- factor(my_df$gear)
