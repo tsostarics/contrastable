@@ -12,7 +12,7 @@ glimpse_contrasts(
   add_namespace = FALSE,
   show_one_level_factors = FALSE,
   minimal = TRUE,
-  verbose = FALSE
+  verbose = getOption("contrastable.verbose")
 )
 }
 \arguments{
@@ -50,9 +50,10 @@ is the first element. \code{FALSE} will return just the glimpse data frame.
 }
 \details{
 Generally, \code{glimpse_contrasts} will give warnings about mismatches between
-the specified contrasts and what's actually set on the factors in a dataframe.
-The warnings will typically tell you how to resolve these mismatches.
-See the \code{contrasts} and \code{warnings} vignettes for more information.
+the specified contrasts and what's actually set on the factors in a
+dataframe. The warnings will typically tell you how to resolve these
+mismatches. See the \code{contrasts} and \code{warnings} vignettes for more
+information.
 }
 \examples{
 

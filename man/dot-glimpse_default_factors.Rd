@@ -16,8 +16,8 @@
 
 \item{set_factors}{Explicitly set columns to ignore}
 
-\item{show_one_level_factors}{Should factor columns with only 1 level be included?
-Default FALSE}
+\item{show_one_level_factors}{Should factor columns with only 1 level be
+included? Default FALSE}
 
 \item{verbose}{Defaults to FALSE, should messages and warnings be printed?}
 }

@@ -4,7 +4,7 @@
 \alias{enlist_contrasts}
 \title{List of contrast matrices}
 \usage{
-enlist_contrasts(model_data, ..., verbose = TRUE)
+enlist_contrasts(model_data, ..., verbose = getOption("contrastable.verbose"))
 }
 \arguments{
 \item{model_data}{Data frame you intend on passing to your model}
@@ -91,20 +91,23 @@ my_df$carb <- factor(my_df$carb)
 enlist_contrasts(
   my_df,
   gear ~ scaled_sum_code,
-  carb ~ helmert_code
+  carb ~ helmert_code,
+  verbose = FALSE
 )
 
 # Add reference levels with +
 enlist_contrasts(
   my_df,
   gear ~ scaled_sum_code + 5,
-  carb ~ contr.sum + 6
+  carb ~ contr.sum + 6,
+  verbose = FALSE
 )
 # Manually specifying matrix also works
 enlist_contrasts(
   my_df,
   gear ~ matrix(c(1, -1, 0, 0, -1, 1), nrow = 3),
-  carb ~ forward_difference_code
+  carb ~ forward_difference_code,
+  verbose = FALSE
 )
 
 # User matrices can be assigned to a variable first, but this may make the
@@ -116,7 +119,8 @@ colnames(my_gear_contrasts) <- c("CMP1", "CMP2")
 enlist_contrasts(
   my_df,
   gear ~ my_gear_contrasts,
-  carb ~ forward_difference_code
+  carb ~ forward_difference_code,
+  verbose = FALSE
 )
 
 
@@ -132,24 +136,53 @@ my_contrasts <- list(gear ~ scaled_sum_code, carb ~ helmert_code)
 enlist_contrasts(my_df,  my_contrasts)
 enlist_contrasts(mtcars, my_contrasts)
 
-\dontrun{
 # Use tidyselect helpers to set multiple variables at once
 # These are all equivalent
-enlist_contrasts(mtcars, cyl ~ sum_code, gear ~ sum_code)
-enlist_contrasts(mtcars, cyl + gear ~ sum_code)
-enlist_contrasts(mtcars, c(cyl, gear) ~ sum_code)
-enlist_contrasts(mtcars, all_of(c('cyl', 'gear')) ~ sum_code)
+contr_list1 <- enlist_contrasts(mtcars,
+                 cyl ~ sum_code, gear ~ sum_code,
+                 verbose = FALSE)
+
+contr_list2 <- enlist_contrasts(mtcars,
+                 cyl + gear ~ sum_code,
+                 verbose = FALSE)
+
+contr_list3 <- enlist_contrasts(mtcars,
+                 c(cyl, gear) ~ sum_code,
+                 verbose = FALSE)
+
+contr_list4 <- enlist_contrasts(mtcars,
+                 all_of(c('cyl', 'gear')) ~ sum_code,
+                 verbose = FALSE)
+
+
 these_vars <- c("cyl", "gear")
-enlist_contrasts(mtcars, all_of(these_vars) ~ sum_code)
+contr_list5 <- enlist_contrasts(mtcars,
+                                all_of(these_vars) ~ sum_code,
+                                verbose = FALSE)
+
+all.equal(contr_list1, contr_list2)
+all.equal(contr_list2, contr_list3)
+all.equal(contr_list3, contr_list4)
+all.equal(contr_list4, contr_list5)
 
 # You can also do something like this:
-enlist_contrasts(mtcars, where(is.numeric) ~ sum_code)
+contr_list6 <- enlist_contrasts(mtcars,
+                                where(is.numeric) ~ sum_code,
+                                verbose = FALSE)
 
 # Each variable name must only be set ONCE, eg these will fail:
-enlist_contrasts(mtcars, cyl ~ sum_code, cyl ~ scaled_sum_code)
-enlist_contrasts(mtcars, cyl ~ sum_code, all_of(these_vars) ~ scaled_sum_code)
-enlist_contrasts(mtcars, cyl ~ sum_code, where(is.numeric) ~ scaled_sum_code)
-}
+try(enlist_contrasts(mtcars,
+                     cyl ~ sum_code,
+                     cyl ~ scaled_sum_code,
+                     verbose = FALSE))
+try(enlist_contrasts(mtcars,
+                     cyl ~ sum_code,
+                     all_of(these_vars) ~ scaled_sum_code,
+                     verbose = FALSE))
+try(enlist_contrasts(mtcars,
+                     cyl ~ sum_code,
+                     where(is.numeric) ~ scaled_sum_code,
+                     verbose = FALSE))
 }
 \seealso{
 \code{\link[=set_contrasts]{set_contrasts()}}

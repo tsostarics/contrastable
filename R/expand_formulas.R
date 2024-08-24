@@ -33,7 +33,7 @@
 
 #' Expand contrast formulas
 #'
-#' Uses `{tidyselect]` functionality to expand the left hand side of a formula
+#' Uses `{tidyselect}` functionality to expand the left hand side of a formula
 #' into multiple formulas. See examples of `enlist_contrasts` for examples.
 #'
 #'
@@ -56,7 +56,7 @@
                           }
                           stop(
                             paste(err,
-                                  "Did you use = instead of ~ when setting the contrast?",
+                                  "Did you use = instead of ~ when setting the contrast?", # nolint
                                   sep = "\n")
                           )
                         }
@@ -85,7 +85,7 @@
            error = \(c) {
              err <- conditionMessage(c)
              stop(paste(err,
-                        "Left hand side of multiple formulas evaluated to the same column name",
+                        "Left hand side of multiple formulas evaluated to the same column name", # nolint
                         sep = "\n"))
            })
 

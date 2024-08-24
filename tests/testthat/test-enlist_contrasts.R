@@ -7,7 +7,11 @@ test_that("Names of resulting list of contrasts correct", {
     )
 
   expect_equal(
-    names(enlist_contrasts(tst_data, two ~ contr.sum, three ~ scaled_sum_code, four ~ contr.poly)),
+    names(enlist_contrasts(tst_data,
+                           two ~ contr.sum,
+                           three ~ scaled_sum_code,
+                           four ~ contr.poly,
+                           verbose = FALSE)),
     c("two", "three", "four")
   )
 })
@@ -25,7 +29,7 @@ test_that("Throw error when factor column not found in model data frame", {
                regexp = "Can't select columns that")
 })
 
-test_that("Setting both reference and intercept simultaneously with + and * works", {
+test_that("Setting both reference and intercept with + and * works", {
   my_df <- mtcars
   my_df$gear <- factor(my_df$gear)
   my_df$carb <- factor(my_df$carb)
@@ -43,7 +47,7 @@ test_that("Setting both reference and intercept simultaneously with + and * work
   )
 })
 
-test_that("Raw matrix call with automatic handling of switching a detected reference level", {
+test_that("Raw matrix call with automatic reference level switching", {
   my_df <- mtcars
   my_df$gear <- factor(my_df$gear)
   my_df$carb <- factor(my_df$carb)
@@ -64,12 +68,13 @@ test_that("Raw matrix call with automatic handling of switching a detected refer
   )
 })
 
-test_that("Environment handling with programmatically set reference levels works", {
+test_that("Programmatic environment handling with set reference levels works", {
   my_df <- mtcars
   my_df$gear <- factor(my_df$gear)
   gear_levels <- levels(my_df$gear)
 
-  # Apply scheme multiple times w/ different reference levels, then check contrasts
+  # Apply scheme multiple times w/ different reference levels,
+  # then check contrasts
   output <- lapply(
     gear_levels,
     function(ref_level) {
@@ -104,8 +109,11 @@ test_that("Environment handling when piping with magrittr works", {
 })
 
 test_that("Error handling when an invalid matrix is passed", {
-  expect_error(enlist_contrasts(mtcars, gear ~ matrix(c(1, 1, 1, 2, 2, 2), nrow = 3), verbose = FALSE),
-    regexp = ("Lapack")
+  expect_error(enlist_contrasts(mtcars,
+                                gear ~ matrix(c(1, 1, 1, 2, 2, 2),
+                                              nrow = 3),
+                                verbose = FALSE),
+               regexp = ("Lapack")
   )
 })
 
@@ -131,7 +139,7 @@ test_that("Warning is thrown when colnames are not set and as_is is TRUE", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
   expect_warning(enlist_contrasts(newdata, carb ~ as_is(contr.sum)),
-    regexp = "and as_is=TRUE"
+                 regexp = "and as_is=TRUE"
   )
 })
 
@@ -146,7 +154,11 @@ test_that("as_is functionality works as expected", {
 test_that("nested as_is works", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
-  df1 <- suppressWarnings(enlist_contrasts(newdata, carb ~ as_is(as_is(as_is((contr.sum))))))
+  df1 <- suppressWarnings(
+    enlist_contrasts(newdata,
+                     carb ~ as_is(as_is(as_is((contr.sum))))
+    )
+  )
 
   expect_equal(df1[[1]], contr.sum(6), ignore_attr = TRUE)
 })
@@ -165,40 +177,49 @@ test_that("moving reference level to earlier level works", {
 })
 
 test_that("warn when n does not match", {
-  expect_warning(suppressMessages(enlist_contrasts(mtcars, gear ~ contr.poly(n = 4))), regex = "using number of factor levels")
+  expect_warning(
+    enlist_contrasts(mtcars, gear ~ contr.poly(n = 4), verbose = FALSE),
+    regex = "using nlevels instead")
 })
 
 test_that("setting contrasts with external list works", {
   my_contrasts <- list(carb ~ treatment_code)
-  expect_equal(suppressMessages(enlist_contrasts(mtcars, my_contrasts))[[1]], treatment_code(6),
+  expect_equal(
+    enlist_contrasts(mtcars, my_contrasts, verbose = FALSE)[[1]],
+    treatment_code(6),
     ignore_attr = TRUE
   )
 
   # Test for list length >1
   my_contrasts <- list(carb ~ treatment_code, gear ~ helmert_code)
-  expect_equal(suppressMessages(enlist_contrasts(mtcars, my_contrasts))[[1]], treatment_code(6),
+  expect_equal(
+    enlist_contrasts(mtcars, my_contrasts, verbose = FALSE)[[1]],
+    treatment_code(6),
     ignore_attr = TRUE
   )
 })
 
 test_that("error when no formula provided", {
-  expect_error(enlist_contrasts(mtcars), regexp = "No contrast formulas provided")
+  expect_error(enlist_contrasts(mtcars),
+               regexp = "No contrast formulas provided")
 })
 
-test_that("Warnings when reference level is attempted to be changed work properly", {
-  expect_error(enlist_contrasts(mtcars, cyl ~ helmert_code + "a", verbose = FALSE),
+test_that("Warnings when reference level is attempted to be changed work properly", { # nolint
+  expect_error(
+    enlist_contrasts(mtcars, cyl ~ helmert_code + "a", verbose = FALSE),
     regexp = "Reference level not found"
   )
-  expect_warning(enlist_contrasts(mtcars, cyl ~ helmert_code + 6, verbose = FALSE),
+  expect_warning(
+    enlist_contrasts(mtcars, cyl ~ helmert_code + 6, verbose = FALSE),
     regexp = "Ignoring reference level"
   )
 })
 
 test_that("Error message when forgetting model_data works", {
   expect_error(enlist_contrasts(cyl ~ 2),
-    regexp = "forget to pass a data frame"
+               regexp = "forget to pass a data frame"
   )
   expect_error(enlist_contrasts(matrix(c(1, 1, 1, 1), nrow = 2)),
-    regexp = "Instead found"
+               regexp = "Instead found"
   )
 })

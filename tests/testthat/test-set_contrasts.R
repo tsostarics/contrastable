@@ -5,15 +5,20 @@ test_that("set contrast equivalent to manual contrast codes", {
     verbose = FALSE
   )
 
-  comparison_df <- dplyr::mutate(mtcars, gear = factor(gear), cyl = factor(cyl))
-  contrasts(comparison_df$cyl) <- use_contrasts(comparison_df$cyl, contr.sum)
-  contrasts(comparison_df$gear) <- use_contrasts(comparison_df$gear, helmert_code)
+  comparison_df <- dplyr::mutate(mtcars,
+                                 gear = factor(gear),
+                                 cyl = factor(cyl))
+  contrasts(comparison_df$cyl) <-
+    use_contrasts(comparison_df$cyl, contr.sum)
+  contrasts(comparison_df$gear) <-
+    use_contrasts(comparison_df$gear, helmert_code)
 
   columns_equivalent <-
     vapply(
       names(tst_df),
       function(x) {
-        all(tst_df[[x]] == comparison_df[[x]]) & class(tst_df[[x]]) == class(comparison_df[[x]])
+        all(tst_df[[x]] == comparison_df[[x]]) &
+          class(tst_df[[x]]) == class(comparison_df[[x]])
       },
       TRUE
     )
@@ -22,17 +27,24 @@ test_that("set contrast equivalent to manual contrast codes", {
 })
 
 test_that("Ignoring dropped levels in orthogonal polynomial contrasts", {
-  expect_warning(set_contrasts(mtcars, carb ~ contr.poly - 4:6, verbose = FALSE),
+  expect_warning(set_contrasts(mtcars,
+                               carb ~ contr.poly - 4:6,
+                               verbose = FALSE),
     regexp = r"(Cannot drop trends .+ formula\.)"
   )
-  expect_warning(aaa <- set_contrasts(mtcars, carb ~ contr.poly - 4:6, gear ~ contr.poly - 2:3, verbose = FALSE),
+  expect_warning(testdf <- set_contrasts(mtcars,
+                                      carb ~ contr.poly - 4:6,
+                                      gear ~ contr.poly - 2:3,
+                                      verbose = FALSE),
     regexp = r"(Cannot drop trends .+ formulas\.)"
   )
-  expect_warning(set_contrasts(mtcars, gear ~ contr.sum - 2:3, verbose = FALSE),
+  expect_warning(set_contrasts(mtcars,
+                               gear ~ contr.sum - 2:3,
+                               verbose = FALSE),
     regexp = "used in invalid context"
   )
 
 
-  expect_equal(contrasts(aaa$carb), contr.poly(6), ignore_attr = TRUE)
-  expect_equal(contrasts(aaa$gear), contr.poly(3), ignore_attr = TRUE)
+  expect_equal(contrasts(testdf$carb), contr.poly(6), ignore_attr = TRUE)
+  expect_equal(contrasts(testdf$gear), contr.poly(3), ignore_attr = TRUE)
 })

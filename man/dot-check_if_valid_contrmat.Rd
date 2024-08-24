@@ -9,6 +9,9 @@
 \arguments{
 \item{contr_mat}{Contrast matrix}
 }
+\value{
+invisibly returns TRUE
+}
 \description{
 Sometimes a user might pass a matrix that can't actually be used, in which
 case we can avoid some calculations by stopping earlier.

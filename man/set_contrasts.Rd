@@ -4,7 +4,7 @@
 \alias{set_contrasts}
 \title{Set contrasts to dataframe}
 \usage{
-set_contrasts(model_data, ..., verbose = TRUE)
+set_contrasts(model_data, ..., verbose = getOption("contrastable.verbose"))
 }
 \arguments{
 \item{model_data}{Data frame you intend on passing to your model}

@@ -1,9 +1,21 @@
 test_that("Intercept interpretation works", {
-  expect_equal(interpret_intercept(contr.treatment(5)), "mean(1)", ignore_attr = TRUE)
-  expect_equal(interpret_intercept(scaled_sum_code(5)), "grand mean", ignore_attr = TRUE)
-  expect_equal(interpret_intercept(helmert_code(5)), "grand mean", ignore_attr = TRUE)
-  expect_warning(interpret_intercept(contr.poly(5)[, 1:3]), "4 columns but found 3")
-  expect_equal(suppressWarnings(interpret_intercept(contr.poly(5)[, 1:3])), "grand mean", ignore_attr = TRUE)
+  expect_equal(interpret_intercept(contr.treatment(5)),
+               "mean(1)",
+               ignore_attr = TRUE)
+
+  expect_equal(interpret_intercept(scaled_sum_code(5)),
+               "grand mean",
+               ignore_attr = TRUE)
+
+  expect_equal(interpret_intercept(helmert_code(5)),
+               "grand mean",
+               ignore_attr = TRUE)
+
+  expect_warning(interpret_intercept(contr.poly(5)[, 1:3]),
+                 "4 columns but found 3")
+  expect_equal(suppressWarnings(interpret_intercept(contr.poly(5)[, 1:3])),
+               "grand mean",
+               ignore_attr = TRUE)
 })
 
 test_that("Glimpse works", {
@@ -18,7 +30,8 @@ test_that("Glimpse works", {
   expect_equal(tst$factor, c("carb", "gear", "cyl"))
   expect_equal(tst$n, c(6, 3, 3),
                ignore_attr = TRUE) # need unname
-  expect_equal(tst$scheme, c("contr.poly", "scaled_sum_code", "contr.treatment"),
+  expect_equal(tst$scheme,
+               c("contr.poly", "scaled_sum_code", "contr.treatment"),
                ignore_attr = TRUE) # need unname
   expect_equal(tst$reference, c(NA, "5", "4"),
                ignore_attr = TRUE) # need unname
@@ -51,8 +64,14 @@ test_that("Glimpse with variables works", {
 
 test_that("Append namespace to scheme names", {
   expect_equal(
-    .add_namespace(c("contr.helmert", "contr.sum", "scaled_sum_code")),
-    c("stats::contr.helmert", "stats::contr.sum", "contrastable::scaled_sum_code")
+    .add_namespace(
+      c("contr.helmert",
+        "contr.sum",
+        "scaled_sum_code")
+    ),
+    c("stats::contr.helmert",
+      "stats::contr.sum",
+      "contrastable::scaled_sum_code")
   )
 })
 
@@ -110,13 +129,13 @@ test_that(".warn_if_mismatched_contrasts throws correct warnings", {
 
   # (2) warning that contrast matrices dont match
   expect_warning(glimpse_contrasts(my_data, clist),
-                 "Contrasts for factors in `my_data` don't match matrices in formulas:[ \n]+- cyl")
+                 "Contrasts for factors in `my_data` don't match matrices in formulas:[ \n]+- cyl") # nolint
 
 
   # (3) warning that labels dont match (but matrices are fine)
   contrasts(my_data$cyl) <- helmert_code(3)
   expect_warning(glimpse_contrasts(my_data, clist),
-                 "Comparison labels for contrasts in `my_data` don't match:[ \n]+- cyl	\\(expected `<6, <8` but found ``\\)")
+                 "Comparison labels for contrasts in `my_data` don't match:[ \n]+- cyl	\\(expected `<6, <8` but found ``\\)") # nolint
 
   # (4) no warnings so long as the contrasts in clist ARE set to my_data
   my_data <- set_contrasts(my_data, clist)
@@ -124,13 +143,14 @@ test_that(".warn_if_mismatched_contrasts throws correct warnings", {
 
   # (5) warning that carb isn't a factor
   clist <- list(cyl ~ helmert_code, carb ~ helmert_code)
-  expect_warning(glimpse_contrasts(my_data, clist),
+  expect_warning(glimpse_contrasts(my_data, clist, verbose = FALSE),
                  "These vars in `my_data` are not factors:[ \n]+- carb")
 
   my_data <- mtcars
   my_data$am <- factor(my_data$am)
   # (6) check that the manually set labels show up correctly
-  expect_warning(glimpse_contrasts(my_data, am ~ treatment_code + 0 | c("diffA")),
+  expect_warning(glimpse_contrasts(my_data,
+                                   am ~ treatment_code + 0 | c("diffA")),
                  c("\\(expected `diffA` but found `1`\\)"))
 
   clist <- list(cyl ~ helmert_code,
@@ -146,7 +166,7 @@ test_that(".warn_if_mismatched_contrasts throws correct warnings", {
   expect_warning(glimpse_contrasts(my_data,
                                    cyl ~ helmert_code,
                                    am ~ treatment_code + 0 | c("diffA")),
-                 "my_data <- set_contrasts\\(my_data,[ \n]+cyl ~ helmert_code,am ~ treatment_code + 0 | c\\(\"diffA\"\\)")
+                 "my_data <- set_contrasts\\(my_data,[ \n]+cyl ~ helmert_code,am ~ treatment_code + 0 | c\\(\"diffA\"\\)") # nolint
 
 })
 
@@ -163,9 +183,10 @@ test_that("Reset label to ??? if nondefault", {
 })
 
 test_that("Reference levels reported correctly", {
-  tstdf <- data.frame(a = factor(c("a", "b", "c")), # contr.treatment default ref = a
-                      b = factor(c("a", "b", "c")), # will make ref = b
-                      c = factor(c("a", "b", "c"))) # will be NA via helmert coding
+  tstdf <-
+    data.frame(a = factor(c("a", "b", "c")), # contr.treatment default ref = a
+               b = factor(c("a", "b", "c")), # will make ref = b
+               c = factor(c("a", "b", "c"))) # will be NA via helmert coding
 
   tst <- suppressWarnings(glimpse_contrasts(tstdf,
                                             b ~ sum_code + "b",

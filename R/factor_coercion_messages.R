@@ -22,7 +22,7 @@
         )
       )
 
-    message(glue::glue("These factors are ordered, you may lose {or_default}: {ordered_names}"))
+    message(glue::glue("These factors are ordered, you may lose {or_default}: {ordered_names}")) # nolint
   }
 }
 
@@ -49,7 +49,7 @@
       return(invisible(1))
     }
   } else if (missing(model_data) || missing(attempting_factors)) {
-    stop("If factor names are not provided, the model data and factors being set must be provided")
+    stop("If factor names are not provided, the model data and factors being set must be provided") # nolint
   } else {
     is_one_level <- vapply(
       attempting_factors,
@@ -64,7 +64,7 @@
   }
 
   one_level_string <- paste(crayon::cyan(one_level_factors), collapse = " ")
-  warning(glue::glue("Contrasts undefined for factors with only one level: {one_level_string}"),
+  warning(glue::glue("Contrasts undefined for factors with only one level: {one_level_string}"), # nolint
     call. = FALSE
   )
   return(invisible(1))
@@ -126,6 +126,6 @@
         ),
         collapse = " "
       )
-    message(glue::glue("Expect {uo_default} or {or_default} for unset factors: {varnames}"))
+    message(glue::glue("Expect {uo_default} or {or_default} for unset factors: {varnames}")) # nolint
   }
 }

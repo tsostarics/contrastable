@@ -8,9 +8,10 @@
 #'
 #' @details
 #' Generally, `glimpse_contrasts` will give warnings about mismatches between
-#' the specified contrasts and what's actually set on the factors in a dataframe.
-#' The warnings will typically tell you how to resolve these mismatches.
-#' See the `contrasts` and `warnings` vignettes for more information.
+#' the specified contrasts and what's actually set on the factors in a
+#' dataframe. The warnings will typically tell you how to resolve these
+#' mismatches. See the `contrasts` and `warnings` vignettes for more
+#' information.
 #'
 #'
 #' @param model_data Data to be passed to a model fitting function
@@ -56,7 +57,7 @@ glimpse_contrasts <- function(model_data,
                               add_namespace = FALSE,
                               show_one_level_factors = FALSE,
                               minimal = TRUE,
-                              verbose = FALSE) {
+                              verbose = getOption("contrastable.verbose")) {
   formulas <- purrr::list_flatten(rlang::dots_list(...))
 
   # Get symbols passed to ... and model_data for .warn_if_mismatched_contrasts
@@ -231,8 +232,8 @@ glimpse_contrasts <- function(model_data,
 #'
 #' @param model_data Dataframe
 #' @param set_factors Explicitly set columns to ignore
-#' @param show_one_level_factors Should factor columns with only 1 level be included?
-#'   Default FALSE
+#' @param show_one_level_factors Should factor columns with only 1 level be
+#'   included? Default FALSE
 #' @param verbose Defaults to FALSE, should messages and warnings be printed?
 #'
 #' @return A table with information about the contrasts for all remaining factor
@@ -457,8 +458,7 @@ glimpse_contrasts <- function(model_data,
 
   schemes_to_use[!same_as_default] <- "???"
 
-  warning(glue::glue("Unset factors do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.
-             {nondefaults}"))
+  warning(glue::glue("Unset factors do not use default {unord_str} or {ord_str}. Glimpse table may be unreliable.\n{nondefaults}")) # nolint
 
   schemes_to_use
 }
@@ -497,10 +497,12 @@ glimpse_contrasts <- function(model_data,
     # Instead we'll just always resolve the namespace when it's specified, then
     # double check to make sure it's a function
     if (is_namespaced) {
-      scheme_parts <- strsplit(scheme, ":::?")[[1]] # third : in case user tries an unexported function
-      scheme_fx <- utils::getFromNamespace(scheme_parts[2],
-                                           scheme_parts[1],
-                                           envir = rlang::get_env(formulas[[i]]))
+      # third : in case user tries an unexported function
+      scheme_parts <- strsplit(scheme, ":::?")[[1]]
+      scheme_fx <-
+        utils::getFromNamespace(scheme_parts[2],
+                                scheme_parts[1],
+                                envir = rlang::get_env(formulas[[i]]))
       if (is.function(scheme_fx))
         return(scheme)
     } else {
@@ -519,11 +521,13 @@ glimpse_contrasts <- function(model_data,
 
 .get_reference_level <- function(cmat) {
   if (is.null(cmat)) {
-    stop("Contrast matrix is NULL, did you try to index a list of contrasts by a name that didn't exist in names(list)?")
+    stop("Contrast matrix is NULL, did you try to index a list of contrasts by a name that didn't exist in names(list)?") # nolint
   }
 
   if (diff(dim(cmat)) != -1L) {
-    stop(paste0("Contrast matrix has invalid size: ", paste0(dim(cmat), collapse = ", ")))
+    stop(paste0("Contrast matrix has invalid size: ",
+                paste0(dim(cmat),
+                       collapse = ", ")))
   }
 
   # Compute the inverse matrix of the contrast matrix. The reference level is
@@ -617,8 +621,10 @@ glimpse_contrasts <- function(model_data,
   WARN_reminder <- NULL
 
   if (any(!var_is_factor)) {
-    non_factor_vars <- paste0(" - ", names(contrast_list)[!var_is_factor], collapse = "\n")
-    WARN_non_factor <- glue::glue("These vars in `{model_data_name}` are not factors:\n{non_factor_vars}")
+    non_factor_vars <- paste0(" - ",
+                              names(contrast_list)[!var_is_factor],
+                              collapse = "\n")
+    WARN_non_factor <- glue::glue("These vars in `{model_data_name}` are not factors:\n{non_factor_vars}") # nolint
     remind_about_set_contrasts <- TRUE
   }
 
@@ -641,14 +647,15 @@ glimpse_contrasts <- function(model_data,
     # Get which variables have mismatching matrices XOR mismatching labels
     # (practically speaking mismatching matrices will entail mismatching labels)
     mismatched_varnames <- names(which(doesnt_match_set_contrasts))
-    mismatched_labels <- names(labels_dont_match)[labels_dont_match & !doesnt_match_set_contrasts]
+    mismatched_labels <-
+      names(labels_dont_match)[labels_dont_match & !doesnt_match_set_contrasts]
 
     remind_about_set_contrasts <- TRUE
 
     if (!identical(mismatched_varnames, character(0))) {
       mismatched_varnames <- paste0(" - ", mismatched_varnames, collapse = "\n")
       WARN_mismatched_contrasts <-
-        glue::glue("Contrasts for factors in `{model_data_name}` don't match matrices in formulas:\n{mismatched_varnames}")
+        glue::glue("Contrasts for factors in `{model_data_name}` don't match matrices in formulas:\n{mismatched_varnames}") # nolint
     }
 
     if (!identical(mismatched_labels, character(0))) {
@@ -657,15 +664,25 @@ glimpse_contrasts <- function(model_data,
       warning_lines <-
         vapply(mismatched_labels,
                \(varname) {
-                 expected_labels <- paste0(colnames(contrast_list[[varname]]), collapse = ", ")
-                 set_labels <- paste0(colnames(contrasts(model_data[[varname]])), collapse = ", ")
+                 expected_labels <-
+                   paste0(colnames(contrast_list[[varname]]),
+                          collapse = ", ")
+                 set_labels <-
+                   paste0(colnames(contrasts(model_data[[varname]])),
+                          collapse = ", ")
 
-                 paste0(" - ", varname, "\t(expected `", expected_labels, "` but found `", set_labels, "`)")
+                 paste0(" - ",
+                        varname,
+                        "\t(expected `",
+                        expected_labels,
+                        "` but found `",
+                        set_labels,
+                        "`)")
                }, character(1))
 
       mismatched_labels <- paste0(warning_lines, collapse = "\n")
       WARN_mismatched_labels <-
-        glue::glue("Comparison labels for contrasts in `{model_data_name}` don't match:\n{mismatched_labels}")
+        glue::glue("Comparison labels for contrasts in `{model_data_name}` don't match:\n{mismatched_labels}") # nolint
     }
 
   }
@@ -673,8 +690,11 @@ glimpse_contrasts <- function(model_data,
   if (remind_about_set_contrasts) {
     # If the user typed out formulas manually, then we need to expand the ...
     if (dots_names[1L] == "...") {
-      padding <- strrep(" ", nchar(model_data_name) + 18L) # nchar(" <- set_contrasts(")
-      initial_newlines <- c("\n", rep("", length(formulas) - 1L)) # need an extra \n on the first formula
+      # number of chars in: nchar(" <- set_contrasts(")
+      padding <- strrep(" ", nchar(model_data_name) + 18L)
+
+      # need an extra \n on the first formula
+      initial_newlines <- c("\n", rep("", length(formulas) - 1L))
       dots_names <-
         paste0(initial_newlines,
                padding,
@@ -683,7 +703,7 @@ glimpse_contrasts <- function(model_data,
                vapply(formulas, format, character(1)),
                collapse = ",\n")
     }
-    WARN_reminder <- glue::glue("To fix, be sure to run:\n{model_data_name} <- set_contrasts({model_data_name}, {dots_names})")
+    WARN_reminder <- glue::glue("To fix, be sure to run:\n{model_data_name} <- set_contrasts({model_data_name}, {dots_names})") # nolint
   }
 
   # Any NULLs won't be included; if all are none the length will be 0

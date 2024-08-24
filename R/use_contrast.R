@@ -165,12 +165,12 @@ use_contrasts.function <- function(factor_col,
   }
 
   if (!is.null(labels)) {
-    stopifnot("Provided labels must be same length as number of columns in contrast matrix." = ncol(new_contrasts) == length(labels))
+    stopifnot("Provided labels must be same length as number of columns in contrast matrix." = ncol(new_contrasts) == length(labels)) # nolint
     colnames(new_contrasts) <- labels
   }
 
   if (as_is && is.null(colnames(new_contrasts))) {
-    warning("No comparison labels set and as_is=TRUE, contrast labels will be column indices.")
+    warning("No comparison labels set and as_is=TRUE, contrast labels will be column indices.") # nolint
   }
   new_contrasts
 }
@@ -279,17 +279,22 @@ use_contrasts.default <- function(factor_col,
                                   ...) {
   if (is.ordered(factor_col)) {
     contrast_function <- options()$contrasts["ordered"]
-    contrast_string <- paste0(". Using ordered default ", crayon::red(contrast_function))
+    contrast_string <- paste0(". Using ordered default ",
+                              crayon::red(contrast_function))
   } else {
     contrast_function <- options()$contrasts["unordered"]
-    contrast_string <- paste0(". Using unordered default ", crayon::blue(contrast_function))
+    contrast_string <- paste0(". Using unordered default ",
+                              crayon::blue(contrast_function))
   }
 
   if (length(code_by) == 1L && is.na(code_by)) {
     return(get(contrast_function)(nlevels(factor_col)))
   }
 
-  warning(paste0("Can't set contrasts with object of class ", class(code_by), contrast_string))
+  warning(paste0("Can't set contrasts with object of class ",
+                 class(code_by),
+                 contrast_string))
+
   get(contrast_function)(nlevels(factor_col))
 }
 
@@ -339,12 +344,17 @@ use_contrasts.hypr <- function(factor_col,
   # We already checked that the number of levels are equivalent, so this is
   # solely about names not matching up
   if (length(potential_factor_name) == 1L) {
-    potential_level_names <- gsub(potential_factor_name, "", rownames(contrast_matrix))
+    potential_level_names <-
+      gsub(potential_factor_name, "", rownames(contrast_matrix))
+
     is_present_in_factor_levels <- potential_level_names %in% levels(factor_col)
     if (!all(is_present_in_factor_levels)) {
       levels_not_present <- potential_level_names[!is_present_in_factor_levels]
+
       warning(paste0(
-        "Levels in hypr object not found in factor column `", potential_factor_name, "`: ",
+        "Levels in hypr object not found in factor column `",
+        potential_factor_name,
+        "`: ",
         paste0(levels_not_present, collapse = ", "),
         "\nContrasts may be misspecified."
       ))
@@ -385,7 +395,7 @@ use_contrasts.hypr <- function(factor_col,
   other_args <- rlang::dots_list(...)[["other"]]
   if ("n" %in% names(other_args)) {
     if (n != other_args[["n"]]) {
-      warning("Number of factor levels does not match `n` specified in function call, using number of factor levels")
+      warning("# of levels does not match `n` in call, using nlevels instead")
     }
     other_args[["n"]] <- NULL
   }

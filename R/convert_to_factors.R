@@ -5,6 +5,8 @@
 #' @param model_data Model data
 #' @param vars_in_model variables specified for contrast coding from formulas
 #' @param verbose Should messages be sent? Defaults to TRUE
+#'
+#' @return model_data with specified columns coerced to factors
 .convert_to_factors <- function(model_data, vars_in_model, verbose = TRUE) {
   which_not_factors <- vapply(
     model_data[vars_in_model],

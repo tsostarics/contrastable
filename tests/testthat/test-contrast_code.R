@@ -6,7 +6,8 @@ test_that("two level factor coding works", {
       four = factor(c("a", "b", "c", "d"))
     )
 
-  expect_equal(contrasts(tst_data$two), use_contrasts(tst_data$two, matrix(c(0, 1))))
+  expect_equal(contrasts(tst_data$two),
+               use_contrasts(tst_data$two, matrix(c(0, 1))))
   expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(.5, -.5)))), "a")
   expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(1, 0)))), "a")
   expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(0, 1)))), "b")
@@ -31,7 +32,9 @@ test_that("three level factor coding works", {
     ),
     c("c", "a")
   )
-  expect_equal(matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3), nrow = 3),
+  expect_equal(matrix(c(-1 / 3, -1 / 3, 2 / 3,
+                        2 / 3, -1 / 3, -1 / 3),
+                      nrow = 3),
     use_contrasts(
       tst_data$three,
       matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
@@ -118,10 +121,15 @@ test_that("default 2 level factor works", {
   unordered_result <- suppressWarnings(use_contrasts(factor(1:2)))
   ordered_result <- suppressWarnings(use_contrasts(ordered(factor(1:2))))
 
-  expect_equal(unordered_result, structure(c(0, 1), dim = 2:1, dimnames = list(c("1", "2"), "2")))
-  expect_equal(round(ordered_result, 6), structure(c(-0.707107, 0.707107), dim = 2:1, dimnames = list(
-    NULL, ".L"
-  )))
+  expect_equal(unordered_result,
+               structure(c(0, 1),
+                         dim = 2:1,
+                         dimnames = list(c("1", "2"), "2")))
+
+  expect_equal(round(ordered_result, 6),
+               structure(c(-0.707107, 0.707107),
+                         dim = 2:1,
+                         dimnames = list(NULL, ".L")))
 })
 
 test_that("Non matrix or function default handling works", {
@@ -241,13 +249,19 @@ test_that("No warning when factor passed to use_contrasts directly", {
 
 test_that("Warnings when trying to set values with hypr object", {
   hypr_object <- hypr::hypr(b ~ a, d ~ a)
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")), hypr_object, reference_level = "b"),
+  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
+                               hypr_object,
+                               reference_level = "b"),
     regexp = "reference_level ignored"
   )
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")), hypr_object, set_intercept = "b"),
+  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
+                               hypr_object,
+                               set_intercept = "b"),
     regexp = "set_intercept ignored"
   )
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")), hypr_object, drop_trends = "b"),
+  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
+                               hypr_object,
+                               drop_trends = "b"),
     regexp = "drop_trends ignored"
   )
 })

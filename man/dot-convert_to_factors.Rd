@@ -13,6 +13,9 @@
 
 \item{verbose}{Should messages be sent? Defaults to TRUE}
 }
+\value{
+model_data with specified columns coerced to factors
+}
 \description{
 Helper to convert columns to factors if they aren't already
 }

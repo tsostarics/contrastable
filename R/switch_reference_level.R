@@ -69,7 +69,7 @@
 
   if (is.na(default_reference_index)) {
     if (!is.na(new_reference_label)) {
-      warning("Ignoring reference level for scheme lacking a singular reference")
+      warning("Ignoring reference level for scheme lacking a singular reference") # nolint
     }
   } else {
     # If a new reference level isn't specified, then make the first level the

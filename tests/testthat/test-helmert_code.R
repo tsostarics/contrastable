@@ -1,7 +1,9 @@
 test_that("helmert coding values correct", {
   expect_equal(
     helmert_code(4),
-    matrix(c(-1 / 2, 1 / 2, 0, 0, -1 / 3, -1 / 3, 2 / 3, 0, -1 / 4, -1 / 4, -1 / 4, 3 / 4),
+    matrix(c(-1 / 2, 1 / 2, 0, 0,
+             -1 / 3, -1 / 3, 2 / 3, 0,
+             -1 / 4, -1 / 4, -1 / 4, 3 / 4),
       nrow = 4
     )
   )
@@ -10,7 +12,9 @@ test_that("helmert coding values correct", {
 test_that("reverse helmert coding values correct", {
   expect_equal(
     reverse_helmert_code(4),
-    matrix(rev(c(-1 / 2, 1 / 2, 0, 0, -1 / 3, -1 / 3, 2 / 3, 0, -1 / 4, -1 / 4, -1 / 4, 3 / 4)),
+    matrix(rev(c(-1 / 2, 1 / 2, 0, 0,
+                 -1 / 3, -1 / 3, 2 / 3, 0,
+                 -1 / 4, -1 / 4, -1 / 4, 3 / 4)),
       nrow = 4
     )
   )
@@ -42,17 +46,38 @@ test_that("helmert_code auto scales contrasts", {
       )
     )
 
-  grp_means <- vapply(split(tstdata, ~grp), \(d) mean(d$val), 1.0, USE.NAMES = TRUE)
+  grp_means <- vapply(split(tstdata, ~grp),
+                      \(d) mean(d$val),
+                      numeric(1),
+                      USE.NAMES = TRUE)
 
   set.seed(111)
-  unscaled_coefs <- coef(lm(val ~ grp, data = tstdata, contrasts = enlist_contrasts(tstdata, grp ~ contr.helmert)))
+  unscaled_coefs <- coef(lm(val ~ grp,
+                            data = tstdata,
+                            contrasts =
+                              enlist_contrasts(tstdata,
+                                               grp ~ contr.helmert,
+                                               verbose = FALSE)
+                            )
+                         )
 
   set.seed(111)
-  scaled_coefs <- coef(lm(val ~ grp, data = tstdata, contrasts = enlist_contrasts(tstdata, grp ~ helmert_code)))
-
-  expect_true(((grp_means["b"] - grp_means["a"]) - scaled_coefs[2]) < 1e-10)
-  expect_true(((grp_means["c"] - mean(c(grp_means["b"], grp_means["a"])) - scaled_coefs[3]) < 1e-10))
-  expect_true(((grp_means["d"] - mean(c(grp_means["c"], grp_means["b"], grp_means["a"])) - scaled_coefs[4]) < 1e-10))
+  scaled_coefs <- coef(lm(val ~ grp,
+                          data = tstdata,
+                          contrasts = enlist_contrasts(tstdata,
+                                                       grp ~ helmert_code,
+                                                       verbose = FALSE)
+                          )
+                       )
+  helmert_diff_1 <- grp_means["b"] - grp_means["a"]
+  helmert_diff_2 <- grp_means["c"] - mean(c(grp_means["b"],
+                                            grp_means["a"]))
+  helmert_diff_3 <- grp_means["d"] - mean(c(grp_means["c"],
+                                            grp_means["b"],
+                                            grp_means["a"]))
+  expect_true((helmert_diff_1 - scaled_coefs[2]) < 1e-10)
+  expect_true((helmert_diff_2 - scaled_coefs[3]) < 1e-10)
+  expect_true((helmert_diff_2 - scaled_coefs[4]) < 1e-10)
 
   expect_true(all(unscaled_coefs * (1:4) - scaled_coefs < 1e-12))
 })

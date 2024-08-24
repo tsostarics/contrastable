@@ -14,7 +14,7 @@ Imports:
     rlang (>= 0.1.2),
     stats,
     tidyselect
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     dplyr,
     knitr,

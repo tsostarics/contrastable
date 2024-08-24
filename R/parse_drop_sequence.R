@@ -9,10 +9,12 @@
 #'
 #' @return A sequence of numbers
 .parse_drop_sequence <- function(scheme_argument, var_envir) {
-  sequence_args <- regmatches(scheme_argument, regexec("(.*):(.*)", scheme_argument))[[1L]][-1L]
+  sequence_args <-
+    regmatches(scheme_argument, regexec("(.*):(.*)", scheme_argument))
+
   # Strings like "3L" cannot be converted to numbers, L must be removed first
   sequence_args <- vapply(
-    sequence_args,
+    sequence_args[[1L]][-1L],
     function(x) {
       ifelse(grepl("^\\d+L$", x),
         gsub("L$", "", x),

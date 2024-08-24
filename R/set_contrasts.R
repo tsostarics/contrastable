@@ -12,7 +12,9 @@
 #'
 #' @return the model_data dataframe, but with updated contrasts.
 #' @export
-set_contrasts <- function(model_data, ..., verbose = TRUE) {
+set_contrasts <- function(model_data,
+                          ...,
+                          verbose = getOption("contrastable.verbose")) {
   formulas <- rlang::dots_list(...)
   formulas <- .reinstate_dropped_trends(formulas)
   contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose)
@@ -58,7 +60,7 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
     # Note: there's no check to see if a passed matrix is actually equivalent
     # to polynomial contrasts. I'm not sure why someone would do that, but
     # something to note for the future.
-    warning(paste("Ignoring dropped trends, `-` used in invalid context (use only with polynomial contrast functions):",
+    warning(paste("Ignoring dropped trends, `-` used in invalid context (use only with polynomial contrast functions):", # nolint
       crayon::cyan(char_formulas[which_used_incorrectly]),
       sep = "\n",
       collapse = "\n"
@@ -75,7 +77,7 @@ set_contrasts <- function(model_data, ..., verbose = TRUE) {
   )
 
   if (any(has_dropped_trends)) {
-    warning(glue::glue("Cannot drop trends with set_contrasts, ignoring in {ignore_string}. Use enlist_contrasts instead."))
+    warning(glue::glue("Cannot drop trends with set_contrasts, ignoring in {ignore_string}. Use enlist_contrasts instead.")) # nolint
   }
 
   formulas_dropped_indices <- which(has_dropped_trends)
