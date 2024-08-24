@@ -1143,21 +1143,22 @@ by the formulas, you’ll also get warnings:</p>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>                  carb <span class="sc">~</span> contr.sum, </span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a>                  gear <span class="sc">~</span> treatment_code <span class="sc">*</span> <span class="dv">4</span>,</span>
 <span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>                  cyl <span class="sc">~</span> contr.treatment <span class="sc">|</span> <span class="fu">c</span>(<span class="st">&quot;diff1&quot;</span>, <span class="st">&quot;diff2&quot;</span>))</span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for factors in `mdl_data` don&#39;t match matrices in formulas:</span></span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt;  - gear</span></span>
-<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt; Comparison labels for contrasts in `mdl_data` don&#39;t match:</span></span>
-<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt;  - cyl   (expected `diff1, diff2` but found `6, 8`)</span></span>
-<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt; To fix, be sure to run:</span></span>
-<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; mdl_data &lt;- set_contrasts(mdl_data, </span></span>
-<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt;                           carb ~ contr.sum,</span></span>
-<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt;                           gear ~ treatment_code * 4,</span></span>
-<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt;                           cyl ~ contr.treatment | c(&quot;diff1&quot;, &quot;diff2&quot;))</span></span>
-<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt;            factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt; 1            carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
-<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; 2            gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt; 3             cyl 3      4, 6, 8 contr.treatment         4    mean(4)</span></span>
-<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; twolevel twolevel 2         a, b contr.treatment         a    mean(a)</span></span></code></pre></div>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: twolevel</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for factors in `mdl_data` don&#39;t match matrices in formulas:</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt;  - gear</span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt; Comparison labels for contrasts in `mdl_data` don&#39;t match:</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt;  - cyl   (expected `diff1, diff2` but found `6, 8`)</span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; To fix, be sure to run:</span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt; mdl_data &lt;- set_contrasts(mdl_data, </span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt;                           carb ~ contr.sum,</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt;                           gear ~ treatment_code * 4,</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt;                           cyl ~ contr.treatment | c(&quot;diff1&quot;, &quot;diff2&quot;))</span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt;            factor n  level_names          scheme reference  intercept</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; 1            carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt; 2            gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; 3             cyl 3      4, 6, 8 contr.treatment         4    mean(4)</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co">#&gt; twolevel twolevel 2         a, b contr.treatment         a    mean(a)</span></span></code></pre></div>
 <p>Remember that <code>set_contrasts</code> will automatically coerce
 dataframe columns into factors when specifying a contrast, but
 <code>glimpse_contrasts</code> does <em>not</em> because it does not
@@ -1449,6 +1450,72 @@ to Contrasts using Contrastable</a></li>
 <p>If you need additional information regarding the various warnings and
 messages this package throws, you can check out the
 <code>warnings</code> vignette in this package.</p>
+</div>
+<div id="citation-examples" class="section level2">
+<h2>Citation examples</h2>
+<p>When citing the package in a paper, ideally three things are
+achieved:</p>
+<ul>
+<li>Mention the contrastable R package (Sostarics, 2024)</li>
+<li>Mention which contrast scheme is used for each variable with
+reference levels as appropriate</li>
+<li>Disambiguate the term “sum coding” when used</li>
+</ul>
+<p>In a paper with multiple analyses, these don’t necessarily need to
+all be mentioned on each analysis, especially when there are
+commonalities between them.</p>
+<p>Bad <em>on first mention</em>: “Condition and group are sum coded.”
+(this can be fine if “sum code” is defined previously)</p>
+<p>Good: “Condition is coded using the <code>sum_code()</code> function
+from the contrastable package (Sostarics 2024), using A as the reference
+level. Group is similarly sum coded, with X as the reference level.”</p>
+<p>Also good: “For all of our analyses, we use the contrastable package
+(Sostarics, 2024) to set the contrasts for our categorical variables.
+Condition and group are sum coded (reference level -1, comparisons +1)
+with A and X as the reference levels, respectively.” The point here is
+to disambiguate what is meant by “sum code”, which has inconsistent
+usage in the literature.</p>
+<p>Here’s a paragraph example describing two models:</p>
+<p>A bit repetitive: “In the model for Experiment 1, Condition is
+treatment coded using the <code>treatment_code()</code> function from
+the contrastable package (Sostarics, 2024), with A as the reference, and
+Group is scaled sum coded using the <code>scaled_sum_code()</code>
+function from the contrastable package, with X as the reference. In the
+model for Experiment 2, Condition is treatment coded with the
+<code>treatment_code()</code> function (reference=A) and Group is scaled
+sum coded with <code>scaled_sum_code()</code> (reference=X), while the
+additional Context predictor is scaled sum coded using the
+<code>scaled_sum_code()</code> function (reference=NoContext).”</p>
+<p>Rewritten: “We use the treatment_code() and scaled_sum_code()
+functions from the contrastable package (Sostarics, 2024) when setting
+the contrasts for our categorical variables. In the model for Experiment
+1, Condition is treatment coded (reference=A) and Group is scaled sum
+coded (reference=X). For Experiment 2, the additional Context predictor
+is scaled sum coded (reference=NoContext); as in Exp. 1, Condition is
+treatment coded (reference=A) and Group is sum coded (reference=X).”</p>
+<p>Other examples:</p>
+<ul>
+<li>For all variables, contrasts were set using the
+<code>scaled_sum_code()</code> function from the contrastable package
+(Sostarics 2024).</li>
+<li>We use the contrastable package (Sostarics 2024) for contrast coding
+our categorical variables; details of the contrasts for each model are
+provided in the appendix. (be sure to do the latter!)</li>
+<li>Below are the contrast matrices returned by the
+<code>helmert_code()</code> and <code>scaled_sum_code()</code> functions
+from the contrastable R package (Sostarics 2024)</li>
+<li>We use the <code>set_contrasts()</code> and <code>sum_code()</code>
+functions from the contrastable package (Sostarics 2024) to sum code
+(+1/-1) our variables</li>
+</ul>
+<p>I also recommend writing out, potentially in a footnote, what the
+comparisons are.</p>
+<p>Good: “We use the contrastable package’s <code>sum_code()</code>
+function (+1/-1, Sostarics 2024) for all categorical variables.”</p>
+<p>Better: “We use the contrastable package’s <code>sum_code()</code>
+function (+1/-1, Sostarics 2024) for all categorical variables. This
+contrast scheme encodes differences between each comparison level and
+the grand mean.”</p>
 </div>
 <div class="footnotes footnotes-end-of-document">
 <hr />
