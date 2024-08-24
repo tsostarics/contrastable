@@ -46,44 +46,10 @@ A BibTeX entry for LaTeX users is
     doi = {10.5281/zenodo.11869427},
     }
 
-In-text citations should reference the package and ideally which
-contrast functions were used to avoid ambiguity.
+See the Citation Examples section at the bottom of this readme for
+suggestions and examples of how to cite this package in a paper.
 
-Bad: “We sum code our variables (Sostarics 2024)”
-
-Good: “We use the `sum_code()` function from the contrastable package
-(Sostarics 2024) for our variables.”
-
-Also good: “We sum code our variable (reference level -1, comparisons
-+1). All contrasts are set using the contrastable package (Sostarics
-2024).” (point here is to remove ambiguity of “sum code” using the
-specific numbers)
-
-Other examples:
-
-- Contrasts were set using the `scaled_sum_code()` function from the
-  contrastable package (Sostarics 2024).
-- We use the contrastable package (Sostarics 2024) for contrast coding
-  our categorical variables; details of the contrasts for each model are
-  provided in the appendix. (be sure to do the latter!)
-- Below are the contrast matrices returned by the `helmert_code()` and
-  `scaled_sum_code()` functions from the contrastable R package
-  (Sostarics 2024)
-- We use the `set_contrasts()` and `sum_code()` functions from the
-  contrastable package (Sostarics 2024) to sum code (+1/-1) our
-  variables
-
-I also recommend writing out, potentially in a footnote, what the
-comparisons are.
-
-Good: “We use the contrastable package’s `sum_code()` function (+1/-1,
-Sostarics 2024).”
-
-Better: “We use the contrastable package’s `sum_code()` function (+1/-1,
-Sostarics 2024). This contrast scheme encodes differences between each
-comparison level and the grand mean.”
-
-# Example
+# Usage
 
 Here is a simple example showing how to set particular factors to a
 specific contrast scheme.
@@ -116,12 +82,12 @@ glimpse_contrasts(my_data,
   knitr::kable()
 ```
 
-| factor |   n | level_names      | scheme                        | reference | intercept  |
-|:-------|----:|:-----------------|:------------------------------|:----------|:-----------|
-| cyl    |   3 | 4, 6, 8          | contrastable::scaled_sum_code | 6         | grand mean |
-| carb   |   6 | 1, 2, 3, 4, 6, 8 | contrastable::helmert_code    | NA        | grand mean |
-| vs     |   2 | 0, 1             | contrastable::treatment_code  | 1         | mean(1)    |
-| gear   |   3 | 3, 4, 5          | stats::contr.poly             | NA        | grand mean |
+|      | factor |   n | level_names | scheme                        | reference | intercept  |
+|:-----|:-------|----:|:------------|:------------------------------|:----------|:-----------|
+| 1    | cyl    |   3 | 4, 6, 8     | contrastable::scaled_sum_code | 6         | grand mean |
+| 2    | carb   |   6 | 1, 2, 3,….  | contrastable::helmert_code    | NA        | grand mean |
+| 3    | vs     |   2 | 0, 1        | contrastable::treatment_code  | 1         | mean(1)    |
+| gear | gear   |   3 | 3, 4, 5     | stats::contr.poly             | NA        | grand mean |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling
@@ -239,3 +205,74 @@ are made and transparent when things happen behind the scenes (e.g.,
 automatic factor coercion). You can check out descriptions of various
 messages and warnings in the `warnings` vignette with
 `vignette('warnings', 'contrastable')`.
+
+## Citation examples
+
+When citing the package in a paper, ideally three things are achieved:
+
+- Mention the contrastable R package (Sostarics, 2024)
+- Mention which contrast scheme is used for each variable with reference
+  levels as appropriate
+- Disambiguate the term “sum coding” when used
+
+In a paper with multiple analyses, these don’t necessarily need to all
+be mentioned on each analysis, especially when there are commonalities
+between them.
+
+Bad *on first mention*: “Condition and group are sum coded.” (this can
+be fine if “sum code” is defined previously)
+
+Good: “Condition is coded using the `sum_code()` function from the
+contrastable package (Sostarics 2024), using A as the reference level.
+Group is similarly sum coded, with X as the reference level.”
+
+Also good: “For all of our analyses, we use the contrastable package
+(Sostarics, 2024) to set the contrasts for our categorical variables.
+Condition and group are sum coded (reference level -1, comparisons +1)
+with A and X as the reference levels, respectively.” The point here is
+to disambiguate what is meant by “sum code”, which has inconsistent
+usage in the literature.
+
+Here’s a paragraph example describing two models:
+
+A bit repetitive: “In the model for Experiment 1, Condition is treatment
+coded using the `treatment_code()` function from the contrastable
+package (Sostarics, 2024), with A as the reference, and Group is scaled
+sum coded using the `scaled_sum_code()` function from the contrastable
+package, with X as the reference. In the model for Experiment 2,
+Condition is treatment coded with the `treatment_code()` function
+(reference=A) and Group is scaled sum coded with `scaled_sum_code()`
+(reference=X), while the additional Context predictor is scaled sum
+coded using the `scaled_sum_code()` function (reference=NoContext).”
+
+Rewritten: “We use the treatment_code() and scaled_sum_code() functions
+from the contrastable package (Sostarics, 2024) when setting the
+contrasts for our categorical variables. In the model for Experiment 1,
+Condition is treatment coded (reference=A) and Group is scaled sum coded
+(reference=X). For Experiment 2, the additional Context predictor is
+scaled sum coded (reference=NoContext); as in Exp. 1, Condition is
+treatment coded (reference=A) and Group is sum coded (reference=X).”
+
+Other examples:
+
+- For all variables, contrasts were set using the `scaled_sum_code()`
+  function from the contrastable package (Sostarics 2024).
+- We use the contrastable package (Sostarics 2024) for contrast coding
+  our categorical variables; details of the contrasts for each model are
+  provided in the appendix. (be sure to do the latter!)
+- Below are the contrast matrices returned by the `helmert_code()` and
+  `scaled_sum_code()` functions from the contrastable R package
+  (Sostarics 2024)
+- We use the `set_contrasts()` and `sum_code()` functions from the
+  contrastable package (Sostarics 2024) to sum code (+1/-1) our
+  variables
+
+I also recommend writing out, potentially in a footnote, what the
+comparisons are.
+
+Good: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024) for all categorical variables.”
+
+Better: “We use the contrastable package’s `sum_code()` function (+1/-1,
+Sostarics 2024) for all categorical variables. This contrast scheme
+encodes differences between each comparison level and the grand mean.”
