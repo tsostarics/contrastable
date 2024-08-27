@@ -8,13 +8,16 @@
 #'   package-specific syntax.
 #'
 #' @inherit enlist_contrasts params details
+#' @param print_contrasts Logical, default FALSE, whether to print the contrasts
+#' set for each factor. Fractions are displayed using `MASS::fractions`
 #' @seealso [enlist_contrasts()]
 #'
 #' @return the model_data dataframe, but with updated contrasts.
 #' @export
 set_contrasts <- function(model_data,
                           ...,
-                          verbose = getOption("contrastable.verbose")) {
+                          verbose = getOption("contrastable.verbose"),
+                          print_contrasts = FALSE) {
   formulas <- rlang::dots_list(...)
   formulas <- .reinstate_dropped_trends(formulas)
   contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose)
@@ -26,6 +29,10 @@ set_contrasts <- function(model_data,
   for (i in seq_along(contrast_list)) {
     factor_name <- names(contrast_list[i])
     contrasts(model_data[[factor_name]]) <- contrast_list[[i]]
+  }
+
+  if (print_contrasts) {
+      print(lapply(contrast_list, MASS::fractions))
   }
 
   model_data

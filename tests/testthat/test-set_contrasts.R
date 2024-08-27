@@ -48,3 +48,14 @@ test_that("Ignoring dropped levels in orthogonal polynomial contrasts", {
   expect_equal(contrasts(testdf$carb), contr.poly(6), ignore_attr = TRUE)
   expect_equal(contrasts(testdf$gear), contr.poly(3), ignore_attr = TRUE)
 })
+
+test_that("Contrasts print when asked for", {
+  expect_snapshot_output(
+    invisible(
+      set_contrasts(mtcars,
+                    gear ~ helmert_code,
+                    print_contrasts = TRUE,
+                    verbose = FALSE)
+      )
+    )
+})

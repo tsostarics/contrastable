@@ -4,7 +4,12 @@
 \alias{set_contrasts}
 \title{Set contrasts to dataframe}
 \usage{
-set_contrasts(model_data, ..., verbose = getOption("contrastable.verbose"))
+set_contrasts(
+  model_data,
+  ...,
+  verbose = getOption("contrastable.verbose"),
+  print_contrasts = FALSE
+)
 }
 \arguments{
 \item{model_data}{Data frame you intend on passing to your model}
@@ -16,6 +21,9 @@ comparison labels can be set using \code{|}, and trends for polynomial coding
 can be removed using \code{-}.}
 
 \item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
+
+\item{print_contrasts}{Logical, default FALSE, whether to print the contrasts
+set for each factor. Fractions are displayed using \code{MASS::fractions}}
 }
 \value{
 the model_data dataframe, but with updated contrasts.
