@@ -33,7 +33,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
-package version 0.3.0.
+package version 0.4.0.
 
 A BibTeX entry for LaTeX users is
 
@@ -41,7 +41,7 @@ A BibTeX entry for LaTeX users is
     author = {Thomas Sostarics},
     title = {{contrastable}: Contrast Coding Utilities in {R}},
     year = {2024},
-    note = {R package version 0.3.0},
+    note = {R package version 0.4.0},
     url = {https://github.com/tsostarics/contrastable},
     doi = {10.5281/zenodo.11869427},
     }
@@ -60,12 +60,46 @@ my_data <- mtcars
 my_data$gear <- ordered(my_data$gear) # Set as ordered factor in dataframe
 ```
 
-We can use `glimpse_contrasts` to get information about the factors and
-diagnostics about the scheme we have set.
+`set_contrasts` can be used to set the contrasts onto the dataframe
+itself, which is needed when a modeling function lacks a `contrasts`
+argument.
 
 ``` r
 # Specify the contrast schemes we want, factor conversion done automatically
 # Set reference level with + and intercept with *
+my_data <- set_contrasts(my_data, 
+                         cyl ~ scaled_sum_code + 6,
+                         carb ~ helmert_code,
+                         vs ~ treatment_code + 1,
+                         print_contrasts = TRUE)
+#> Converting to factors: cyl carb vs
+#> Expect contr.treatment or contr.poly for unset factors: gear
+#> $cyl
+#>   4    8   
+#> 4  2/3 -1/3
+#> 6 -1/3 -1/3
+#> 8 -1/3  2/3
+#> 
+#> $carb
+#>   <2   <3   <4   <6   <8  
+#> 1 -1/2 -1/3 -1/4 -1/5 -1/6
+#> 2  1/2 -1/3 -1/4 -1/5 -1/6
+#> 3    0  2/3 -1/4 -1/5 -1/6
+#> 4    0    0  3/4 -1/5 -1/6
+#> 6    0    0    0  4/5 -1/6
+#> 8    0    0    0    0  5/6
+#> 
+#> $vs
+#>   0
+#> 0 1
+#> 1 0
+```
+
+We can use `glimpse_contrasts` to get information about the factors and
+diagnostics about the scheme we have set.
+
+``` r
+# Create a reusable list to use with multiple functions
 contrast_schemes <- list(
   cyl ~ scaled_sum_code + 6,
   carb ~ helmert_code,
@@ -80,7 +114,6 @@ glimpse_contrasts(my_data,
                   show_all_factors = TRUE
 ) |>
   knitr::kable()
-#> Converting to factors: cyl carb vs
 #> Expect contr.treatment or contr.poly for unset factors: gear
 ```
 
@@ -120,29 +153,11 @@ enlist_contrasts(mtcars, contrast_schemes)
     #> 0 1
     #> 1 0
 
-`set_contrasts` can be used to set the contrasts onto the dataframe
-itself, which is needed when a modeling function lacks a `contrasts`
-argument.
-
-``` r
-# Set contrasts to dataframe itself
-my_data <- set_contrasts(my_data, contrast_schemes)
-#> Converting to factors: cyl carb vs
-#> Expect contr.treatment or contr.poly for unset factors: gear
-MASS::fractions(contrasts(my_data$carb))
-#>   <2   <3   <4   <6   <8  
-#> 1 -1/2 -1/3 -1/4 -1/5 -1/6
-#> 2  1/2 -1/3 -1/4 -1/5 -1/6
-#> 3    0  2/3 -1/4 -1/5 -1/6
-#> 4    0    0  3/4 -1/5 -1/6
-#> 6    0    0    0  4/5 -1/6
-#> 8    0    0    0    0  5/6
-```
-
 You can also set multiple contrasts at once using `{tidyselect}`
 functionality.
 
 ``` r
+# Create a new dataframe with a bunch of factors
 my_data2 <- 
   data.frame(a = gl(2,10),
              b = gl(5,2, ordered = TRUE),

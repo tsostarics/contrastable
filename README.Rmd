@@ -45,7 +45,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. 
-R package version 0.3.0.
+R package version 0.4.0.
 
 A BibTeX entry for LaTeX users is
 
@@ -54,7 +54,7 @@ A BibTeX entry for LaTeX users is
 author = {Thomas Sostarics},
 title = {{contrastable}: Contrast Coding Utilities in {R}},
 year = {2024},
-note = {R package version 0.3.0},
+note = {R package version 0.4.0},
 url = {https://github.com/tsostarics/contrastable},
 doi = {10.5281/zenodo.11869427},
 }
@@ -76,12 +76,26 @@ my_data <- mtcars
 my_data$gear <- ordered(my_data$gear) # Set as ordered factor in dataframe
 ```
 
+
+`set_contrasts` can be used to set the contrasts onto the dataframe itself,
+which is needed when a modeling function lacks a `contrasts` argument.
+
+```{r, message = TRUE}
+# Specify the contrast schemes we want, factor conversion done automatically
+# Set reference level with + and intercept with *
+my_data <- set_contrasts(my_data, 
+                         cyl ~ scaled_sum_code + 6,
+                         carb ~ helmert_code,
+                         vs ~ treatment_code + 1,
+                         print_contrasts = TRUE)
+```
+
+
 We can use `glimpse_contrasts` to get information about
 the factors and diagnostics about the scheme we have set.
 
 ```{r, message = TRUE, warning=FALSE}
-# Specify the contrast schemes we want, factor conversion done automatically
-# Set reference level with + and intercept with *
+# Create a reusable list to use with multiple functions
 contrast_schemes <- list(
   cyl ~ scaled_sum_code + 6,
   carb ~ helmert_code,
@@ -112,18 +126,10 @@ lapply(enlist_contrasts(mtcars, contrast_schemes), MASS::fractions)
 ```
 
 
-`set_contrasts` can be used to set the contrasts onto the dataframe itself,
-which is needed when a modeling function lacks a `contrasts` argument.
-
-```{r, message = TRUE}
-# Set contrasts to dataframe itself
-my_data <- set_contrasts(my_data, contrast_schemes)
-MASS::fractions(contrasts(my_data$carb))
-```
-
 You can also set multiple contrasts at once using `{tidyselect}` functionality.
 
 ```{r}
+# Create a new dataframe with a bunch of factors
 my_data2 <- 
   data.frame(a = gl(2,10),
              b = gl(5,2, ordered = TRUE),
