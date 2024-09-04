@@ -47,7 +47,46 @@ use_contrasts <- function(factor_col,
 }
 
 
-#' Symbol handler for use_contrasts
+#' AsIs method for use_contrasts
+#'
+#' Evaluates `code_by`, then applies the appropriate use_contrasts method
+#'
+#' @param factor_col A factor vector, eg from df$factorVarName
+#' @param code_by A symbol to be evaluated
+#' @param labels A vector of labels to apply to the matrix column names, default
+#' NULL (no new labels)
+#' @param as_is Logical, default FALSE, whether to leave the resulting matrix
+#' as-is
+#' @param ... Additional arguments to be passed on
+#' @param reference_level The level to use as the reference level, default NA
+#' @param set_intercept The intercept to use, default NA
+#' @param drop_trends The trends to drop, default NA
+#'
+#' @return A contrast coding matrix with labels and proper reference level
+#' @method use_contrasts AsIs
+#' @export
+#'
+#' @examples
+#'
+#' use_contrasts(gl(5,1), I(scaled_sum_code))
+#'
+use_contrasts.AsIs <- function(factor_col,
+                               code_by = NA,
+                               reference_level = NA,
+                               set_intercept = NA,
+                               drop_trends = NA,
+                               labels = NULL,
+                               as_is = FALSE, ...) {
+  class(code_by) <- class(code_by)[class(code_by) != "AsIs"]
+  method_call <- match.call()
+  method_call[["code_by"]] <- code_by
+  method_call[[1]] <- use_contrasts
+  method_call[["as_is"]] <- TRUE
+  eval(method_call)
+}
+
+
+#' Symbol method for use_contrasts
 #'
 #' Evaluates `code_by`, then applies the appropriate use_contrasts method
 #'
@@ -90,7 +129,7 @@ use_contrasts.name <- function(factor_col,
 
 
 
-#' Function handler for use_contrasts
+#' Function method for use_contrasts
 #'
 #' If the user provides a function, use the function and supplied arguments to
 #' create a contrast matrix
@@ -175,7 +214,7 @@ use_contrasts.function <- function(factor_col,
   new_contrasts
 }
 
-#' Matrix handler for use_contrasts
+#' Matrix method for use_contrasts
 #'
 #' If a user provides a raw matrix, then use that matrix as the contrast matrix
 #'
@@ -249,7 +288,7 @@ use_contrasts.matrix <- function(factor_col,
   .reset_comparison_labels(new_contrasts)
 }
 
-#' Default handler for use_contrasts
+#' Default method for use_contrasts
 #'
 #' If a user doesn't specify a contrast matrix, use the defaults from options().
 #' If the user tries to use something we don't know how to work with, throw a

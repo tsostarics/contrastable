@@ -2,7 +2,7 @@
 % Please edit documentation in R/use_contrast.R
 \name{use_contrasts.matrix}
 \alias{use_contrasts.matrix}
-\title{Matrix handler for use_contrasts}
+\title{Matrix method for use_contrasts}
 \usage{
 \method{use_contrasts}{matrix}(
   factor_col,

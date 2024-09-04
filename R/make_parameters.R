@@ -133,9 +133,21 @@
 
 .process_code_by <- function(formula, params, env) {
   # Check if the formula contains as_is
-  if (length(formula) > 1L && identical(formula[[1]], sym("as_is"))) {
+
+  if (length(formula) > 1L && (identical(formula[[1]], sym("I")))) {
+
+    not_singleton <- TRUE
+
+    # Unwrap nested I()s
+    while(not_singleton && identical(formula[[1]], sym("I"))){
+      formula <- formula[[2L]]
+      not_singleton <- length(formula) > 1
+    }
+
     params[["as_is"]] <- TRUE
-    formula <- formula[[2L]]
+
+    if (not_singleton)
+      formula <- formula[[2]]
   }
 
   # If we've been given what looks like a function, but the function doesn't

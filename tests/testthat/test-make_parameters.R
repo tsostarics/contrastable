@@ -22,8 +22,8 @@ test_that("Different combinations of formula operations work", {
       f14 = 1 ~ sum_code - 5:6 + 3 * 4,
       f15 = 1 ~ sum_code - 5:6 * 4 + 3,
       # Ensure as_is_works correctly
-      f16 = 1 ~ as_is(sum_code) - 5:6 * 4 + 3,
-      f17 = 1 ~ as_is(sum_code)
+      f16 = 1 ~ I(sum_code) - 5:6 * 4 + 3,
+      f17 = 1 ~ I(sum_code)
     )
 
   params <- lapply(formulae, .make_parameters)

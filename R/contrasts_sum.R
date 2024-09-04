@@ -39,6 +39,8 @@
 #' lm(resp ~ grp, data = mydf)
 #'
 sum_code <- function(n) {
+
+
   if (n == 2) {
     return(-stats::contr.sum(n))
   }

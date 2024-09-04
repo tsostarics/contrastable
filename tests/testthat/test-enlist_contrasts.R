@@ -138,7 +138,7 @@ test_that("Providing namespace with contrast function works", {
 test_that("Warning is thrown when colnames are not set and as_is is TRUE", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
-  expect_warning(enlist_contrasts(newdata, carb ~ as_is(contr.sum)),
+  expect_warning(enlist_contrasts(newdata, carb ~ I(contr.sum)),
                  regexp = "and as_is=TRUE"
   )
 })
@@ -146,7 +146,7 @@ test_that("Warning is thrown when colnames are not set and as_is is TRUE", {
 test_that("as_is functionality works as expected", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
-  df1 <- suppressWarnings(enlist_contrasts(newdata, carb ~ as_is(contr.sum)))
+  df1 <- suppressWarnings(enlist_contrasts(newdata, carb ~ I(contr.sum)))
   df2 <- enlist_contrasts(newdata, carb ~ sum_code + 8)
   expect_equal(df1, df2, ignore_attr = TRUE)
 })
@@ -156,7 +156,7 @@ test_that("nested as_is works", {
   newdata$carb <- factor(newdata$carb)
   df1 <- suppressWarnings(
     enlist_contrasts(newdata,
-                     carb ~ as_is(as_is(as_is((contr.sum))))
+                     carb ~ I(I(I((contr.sum))))
     )
   )
 

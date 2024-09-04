@@ -2,7 +2,7 @@
 % Please edit documentation in R/use_contrast.R
 \name{use_contrasts.function}
 \alias{use_contrasts.function}
-\title{Function handler for use_contrasts}
+\title{Function method for use_contrasts}
 \usage{
 \method{use_contrasts}{`function`}(
   factor_col,

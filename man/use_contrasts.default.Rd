@@ -2,7 +2,7 @@
 % Please edit documentation in R/use_contrast.R
 \name{use_contrasts.default}
 \alias{use_contrasts.default}
-\title{Default handler for use_contrasts}
+\title{Default method for use_contrasts}
 \usage{
 \method{use_contrasts}{default}(
   factor_col,
