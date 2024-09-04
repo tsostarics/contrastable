@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Contrast Coding Utilities
-Version: 0.3.3
+Version: 0.3.2
 Authors@R: person("Sostarics", "Thomas", email = "tsostarics@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1178-7967"))
 Description: Quickly set contrasts for factors prior to regression analyses. Allows intended comparisons to be explicitly set and documented without user needing to directly manipulate matrices.
 License: MIT + file LICENSE
