@@ -398,14 +398,14 @@ enlist_contrasts(mdl_data, carb ~ sum_code)
 enlist_contrasts(mdl_data, carb ~ foo)
 ```
 
-If you want to suppress this behavior, you can use the wrapper `as_is`.
+If you want to suppress this behavior, you can use the wrapper `I` from base R.
 Note this will also result in not setting the labels for you: it will use
 the generated matrix as-is.
 This is useful if you explicitly create a matrix and
 want to make sure the reference level isn't shifted around.
 
 ```{r example-as-is}
-enlist_contrasts(mdl_data, carb ~ as_is(contr.sum))
+enlist_contrasts(mdl_data, carb ~ I(contr.sum))
 ```
 
 One last quick note is that you can keep the parentheses with the function,

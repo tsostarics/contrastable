@@ -119,7 +119,7 @@ enlist_contrasts(mdl_data, carb ~ sum_code)
 enlist_contrasts(mdl_data, carb ~ foo)
 
 ## ----example-as-is------------------------------------------------------------
-enlist_contrasts(mdl_data, carb ~ as_is(contr.sum))
+enlist_contrasts(mdl_data, carb ~ I(contr.sum))
 
 ## ----parentheses-handling-----------------------------------------------------
 enlist_contrasts(mdl_data, carb ~ contr.sum())

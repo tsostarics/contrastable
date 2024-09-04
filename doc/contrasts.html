@@ -881,11 +881,11 @@ original matrix was.</p>
 <span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a><span class="co">#&gt; 6  0  0  0  1  0</span></span>
 <span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a><span class="co">#&gt; 8  0  0  0  0  1</span></span></code></pre></div>
 <p>If you want to suppress this behavior, you can use the wrapper
-<code>as_is</code>. Note this will also result in not setting the labels
-for you: it will use the generated matrix as-is. This is useful if you
-explicitly create a matrix and want to make sure the reference level
-isn’t shifted around.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> <span class="fu">as_is</span>(contr.sum))</span>
+<code>I</code> from base R. Note this will also result in not setting
+the labels for you: it will use the generated matrix as-is. This is
+useful if you explicitly create a matrix and want to make sure the
+reference level isn’t shifted around.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> <span class="fu">I</span>(contr.sum))</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; Warning in use_contrasts.function(factor_col = get(params[[&quot;factor_col&quot;]], : No</span></span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co">#&gt; comparison labels set and as_is=TRUE, contrast labels will be column indices.</span></span>
