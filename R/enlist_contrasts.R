@@ -249,7 +249,7 @@ enlist_contrasts <- function(model_data,
 .process_contrasts <- function(model_data, raw_formula) {
   var_envir <- rlang::get_env(raw_formula)
 
-  params <- .split_if_language(.parse_formula(raw_formula), var_envir)
+  params <- .split_if_language(.make_parameters(raw_formula), var_envir)
 
   use_contrasts(
     factor_col = get(params[["factor_col"]], model_data),

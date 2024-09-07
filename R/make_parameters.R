@@ -39,10 +39,10 @@
     switch(
       .get_reserved_operator(node),
       "~" = {params <- .process_factor_col(cur_expr, params, env)},
-      "+" = {params <- .process_reference(cur_expr, params, env)},
-      "-" = {params <- .process_drop_trends(cur_expr, params, env)},
-      "*" = {params <- .process_intercept(cur_expr, params, env, EMBEDDED)},
-      "|" = {params <- .process_labels(cur_expr, params, env)},
+      "+" = {params <- .set_param(cur_expr, params, env, "reference_level")},
+      "-" = {params <- .set_param(cur_expr, params, env, "drop_trends")},
+      "*" = {params <- .set_param(cur_expr, params, env, "intercept_level")},
+      "|" = {params <- .set_param(cur_expr, params, env, "labels")},
       {params <- .process_code_by(formula, params, env)}
     )
 
@@ -88,52 +88,47 @@
 }
 
 
-.process_reference <- function(cur_expr, params, env) {
+#' Process and set parameter
+#'
+#' Unpacks the given expression to set the parameter specified by `which_param`
+#' to `params`. Continues recursively setting parameters via `make_parameters`.
+#'
+#' @param cur_expr Current expression, a formula or list representation thereof
+#' @param params Named list of parameters
+#' @param env Environment to evaluate expressions in `cur_expr` in
+#' @param which_param Which parameter to set, a string, see `make_parameters`
+#' for usage
+#'
+#' @return `params`
+.set_param <- function(cur_expr, params, env, which_param) {
   LHS <- cur_expr[[2L]]
   RHS <- cur_expr[[3L]]
-  r_has_child <- length(RHS) == 3
+
+  if (which_param == "labels") {
+    already_set <- !is.null(params[[which_param]])
+  } else {
+    already_set <- !is.na(params[[which_param]])
+  }
+
+  if (already_set)
+    stop("You may only use *, -, and * once")
+
+  # Unnest the RHS if there are more reserved operators present
+  while (length(RHS) > 1L && .is_reserved_operator(RHS[[1L]])) {
+    LHS <- list(RHS[[1]], LHS, RHS[[3]])
+    RHS <- RHS[[2]]
+  }
+
+  params[[which_param]] <- RHS
   params <- .make_parameters(LHS, params, env)
-
-  # Must check if rhs has children before subsetting with +
-  if (r_has_child && .is_reserved_operator(RHS[[1L]], "*")) {
-    params[["reference_level"]] <- RHS[[2L]]
-    params <- .make_parameters(RHS, params, env, TRUE)
-  } else {
-    params[["reference_level"]] <- RHS
-  }
-
   params
-}
-
-.process_drop_trends <- function(cur_expr, params, env) {
-  LHS <- cur_expr[[2L]]
-  RHS <- cur_expr[[3L]]
-  if (.is_reserved_operator(RHS[[1L]], "*")) {
-    params[["drop_trends"]] <- RHS[[2L]]
-    params <- .make_parameters(RHS, params, env, TRUE)
-    params <- .make_parameters(LHS, params, env)
-  } else {
-    params[["drop_trends"]] <- RHS
-    params <- .make_parameters(LHS, params, env)
-  }
-}
-
-.process_intercept <- function(cur_expr, params, env, EMBEDDED) {
-  LHS <- cur_expr[[2L]]
-  RHS <- cur_expr[[3L]]
-  params[["intercept_level"]] <- RHS
-  # If we don't check whether * is embedded in - or + before recursing, then
-  # we will overwrite code_by on accident
-  if (!EMBEDDED) {
-    params <- .make_parameters(LHS, params, env)
-  }
 
   params
 }
 
 .process_code_by <- function(formula, params, env) {
-  # Check if the formula contains as_is
 
+  # Check if the formula contains AsIs specification
   if (length(formula) > 1L && (identical(formula[[1]], sym("I")))) {
 
     not_singleton <- TRUE
@@ -171,13 +166,5 @@
 
   params[["code_by"]] <- formula
 
-  params
-}
-
-.process_labels <- function(cur_expr, params, env) {
-  LHS <- cur_expr[[2L]]
-  RHS <- cur_expr[[3L]]
-  params[["labels"]] <- RHS
-  params <- .make_parameters(LHS, params, env)
   params
 }
