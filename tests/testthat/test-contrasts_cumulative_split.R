@@ -12,6 +12,6 @@ test_that("cumulative split contrasts work", {
 
   expect_equal(round(coef(lm(y ~ x, data = testdf))),
                c("(Intercept)" = 7,
-                 x1 = -4,
-                 x2 = -5))
+                 "x1|2" = -4,
+                 "x2|3" = -5))
 })

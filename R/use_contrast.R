@@ -120,6 +120,8 @@ use_contrasts.name <- function(factor_col,
                                drop_trends = NA,
                                labels = NULL,
                                as_is = FALSE, ...) {
+
+
   code_by <- get(code_by,envir = parent.frame())
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
@@ -159,6 +161,8 @@ use_contrasts.function <- function(factor_col,
                                    as_is = FALSE,
                                    ...) {
   # Extract labels to use for contrast matrix
+  dots <- rlang::dots_list(...)
+
   matrix_labels <- .get_dimnames(factor_col)
   params <- .bundle_params(factor_col, ...)
 
@@ -203,7 +207,7 @@ use_contrasts.function <- function(factor_col,
 
     # Set the contrast labels, reorder as needed
     dimnames(new_contrasts) <- matrix_labels
-    new_contrasts <- .reset_comparison_labels(new_contrasts, code_by)
+    new_contrasts <- .reset_comparison_labels(new_contrasts, dots[["symchar"]])
   }
   # If an intercept was specified, set it here
   if (!is.na(set_intercept)) {

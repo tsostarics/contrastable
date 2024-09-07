@@ -235,3 +235,4 @@ test_that("Error message when forgetting model_data works", {
                regexp = "Instead found"
   )
 })
+

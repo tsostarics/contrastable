@@ -74,6 +74,7 @@ polynomial_code <- orth_polynomial_code
 raw_polynomial_code <- function(n) {
   contrmat <- poly(seq_len(n), n - 1, raw = TRUE)
   attr(contrmat, "degree") <- NULL
+  class(contrmat) <- c("matrix", "array")
   contrmat
 }
 

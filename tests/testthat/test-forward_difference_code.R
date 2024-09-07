@@ -1,35 +1,15 @@
 test_that("backward difference labels work", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
+  labels <- colnames(enlist_contrasts(data.frame(x=gl(4,1)),
+                            x ~ backward_difference_code)[[1]])
 
-  expect_equal(
-    dimnames(use_contrasts(tst_data$four, backward_difference_code(4))),
-    list(
-      c("a", "b", "c", "d"),
-      c("b-a", "c-b", "d-c")
-    )
-  )
+  expect_equal(labels, c("2-1", "3-2", "4-3"))
 })
 
 test_that("forward difference labels work", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
+  labels <- colnames(enlist_contrasts(data.frame(x=gl(4,1)),
+                                      x ~ forward_difference_code)[[1]])
 
-  expect_equal(
-    dimnames(use_contrasts(tst_data$four, forward_difference_code(4))),
-    list(
-      c("a", "b", "c", "d"),
-      c("a-b", "b-c", "c-d")
-    )
-  )
+  expect_equal(labels, c("1-2", "2-3", "3-4"))
 })
 
 test_that("backward difference values correct", {

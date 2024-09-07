@@ -251,15 +251,19 @@ enlist_contrasts <- function(model_data,
 
   params <- .split_if_language(.make_parameters(raw_formula), var_envir)
 
+  code_by_value <- eval(params[["code_by"]], var_envir)
+  code_by_sym <- as.character(params[["code_by"]])[1L]
+
   use_contrasts(
     factor_col = get(params[["factor_col"]], model_data),
-    code_by = eval(params[["code_by"]], var_envir),
+    code_by = code_by_value,
     labels = eval(params[["labels"]], var_envir),
     reference_level = eval(params[["reference_level"]], var_envir),
     set_intercept = eval(params[["intercept_level"]], var_envir),
     drop_trends = eval(params[["drop_trends"]], var_envir),
     as_is = params[["as_is"]],
-    other = params[["other_args"]]
+    other = params[["other_args"]],
+    symchar = code_by_sym
   )
 }
 
