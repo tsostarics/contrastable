@@ -114,12 +114,12 @@ use_contrasts.AsIs <- function(factor_col,
 #' use_contrasts(gl(5,1), contrast_scheme)
 #'
 use_contrasts.name <- function(factor_col,
-                                 code_by = NA,
-                                 reference_level = NA,
-                                 set_intercept = NA,
-                                 drop_trends = NA,
-                                 labels = NULL,
-                                 as_is = FALSE, ...) {
+                               code_by = NA,
+                               reference_level = NA,
+                               set_intercept = NA,
+                               drop_trends = NA,
+                               labels = NULL,
+                               as_is = FALSE, ...) {
   code_by <- get(code_by,envir = parent.frame())
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
@@ -179,10 +179,18 @@ use_contrasts.function <- function(factor_col,
   if (!as_is) {
     # Get indices for the default reference level and user-specified level
     if (is.function(reference_level))
-      stop(cli::format_error(c("Reference level is a function instead of an atomic type object.",
-                               " " ="Is the contrast object/function in the wrong place? See example:",
-                               "x" = "var ~ 1 + sum_code",
-                               "v" = "var ~ sum_code + 1")))
+      stop(
+        cli::format_error(
+          c(
+            "Reference level is a function instead of an atomic type object.",
+            " " = "Is the contrast object/function in the wrong place? See example:",
+            "x" = "var ~ 1 + sum_code",
+            "v" = "var ~ sum_code + 1"
+          )
+        )
+      )
+
+
     new_reference_index <- which(matrix_labels[[1]] == reference_level)
 
     # Switch reference level if needed, along with various error handling
@@ -337,9 +345,9 @@ use_contrasts.default <- function(factor_col,
 
   if (!is.matrix(code_by) && is.atomic(code_by)) {
     stop(
-    cli::format_error(c("Can't set contrasts with atomic type object, see example below:",
-                        "x" = "var ~ 1 + sum_code",
-                        "v" = "var ~ sum_code + 1"))
+      cli::format_error(c("Can't set contrasts with atomic type object, see example below:",
+                          "x" = "var ~ 1 + sum_code",
+                          "v" = "var ~ sum_code + 1"))
     )
   }
 

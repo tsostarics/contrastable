@@ -154,24 +154,10 @@
       formula <- formula[[2]]
   }
 
-  # If we've been given what looks like a function, but the function doesn't
-  # actually exist in the calling environment, throw an error.
-  if (is.call(formula)) {
-    if (!is.function(get(formula[[1]], envir = env))) {
-      stop("in ",
-           format(formula),
-           " : could not find function \"",
-           as.character(formula[[1]]),
-           '"',
-           call. = FALSE)
-    }
-
-    # Remove parentheses to treat as symbol
-    if (length(formula) == 1L) {
+  # Remove parentheses to treat as symbol
+  if (is.call(formula) && length(formula) == 1L) {
       formula <- formula[[1]]
-    }
   }
-
 
   params[["code_by"]] <- formula
 
