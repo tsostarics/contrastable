@@ -30,6 +30,7 @@
            "orth_polynomial_code" = colnames(polynomial_code(n)),
            "raw_polynomial_code"  = colnames(polynomial_code(n)),
            "contr.poly"           = colnames(polynomial_code(n)),
+           "contr.helmert"        = paste0("(<", levelnames[-1L], ")/", seq_along(levelnames)[-1L]),
            "helmert_code"         = paste0("<", levelnames[-1L]),
            "reverse_helmert_code" = paste0(">", levelnames[-n]),
            "backward_difference_code" =  paste(levelnames[-1], levelnames[-n], sep = "-"),
