@@ -102,7 +102,16 @@
 #' @return `params`
 .set_param <- function(cur_expr, params, env, which_param) {
   LHS <- cur_expr[[2L]]
-  RHS <- cur_expr[[3L]]
+  RHS <- tryCatch(cur_expr[[3L]],
+                  error = \(e) {
+                    err <- conditionMessage(e)
+                    stop(
+                      cli::format_error(c(err,
+                                          " " = "Is the contrast object/function in the wrong place? See example:",
+                                          "x" = "var ~ 1 + sum_code",
+                                          "v" = "var ~ sum_code + 1"))
+                    )
+                  })
 
   if (which_param == "labels") {
     already_set <- !is.null(params[[which_param]])

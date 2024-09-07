@@ -68,6 +68,18 @@ test_that("Raw matrix call with automatic reference level switching", {
   )
 })
 
+test_that("Matrix doesn't trigger atomic error", {
+  cmat <- sum_code(3)
+  expect_equal(sum_code(3),
+               enlist_contrasts(mtcars, cyl ~ cmat, verbose = FALSE)[[1]],
+               ignore_attr = TRUE)
+
+  class(cmat) <- "foo"
+  expect_equal(treatment_code(3),
+               suppressWarnings(enlist_contrasts(mtcars, cyl ~ cmat, verbose = FALSE)[[1]]),
+               ignore_attr = TRUE)
+})
+
 test_that("Programmatic environment handling with set reference levels works", {
   my_df <- mtcars
   my_df$gear <- factor(my_df$gear)

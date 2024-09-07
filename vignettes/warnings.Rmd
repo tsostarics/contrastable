@@ -100,18 +100,47 @@ Under the hood, methods are defined for the following object classes:
  - function
  - hypr
  
- You'll receive a warning if you use something else and the default contrast (depending on ordered or unordered) will be used instead.
+You'll receive a warning if you use something else and the default contrast 
+(depending on ordered or unordered) will be used instead.
 
 ```{r,results='hide'}
-my_matrix <- sum_code(3)  # class = "matrix" "array"
-class(my_matrix) <- "foo" # class = "foo"
+my_matrix <- sum_code(3)  # current class is "matrix" "array"
+class(my_matrix) <- "foo" # now class is "foo"
+
 set_contrasts(mtcars, cyl ~ my_matrix) # idk what to do with "foo" objects
 ```
 
-Note this also occurs if you accidentally quote the function name:
+So long as the object *inherits* one of the above classes though it will work
+as expected. Accordingly, note that no class coercion happens here.
+
+```{r, results='hide'}
+class(my_matrix) <- c("foo", "matrix", "array")
+set_contrasts(mtcars, cyl ~ my_matrix) # idk what "foo" is but i know "matrix"!
+```
+
+Note that if you accidentally quote the function name, you will receive an
+error instead because it thinks you're trying to set contrasts with an atomic
+character object.
 
 ```{r,results='hide'}
-set_contrasts(mtcars, cyl ~ "sum_code") # sum_code shouldnt be in quotes
+try(set_contrasts(mtcars, cyl ~ "sum_code")) # sum_code shouldnt be in quotes
+```
+
+The same issue can commonly occur if you don't order the right hand side
+correctly. The first term should always be a contrast-generating function or
+a variable name that's been assigned an object of the above classes.
+Failure to do this can lead to other kinds of errors depending on what the
+first element to the right hand side is.
+I've tried to document a few cases of illformedness, but I can't do every case.
+
+```{r, results='hide'}
+try(set_contrasts(mtcars, cyl ~ 4 + sum_code)) # bad!
+try(set_contrasts(mtcars, cyl ~ sum_code + 4)) # good!
+
+# These give different kinds of errors, all are ill-formed
+try(set_contrasts(mtcars, cyl ~ +4 + sum_code)) 
+try(set_contrasts(mtcars, cyl ~ c("a", "b") + sum_code)) 
+try(set_contrasts(mtcars, cyl ~ 1 + 2 + 3 + sum_code)) 
 ```
 
 

@@ -178,6 +178,11 @@ use_contrasts.function <- function(factor_col,
 
   if (!as_is) {
     # Get indices for the default reference level and user-specified level
+    if (is.function(reference_level))
+      stop(cli::format_error(c("Reference level is a function instead of an atomic type object.",
+                               " " ="Is the contrast object/function in the wrong place? See example:",
+                               "x" = "var ~ 1 + sum_code",
+                               "v" = "var ~ sum_code + 1")))
     new_reference_index <- which(matrix_labels[[1]] == reference_level)
 
     # Switch reference level if needed, along with various error handling
@@ -330,9 +335,20 @@ use_contrasts.default <- function(factor_col,
     return(get(contrast_function)(nlevels(factor_col)))
   }
 
+  if (!is.matrix(code_by) && is.atomic(code_by)) {
+    stop(
+    cli::format_error(c("Can't set contrasts with atomic type object, see example below:",
+                        "x" = "var ~ 1 + sum_code",
+                        "v" = "var ~ sum_code + 1"))
+    )
+  }
+
   warning(paste0("Can't set contrasts with object of class ",
                  class(code_by),
                  contrast_string))
+
+
+
 
   get(contrast_function)(nlevels(factor_col))
 }
@@ -477,3 +493,4 @@ use_contrasts.hypr <- function(factor_col,
   dimnames(new_contrasts) <- dimnames(contrast_matrix)
   new_contrasts
 }
+

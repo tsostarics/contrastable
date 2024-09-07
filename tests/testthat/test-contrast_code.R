@@ -26,7 +26,7 @@ test_that("three level factor coding works", {
       use_contrasts(
         tst_data$three,
         matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
-          nrow = 3
+               nrow = 3
         )
       )
     ),
@@ -35,13 +35,13 @@ test_that("three level factor coding works", {
   expect_equal(matrix(c(-1 / 3, -1 / 3, 2 / 3,
                         2 / 3, -1 / 3, -1 / 3),
                       nrow = 3),
-    use_contrasts(
-      tst_data$three,
-      matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
-        nrow = 3
-      )
-    ),
-    ignore_attr = TRUE
+               use_contrasts(
+                 tst_data$three,
+                 matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
+                        nrow = 3
+                 )
+               ),
+               ignore_attr = TRUE
   )
 })
 
@@ -108,12 +108,12 @@ test_that("four level functional coding work", {
     )
 
   expect_equal(contr.poly(4),
-    use_contrasts(tst_data$four, contr.poly),
-    ignore_attr = TRUE
+               use_contrasts(tst_data$four, contr.poly),
+               ignore_attr = TRUE
   )
   expect_equal(contr.poly(4),
-    use_contrasts(tst_data$four, contr.poly(4)),
-    ignore_attr = TRUE
+               use_contrasts(tst_data$four, contr.poly(4)),
+               ignore_attr = TRUE
   )
 })
 
@@ -132,10 +132,21 @@ test_that("default 2 level factor works", {
                          dimnames = list(NULL, ".L")))
 })
 
-test_that("Non matrix or function default handling works", {
-  expect_warning(use_contrasts(factor(c(1, 2, 3)), c(0, 1, 0, 0, 0, 1)),
-    regexp = "Using unordered default"
-  )
+test_that("Atomic type object throws error", {
+  expect_error(use_contrasts(factor(c(1, 2, 3)), c(0, 1, 0, 0, 0, 1)),
+               regexp = "atomic")
+
+  expect_error(enlist_contrasts(mtcars, gear ~ 1 + sum_code, verbose = FALSE),
+               regexp = "atomic")
+})
+
+test_that("Unknown nonatomic object throws warning", {
+  foo <- list(sum_code(3))
+  class(foo) <- "foo"
+
+  expect_warning(use_contrasts(factor(c(1, 2, 3)), foo),
+               regexp = "Can't set contrasts with object of class foo")
+
 })
 
 
@@ -187,16 +198,16 @@ test_that("Argument handling in parentheses & empty parentheses work", {
     )
 
   expect_equal(test_contrasts[["two"]],
-    contr.poly(2),
-    ignore_attr = TRUE
+               contr.poly(2),
+               ignore_attr = TRUE
   )
   expect_equal(test_contrasts[["three"]],
-    contr.poly(3),
-    ignore_attr = TRUE
+               contr.poly(3),
+               ignore_attr = TRUE
   )
   expect_equal(test_contrasts[["four"]],
-    contr.poly(4, scores = c(.1, .2, .5, .9)),
-    ignore_attr = TRUE
+               contr.poly(4, scores = c(.1, .2, .5, .9)),
+               ignore_attr = TRUE
   )
 
   expect_error(
@@ -217,8 +228,8 @@ test_that("Setting contrast with hypr object works", {
     enlist_contrasts(tst_data, three ~ hypr_object)
 
   expect_equal(test_contrasts,
-    enlist_contrasts(tst_data, three ~ scaled_sum_code),
-    ignore_attr = TRUE
+               enlist_contrasts(tst_data, three ~ scaled_sum_code),
+               ignore_attr = TRUE
   )
 })
 
@@ -231,19 +242,19 @@ test_that("Warning with missing level hypr object works", {
   hypr_object2 <- hypr::hypr(threeb ~ threea, threed ~ threea)
 
   expect_warning(enlist_contrasts(tst_data, three ~ hypr_object),
-    regexp = "not found in factor column `three`: d"
+                 regexp = "not found in factor column `three`: d"
   )
 
   expect_warning(enlist_contrasts(tst_data, three ~ hypr_object2),
-    regexp = "not found in factor column `three`: d"
+                 regexp = "not found in factor column `three`: d"
   )
 })
 
 test_that("No warning when factor passed to use_contrasts directly", {
   hypr_object <- hypr::hypr(b ~ a, d ~ a)
   expect_equal(use_contrasts(factor(c("a", "b", "c", "a")), hypr_object),
-    scaled_sum_code(3),
-    ignore_attr = TRUE
+               scaled_sum_code(3),
+               ignore_attr = TRUE
   )
 })
 
@@ -252,16 +263,16 @@ test_that("Warnings when trying to set values with hypr object", {
   expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
                                hypr_object,
                                reference_level = "b"),
-    regexp = "reference_level ignored"
+                 regexp = "reference_level ignored"
   )
   expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
                                hypr_object,
                                set_intercept = "b"),
-    regexp = "set_intercept ignored"
+                 regexp = "set_intercept ignored"
   )
   expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
                                hypr_object,
                                drop_trends = "b"),
-    regexp = "drop_trends ignored"
+                 regexp = "drop_trends ignored"
   )
 })
