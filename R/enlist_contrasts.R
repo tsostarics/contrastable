@@ -69,7 +69,11 @@
 #'   can be removed using `-`.
 #' @param verbose Logical, defaults to FALSE, whether messages should be printed
 #'
-#' @return List of named contrast matrices
+#' @return List of named contrast matrices. Internally, if called within
+#' set_contrasts, will return a named list with `contrasts` equal to the list
+#' of named contrast matrices and `data` equal to the passed `model_data` with
+#' any factor coercions applied (so that `set_contrasts` doesn't need to do
+#' it a second time).
 #' @seealso [set_contrasts()]
 #' @export
 #'
@@ -199,9 +203,10 @@ enlist_contrasts <- function(model_data,
     stop("No contrast formulas provided")
   }
 
-  # If this is called by means of set_contrasts, then omit_drop will be set
-  # to the formula list. This lets us know to ignore any - operators later.
-  should_omit <- !is.null(attr(formulas, "omit_drop"))
+  # If this is called by means of set_contrasts, then we need to ignore and warn
+  # about any usage of the `-` operator and also return the factor coerced data
+  is_embedded <- identical(rlang::sym("set_contrasts"),
+                           sys.call(sys.parent(1L))[[1L]])
 
   formulas <- .expand_formulas(formulas, model_data)
   lhs_variables <- names(formulas)
@@ -216,7 +221,7 @@ enlist_contrasts <- function(model_data,
   is_onelevel_factor <- vapply(
     lhs_variables,
     function(x) nlevels(model_data[[x]]) == 1L,
-    logical(1)
+    logical(1L)
   )
 
   .warn_if_onelevel(lhs_variables[is_onelevel_factor])
@@ -224,20 +229,29 @@ enlist_contrasts <- function(model_data,
   formulas <- formulas[!is_onelevel_factor]
   lhs_variables <- lhs_variables[!is_onelevel_factor]
 
-  if (length(formulas) == 0) {
+  if (length(formulas) == 0L) {
     stop("No factors with more than 1 level found")
   }
 
-  stats::setNames(
-    lapply(
-      seq_along(formulas),
-      function(i) {
-        # Reference value bindings
-        .process_contrasts(model_data, raw_formula = formulas[[i]], should_omit)
-      }
-    ),
-    lhs_variables
-  )
+  contrast_list <-
+    stats::setNames(
+      lapply(
+        seq_along(formulas),
+        function(i) {
+          # Reference value bindings
+          .process_contrasts(model_data, raw_formula = formulas[[i]], is_embedded)
+        }
+      ),
+      lhs_variables
+    )
+
+  # If called within set_contrasts, also return model_data with the coerced
+  # factor columns
+  if (is_embedded)
+    return(list(contrasts = contrast_list,
+                data = model_data))
+
+  contrast_list
 }
 
 

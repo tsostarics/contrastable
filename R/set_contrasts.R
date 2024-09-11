@@ -22,15 +22,13 @@ set_contrasts <- function(model_data,
                           print_contrasts = FALSE) {
   formulas <- rlang::dots_list(...)
 
-  attr(formulas, "omit_drop") <- TRUE
-
-  # formulas <- lapply(formulas, \(f) attr(f, "omit_drop") <- TRUE)
+  # Because enlist_contrasts is being called from within this function, it will
+  # return a list with both the contrasts and the factor-coerced data
   contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose)
-  factor_vars <- names(contrast_list)
+  model_data <- contrast_list$data
+  contrast_list <- contrast_list$contrasts
 
-  # Always FALSE to avoid printing message twice
-  model_data <- .convert_to_factors(model_data, factor_vars, verbose = FALSE)
-
+  # Apply the contrasts to each factor column
   for (i in seq_along(contrast_list)) {
     factor_name <- names(contrast_list[i])
     contrasts(model_data[[factor_name]]) <- contrast_list[[i]]

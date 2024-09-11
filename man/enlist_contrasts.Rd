@@ -18,7 +18,11 @@ can be removed using \code{-}.}
 \item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
 }
 \value{
-List of named contrast matrices
+List of named contrast matrices. Internally, if called within
+set_contrasts, will return a named list with \code{contrasts} equal to the list
+of named contrast matrices and \code{data} equal to the passed \code{model_data} with
+any factor coercions applied (so that \code{set_contrasts} doesn't need to do
+it a second time).
 }
 \description{
 Returns a named list of contrast matrices to use with modeling
