@@ -326,12 +326,6 @@ enlist_contrasts <- function(model_data,
 #' additional list entry for other arguments, which will be empty if no
 #' arguments are provided.
 .split_if_language <- function(params, var_envir) {
-  # In the event someone tries to do v ~ as_is(as_is(as_is(foo)))
-  while (length(params[["code_by"]]) > 1L &&
-         identical(params[["code_by"]][[1]], quote(as_is))) {
-    params[["as_is"]] <- TRUE
-    params[["code_by"]][1] <- NULL
-  }
 
   params[["other_args"]] <- list()
   language_detected <-

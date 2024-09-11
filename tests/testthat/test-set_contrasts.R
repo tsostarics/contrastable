@@ -56,3 +56,11 @@ test_that("Contrasts print when asked for", {
       )
     )
 })
+
+
+test_that("Namespaced call works", {
+  result <- contrastable::set_contrasts(mtcars,
+                                        carb ~ contr.sum,
+                                        verbose = FALSE)
+  expect_true(!is.null(result))
+})

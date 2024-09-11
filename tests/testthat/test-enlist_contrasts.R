@@ -163,7 +163,7 @@ test_that("as_is functionality works as expected", {
   expect_equal(df1, df2, ignore_attr = TRUE)
 })
 
-test_that("nested as_is works", {
+test_that("nested I is handled appropriately", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
   df1 <- suppressWarnings(
@@ -236,3 +236,27 @@ test_that("Error message when forgetting model_data works", {
   )
 })
 
+
+test_that("Error on illformed formula", {
+  expect_error(enlist_contrasts(mtcars, cyl ~ 4 + contr.sum, verbose = FALSE),
+               regexp = "with atomic type")
+})
+
+
+test_that("Error on illformed formula", {
+  expect_error(enlist_contrasts(mtcars, cyl ~ c("3", "4") + contr.sum, verbose = FALSE),
+               regexp = "Reference level is a function")
+})
+
+
+test_that("Error on mismatching dimensions", {
+  cmat <- contr.sum(6)
+
+  expect_error(enlist_contrasts(mtcars, cyl ~ cmat, verbose = FALSE),
+               regexp = "is size 6x5 but .+? is size 3x2")
+})
+
+test_that("Error on missing intercept level", {
+  expect_error(enlist_contrasts(mtcars, cyl ~ contr.sum * 7, verbose = FALSE),
+               regexp = "to use as intercept not found")
+})
