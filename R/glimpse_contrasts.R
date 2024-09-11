@@ -98,7 +98,7 @@ glimpse_contrasts <- function(model_data,
   # can give a more parsimonious warning if there are mismatches
   unexpanded_formulas <- formulas
   formulas <- .expand_formulas(unexpanded_formulas, model_data)
-  params <- lapply(formulas, .make_parameters)
+  params <- lapply(formulas, \(x) .make_parameters(x, verbose =  FALSE))
 
 
   # Need to check whether the contrasts on the data frame are the same as

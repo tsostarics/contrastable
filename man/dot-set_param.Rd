@@ -4,17 +4,22 @@
 \alias{.set_param}
 \title{Process and set parameter}
 \usage{
-.set_param(cur_expr, params, env, which_param)
+.set_param(cur_expr, params, env, which_param, verbose)
 }
 \arguments{
 \item{cur_expr}{Current expression, a formula or list representation thereof}
 
-\item{params}{Named list of parameters}
+\item{params}{Parameter accumulator}
 
-\item{env}{Environment to evaluate expressions in \code{cur_expr} in}
+\item{env}{Environment for the formula, on the first recursion this will be
+pulled from \code{formula} and then passed to subsequent recursions. Needed to
+check whether a function is actually a function.}
 
 \item{which_param}{Which parameter to set, a string, see \code{make_parameters}
 for usage}
+
+\item{verbose}{Logical, default \code{TRUE}, whether to show drop_trends warning
+if used incorrectly}
 }
 \value{
 \code{params}

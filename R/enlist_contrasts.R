@@ -199,6 +199,10 @@ enlist_contrasts <- function(model_data,
     stop("No contrast formulas provided")
   }
 
+  # If this is called by means of set_contrasts, then omit_drop will be set
+  # to the formula list. This lets us know to ignore any - operators later.
+  should_omit <- !is.null(attr(formulas, "omit_drop"))
+
   formulas <- .expand_formulas(formulas, model_data)
   lhs_variables <- names(formulas)
 
@@ -229,7 +233,7 @@ enlist_contrasts <- function(model_data,
       seq_along(formulas),
       function(i) {
         # Reference value bindings
-        .process_contrasts(model_data, raw_formula = formulas[[i]])
+        .process_contrasts(model_data, raw_formula = formulas[[i]], should_omit)
       }
     ),
     lhs_variables
@@ -244,12 +248,30 @@ enlist_contrasts <- function(model_data,
 #'
 #' @param model_data Data frame with factor column
 #' @param raw_formula Raw formula
+#' @param omit_drop Logical, set to TRUE when set_contrasts is used by
+#' appending an attribute to the formula list, otherwise is FALSE (as in
+#' enlist_contrasts)
 #'
 #' @return A contrast matrix
-.process_contrasts <- function(model_data, raw_formula) {
+.process_contrasts <- function(model_data, raw_formula, omit_drop) {
   var_envir <- rlang::get_env(raw_formula)
 
   params <- .split_if_language(.make_parameters(raw_formula), var_envir)
+
+  # If the user used set_contrasts, then we need to remove drop_trends from
+  # the parameters and warn the user that the - operator can't be used
+  # (the missing comparisons are filled in with something else)
+  if (omit_drop) {
+    if (!identical(params[['drop_trends']], NA))
+      warning(
+        paste0("Cannot use `-` with set_contrasts, ignoring in ",
+               deparse1(raw_formula),
+               ".\n  Use enlist_contrasts instead."),
+        call. = FALSE
+      )
+    params[['drop_trends']] <- NA
+  }
+
 
   code_by_value <- eval(params[["code_by"]], var_envir)
   code_by_sym <- as.character(params[["code_by"]])[1L]

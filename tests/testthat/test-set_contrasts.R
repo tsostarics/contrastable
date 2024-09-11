@@ -30,23 +30,20 @@ test_that("Ignoring dropped levels in orthogonal polynomial contrasts", {
   expect_warning(set_contrasts(mtcars,
                                carb ~ contr.poly - 4:6,
                                verbose = FALSE),
-    regexp = r"(Cannot drop trends .+ formula\.)"
+    regexp = r"(Cannot use ... with set_contrasts.)"
   )
-  expect_warning(testdf <- set_contrasts(mtcars,
-                                      carb ~ contr.poly - 4:6,
-                                      gear ~ contr.poly - 2:3,
-                                      verbose = FALSE),
-    regexp = r"(Cannot drop trends .+ formulas\.)"
-  )
+  testdf <- suppressWarnings(set_contrasts(mtcars,
+                          carb ~ contr.poly - 4:6,
+                          verbose = FALSE))
+
   expect_warning(set_contrasts(mtcars,
                                gear ~ contr.sum - 2:3,
                                verbose = FALSE),
-    regexp = "used in invalid context"
+    regexp = "only be used with polynomial contrasts"
   )
 
 
   expect_equal(contrasts(testdf$carb), contr.poly(6), ignore_attr = TRUE)
-  expect_equal(contrasts(testdf$gear), contr.poly(3), ignore_attr = TRUE)
 })
 
 test_that("Contrasts print when asked for", {

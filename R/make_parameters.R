@@ -11,8 +11,8 @@
 #' @param env Environment for the formula, on the first recursion this will be
 #' pulled from `formula` and then passed to subsequent recursions. Needed to
 #' check whether a function is actually a function.
-#' @param EMBEDDED Whether the current operation is embedded in another, helps
-#' to handle operator precedence with *
+#' @param verbose Logical, default `TRUE`, whether to show drop_trends warning
+#' if used incorrectly
 #'
 #' @return Named list of parameters that can be evaluated in `enlist_contrasts`
 .make_parameters <- function(formula,
@@ -26,24 +26,26 @@
                                "as_is" = FALSE
                              ),
                              env = NULL,
-                             EMBEDDED = FALSE) {
+                             verbose = TRUE) {
   cur_expr <- as.list(formula)
   node <- cur_expr[[1]]
   if (is.null(env)) {
     env <- tryCatch(rlang::get_env(formula), error = \(e) NULL)
   }
 
+  set <- \(x) .set_param(cur_expr, params, env, x, verbose)
+
   # Is the current node an operator for the package syntax? if so, process
   # the arguments for that operator appropriately and continue recursing.
   # if not, then we're at the top level and need to process the whole formula
     switch(
       .get_reserved_operator(node),
-      "~" = {params <- .process_factor_col(cur_expr, params, env)},
-      "+" = {params <- .set_param(cur_expr, params, env, "reference_level")},
-      "-" = {params <- .set_param(cur_expr, params, env, "drop_trends")},
-      "*" = {params <- .set_param(cur_expr, params, env, "intercept_level")},
-      "|" = {params <- .set_param(cur_expr, params, env, "labels")},
-      {params <- .process_code_by(formula, params, env)}
+      "~" = {params <- .process_factor_col(cur_expr, params, env, verbose)},
+      "+" = {params <- set("reference_level")},
+      "-" = {params <- set("drop_trends")},
+      "*" = {params <- set("intercept_level")},
+      "|" = {params <- set("labels")},
+      {params <- .process_code_by(formula, params, env, verbose)}
     )
 
   params
@@ -81,9 +83,9 @@
 ## Process each of the various operators and assign the relevant parameters
 ## while recursing into the rest of the expression
 
-.process_factor_col <- function(cur_expr, params, env) {
+.process_factor_col <- function(cur_expr, params, env, verbose) {
   params[["factor_col"]] <- cur_expr[[2L]]
-  params <- .make_parameters(cur_expr[[3L]], params, env)
+  params <- .make_parameters(cur_expr[[3L]], params, env, verbose)
   params
 }
 
@@ -94,13 +96,12 @@
 #' to `params`. Continues recursively setting parameters via `make_parameters`.
 #'
 #' @param cur_expr Current expression, a formula or list representation thereof
-#' @param params Named list of parameters
-#' @param env Environment to evaluate expressions in `cur_expr` in
 #' @param which_param Which parameter to set, a string, see `make_parameters`
 #' for usage
+#' @inheritParams .make_parameters
 #'
 #' @return `params`
-.set_param <- function(cur_expr, params, env, which_param) {
+.set_param <- function(cur_expr, params, env, which_param, verbose) {
   LHS <- cur_expr[[2L]]
   RHS <- tryCatch(cur_expr[[3L]],
                   error = \(e) {
@@ -129,13 +130,13 @@
   }
 
   params[[which_param]] <- RHS
-  params <- .make_parameters(LHS, params, env)
+  params <- .make_parameters(LHS, params, env, verbose)
   params
 
   params
 }
 
-.process_code_by <- function(formula, params, env) {
+.process_code_by <- function(formula, params, env, verbose) {
 
   # Check if the formula contains AsIs specification
   if (length(formula) > 1L && (identical(formula[[1]], sym("I")))) {
@@ -160,6 +161,13 @@
   }
 
   params[["code_by"]] <- formula
+
+  if (!identical(params[['drop_trends']], NA) && !.is_polynomial_scheme(as.character(params[['code_by']]))) {
+    params[['drop_trends']] <- NA
+    if (verbose)
+      warning("Ignoring the `-` operator: should only be used with polynomial contrasts",
+              call. = FALSE)
+  }
 
   params
 }

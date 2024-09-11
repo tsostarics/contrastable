@@ -1249,9 +1249,9 @@ matrix will just add in these values anyways. If you try to use the
 <code>-</code> operator with <code>set_contrasts</code> you’ll get a
 warning, and the <code>-</code> operator will be ignored:</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>mdl_data15 <span class="ot">&lt;-</span> <span class="fu">set_contrasts</span>(mdl_data, carb <span class="sc">~</span> polynomial_code <span class="sc">-</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">5</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt; Warning in .reinstate_dropped_trends(formulas): Ignoring dropped trends, `-` used in invalid context (use only with polynomial contrast functions):</span></span>
-<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a><span class="co">#&gt; carb ~ polynomial_code - 3:5</span></span>
-<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span></code></pre></div>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a><span class="co">#&gt; Warning: Cannot use `-` with set_contrasts, ignoring in carb ~ polynomial_code - 3:5.</span></span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a><span class="co">#&gt;   Use enlist_contrasts instead.</span></span></code></pre></div>
 </div>
 </div>
 <div id="decompose_contrasts" class="section level2">

@@ -12,21 +12,21 @@ test_that("Different combinations of formula operations work", {
       f6  = 1 ~ sum_code * 4 + 3,
       f7  = 1 ~ sum_code + 3 - 5:6,
       f8  = 1 ~ sum_code - 5:6 + 3,
-      f9  = 1 ~ sum_code * 4 - 5:6,
-      f10 = 1 ~ sum_code - 5:6 * 4,
+      f9  = 1 ~ contr.poly * 4 - 5:6,
+      f10 = 1 ~ contr.poly - 5:6 * 4,
       # Tests for combinations of all parameters
-      f11 = 1 ~ sum_code + 3 * 4 - 5:6,
-      f12 = 1 ~ sum_code + 3 - 5:6 * 4,
-      f12 = 1 ~ sum_code * 4 + 3 - 5:6,
-      f13 = 1 ~ sum_code * 4 - 5:6 + 3,
-      f14 = 1 ~ sum_code - 5:6 + 3 * 4,
-      f15 = 1 ~ sum_code - 5:6 * 4 + 3,
+      f11 = 1 ~ contr.poly + 3 * 4 - 5:6,
+      f12 = 1 ~ contr.poly + 3 - 5:6 * 4,
+      f12 = 1 ~ contr.poly * 4 + 3 - 5:6,
+      f13 = 1 ~ contr.poly * 4 - 5:6 + 3,
+      f14 = 1 ~ contr.poly - 5:6 + 3 * 4,
+      f15 = 1 ~ contr.poly - 5:6 * 4 + 3,
       # Ensure as_is_works correctly
       f16 = 1 ~ I(sum_code) - 5:6 * 4 + 3,
       f17 = 1 ~ I(sum_code)
     )
 
-  params <- lapply(formulae, .make_parameters)
+  params <- suppressWarnings(lapply(formulae, .make_parameters))
   expect_true(params$f1$factor_col == 1 &
                 identical(params$f2$code_by, sym("sum_code")))
   expect_true(params$f2$factor_col == 1 &
@@ -37,7 +37,7 @@ test_that("Different combinations of formula operations work", {
                 params$f3$intercept_level == 4)
   expect_true(params$f4$factor_col == 1 &
                 identical(params$f4$code_by, sym("sum_code")) &
-                identical(params$f4$drop_trends, expr(5:6)))
+                identical(params$f4$drop_trends, NA))
   expect_true(params$f5$factor_col == 1 &
                 identical(params$f5$code_by, sym("sum_code")) &
                 params$f5$reference_level == 3 &
@@ -46,15 +46,15 @@ test_that("Different combinations of formula operations work", {
   expect_true(params$f7$factor_col == 1 &
                 identical(params$f7$code_by, sym("sum_code")) &
                 params$f7$reference_level == 3 &
-                identical(params$f7$drop_trends, expr(5:6)))
+                identical(params$f7$drop_trends, NA))
   expect_equal(params$f7, params$f8)
   expect_true(params$f9$factor_col == 1 &
-                identical(params$f9$code_by, sym("sum_code")) &
+                identical(params$f9$code_by, sym("contr.poly")) &
                 params$f9$intercept_level == 4 &
                 identical(params$f9$drop_trends, expr(5:6)))
   expect_equal(params$f9, params$f10)
   expect_true(params$f11$factor_col == 1 &
-                identical(params$f11$code_by, sym("sum_code")) &
+                identical(params$f11$code_by, sym("contr.poly")) &
                 params$f11$reference_level == 3 &
                 params$f11$intercept_level == 4 &
                 identical(params$f11$drop_trends, expr(5:6)))

@@ -9,7 +9,7 @@
   params = list(factor_col = NA, code_by = NA, reference_level = NA, intercept_level =
     NA, drop_trends = NA, labels = NULL, as_is = FALSE),
   env = NULL,
-  EMBEDDED = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -21,8 +21,8 @@
 pulled from \code{formula} and then passed to subsequent recursions. Needed to
 check whether a function is actually a function.}
 
-\item{EMBEDDED}{Whether the current operation is embedded in another, helps
-to handle operator precedence with *}
+\item{verbose}{Logical, default \code{TRUE}, whether to show drop_trends warning
+if used incorrectly}
 }
 \value{
 Named list of parameters that can be evaluated in \code{enlist_contrasts}

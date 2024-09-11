@@ -4,12 +4,16 @@
 \alias{.process_contrasts}
 \title{Pass arguments to contrast code}
 \usage{
-.process_contrasts(model_data, raw_formula)
+.process_contrasts(model_data, raw_formula, omit_drop)
 }
 \arguments{
 \item{model_data}{Data frame with factor column}
 
 \item{raw_formula}{Raw formula}
+
+\item{omit_drop}{Logical, set to TRUE when set_contrasts is used by
+appending an attribute to the formula list, otherwise is FALSE (as in
+enlist_contrasts)}
 }
 \value{
 A contrast matrix
