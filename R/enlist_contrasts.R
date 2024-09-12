@@ -205,13 +205,7 @@ enlist_contrasts <- function(model_data,
 
   # If this is called by means of set_contrasts, then we need to ignore and warn
   # about any usage of the `-` operator and also return the factor coerced data
-  embedded_call <- sys.call(sys.parent(1L))[[1L]]
-
-  # Clear any namespacing
-  if (length(embedded_call) > 1L)
-    embedded_call <- embedded_call[[3L]]
-
-  is_embedded <- identical(rlang::sym("set_contrasts"), embedded_call)
+  is_embedded <- !is.null(attr(formulas, "omit_drop"))
 
   formulas <- .expand_formulas(formulas, model_data)
   lhs_variables <- names(formulas)
