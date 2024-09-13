@@ -80,3 +80,13 @@ test_that("Multiple operator usage disallowed", {
   expect_error(enlist_contrasts(mtcars, cyl ~ sum_code + 4 + 4, verbose = FALSE),
                regex = "You may only use")
 })
+
+test_that("Error on illformed expression", {
+  expect_error(.make_parameters(cyl ~ +1 + stats::contr.sum),
+               regexp = "\\+1 \\+ sum_code")
+})
+
+test_that("Backtransforming contrasts works", {
+  expect_equal(contr.sum(2), .convert_matrix(.convert_matrix(contr.sum(2))),
+               ignore_attr = TRUE)
+})

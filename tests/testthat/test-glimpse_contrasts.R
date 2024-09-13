@@ -75,6 +75,28 @@ test_that("Append namespace to scheme names", {
   )
 })
 
+test_that("Nonexistant namespace returns original name", {
+  foo <- helmert_code
+
+  expect_equal("foo", .add_namespace("foo"))
+})
+
+
+test_that("Glimpse shows namespace when requested", {
+  gtbl <- suppressWarnings(glimpse_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE,
+                    add_namespace = TRUE))
+
+  expect_equal("contrastable::sum_code", gtbl$scheme)
+})
+
+test_that("Returning list works fine", {
+  gtbl <- suppressWarnings(glimpse_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE,
+                                             return_list = TRUE))
+
+  expect_equal(c("glimpse", "contrasts"), names(gtbl))
+})
+
+
 test_that("Warning with non default contrasts works", {
   tstdf <- dplyr::mutate(mtcars,
                          gear = factor(gear),

@@ -58,3 +58,8 @@ test_that("Two level factors return NA", {
 
   expect_equal(orth_vector, c(NA, NA, NA), ignore_attr = TRUE)
 })
+
+test_that("Singular matrices are fine", {
+  expect_true(is_orthogonal(helmert_code(4)))
+  expect_false(is_orthogonal(treatment_code(4)))
+})

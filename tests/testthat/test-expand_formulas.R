@@ -42,3 +42,14 @@ test_that("tidyselect errors work", {
                                 where(is.numeric) ~ sum_code),
                "Left hand side of multiple formulas")
 })
+
+test_that("is.unordered works", {
+  tstdf <- data.frame(a = gl(3,1),
+                      b = gl(3,1),
+                      c = gl(3,1, ordered = TRUE))
+
+  expect_equal(names(enlist_contrasts(tstdf,
+                                      where(is.unordered) ~ sum_code,
+                                      verbose = FALSE)),
+               c('a', 'b'))
+})

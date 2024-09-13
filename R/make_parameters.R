@@ -109,7 +109,7 @@
                     stop(
                       cli::format_error(c(err,
                                           " " = "Is the contrast object/function in the wrong place? See example:",
-                                          "x" = "var ~ 1 + sum_code",
+                                          "x" = "var ~ +1 + sum_code",
                                           "v" = "var ~ sum_code + 1"))
                     )
                   })

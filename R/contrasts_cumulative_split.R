@@ -56,8 +56,5 @@ cumulative_split_code <- function(n) {
   contrast_matrix <-
     .hypotheses_to_contrasts(cbind(rep(1 / n, n), hypothesis_matrix))
 
-  if (!is.matrix(contrast_matrix))
-    contrast_matrix <- matrix(contrast_matrix, nrow = n)
-
   contrast_matrix
 }
