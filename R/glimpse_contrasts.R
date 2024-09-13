@@ -125,19 +125,18 @@ glimpse_contrasts <- function(model_data,
   factor_sizes <- vapply(contrast_list, nrow, 1L, USE.NAMES = FALSE)
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
-  reference_levels <- .get_reference_levels(contrast_list)
+  reference_levels <- .get_from_params("reference_level", params, formulas)
   intercept_interpretations <- vapply(contrast_list,
                                       interpret_intercept,
                                       character(1),
-                                      USE.NAMES = FALSE
-  )
+                                      USE.NAMES = FALSE)
 
   orthogonal_contrasts <- is_orthogonal(contrast_list)
   centered_contrasts <- is_centered(contrast_list)
 
 
   # Double check that dropped trends are only included for polynomial contrasts
-  dropped_trends <- .get_dropped_trends(params, formulas)
+  dropped_trends <- .get_from_params("drop_trends", params, formulas)
   which_are_polynomials <- vapply(scheme_labels, .is_polynomial_scheme, TRUE)
   dropped_trends[!which_are_polynomials] <- NA
 
@@ -562,24 +561,31 @@ glimpse_contrasts <- function(model_data,
 .get_reference_levels <- function(contrast_list,
                                   params = NULL,
                                   formulas = NULL) {
-  if (!is.null(params) && !is.null(formulas)) {
-    reference_levels <- .get_from_params("reference_level", params, formulas)
-  } else {
-    reference_levels <- rep(NA_character_, length(contrast_list))
-    # If a reference level wasn't specified, try to figure it out from the
-    # matrix
-    for (i in seq_along(reference_levels)) {
-      # Dont bother with contr.poly - x:y
-      is_contrast_matrix <- diff(dim(contrast_list[[i]])) == -1
-      if (is_contrast_matrix) {
-        reference_index <- .get_reference_level(contrast_list[[i]])
-        if (!is.na(reference_index)) {
-          reference_levels[[i]] <- rownames(contrast_list[[i]])[reference_index]
-        }
-      }
-    }
-  }
-  reference_levels
+  params_available <- !is.null(params) & !is.null(formulas)
+  vapply(names(contrast_list),
+         \(x) {
+           reference_level <- NA
+
+           # Grab the reference level if it's set in the params
+           if (params_available & x %in% names(params)) {
+             reference_level <- .get_from_params("reference_level",
+                                                           params,
+                                                           formulas)
+           }
+
+           # If the reference level is still missing, try to determine it from
+           # the contrast matrix directly
+           if (is.na(reference_level)){
+             contr_mat <- contrast_list[[x]]
+             if (.is_valid_contrmat(contr_mat)) {
+               reference_index <- .get_reference_level(contr_mat)
+               reference_level <- rownames(contr_mat)[reference_index]
+             }
+           }
+
+           as.character(reference_level)
+         }, FUN.VALUE = character(1))
+
 }
 
 .get_from_params <- function(what, params, formulas) {
@@ -588,13 +594,14 @@ glimpse_contrasts <- function(model_data,
   vapply(
     seq_along(params),
     function(i) {
-      ref_level <- params[[i]][[what]]
-      if (!is.symbol(ref_level) && is.na(ref_level)) {
-        return(NA_character_)
-      }
+      param_symbol <- params[[i]][[what]]
 
       # Will evaluate variables and syntactic literals accordingly
-      as.character(eval(ref_level, rlang::get_env(formulas[[i]])))
+      value <- eval(param_symbol, rlang::get_env(formulas[[i]]))
+      if (identical(value, NA))
+        return (NA_character_)
+
+      paste0(value, collapse=",")
     },
     character(1)
   )

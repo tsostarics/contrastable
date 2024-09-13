@@ -5,7 +5,7 @@
 #'
 #' @param contr_mat Contrast matrix
 #' @return invisibly returns TRUE
-.check_if_valid_contrmat <- function(contr_mat) {
+.is_valid_contrmat <- function(contr_mat) {
   tryCatch(.contrasts_to_hypotheses(contr_mat, nrow(contr_mat)),
     error = function(c) {
       err <- conditionMessage(c)

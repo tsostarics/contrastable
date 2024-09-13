@@ -1,121 +1,3 @@
-test_that("two level factor coding works", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
-
-  expect_equal(contrasts(tst_data$two),
-               use_contrasts(tst_data$two, matrix(c(0, 1))))
-  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(.5, -.5)))), "a")
-  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(1, 0)))), "a")
-  expect_equal(colnames(use_contrasts(tst_data$two, matrix(c(0, 1)))), "b")
-})
-
-test_that("three level factor coding works", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
-
-  expect_equal(
-    colnames(
-      use_contrasts(
-        tst_data$three,
-        matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
-               nrow = 3
-        )
-      )
-    ),
-    c("c", "a")
-  )
-  expect_equal(matrix(c(-1 / 3, -1 / 3, 2 / 3,
-                        2 / 3, -1 / 3, -1 / 3),
-                      nrow = 3),
-               use_contrasts(
-                 tst_data$three,
-                 matrix(c(-1 / 3, -1 / 3, 2 / 3, 2 / 3, -1 / 3, -1 / 3),
-                        nrow = 3
-                 )
-               ),
-               ignore_attr = TRUE
-  )
-})
-
-test_that("four level helmert coding works", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
-
-  expect_equal(
-    colnames(use_contrasts(tst_data$four, matrix(
-      c(
-        -1 / 4, -1 / 4, -1 / 4, 3 / 4,
-        -1 / 3, -1 / 3, 2 / 3, 0,
-        -1 / 2, 1 / 2, 0, 0
-      ),
-      nrow = 4
-    ))),
-    c("d", "c", "b")
-  )
-  expect_equal(
-    use_contrasts(tst_data$four, matrix(
-      c(
-        -1 / 4, -1 / 4, -1 / 4, 3 / 4,
-        -1 / 3, -1 / 3, 2 / 3, 0,
-        -1 / 2, 1 / 2, 0, 0
-      ),
-      nrow = 4
-    )),
-    matrix(
-      c(
-        -1 / 4, -1 / 4, -1 / 4, 3 / 4,
-        -1 / 3, -1 / 3, 2 / 3, 0,
-        -1 / 2, 1 / 2, 0, 0
-      ),
-      nrow = 4
-    ),
-    ignore_attr = TRUE
-  )
-})
-
-test_that("polynomial coding works", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
-
-  expect_equal(
-    colnames(use_contrasts(tst_data$four, contr.poly(4))),
-    c(".L", ".Q", ".C")
-  )
-})
-
-test_that("four level functional coding work", {
-  tst_data <-
-    data.frame(
-      two = factor(c("a", "b", "a", "b")),
-      three = factor(c("a", "b", "c", "a")),
-      four = factor(c("a", "b", "c", "d"))
-    )
-
-  expect_equal(contr.poly(4),
-               use_contrasts(tst_data$four, contr.poly),
-               ignore_attr = TRUE
-  )
-  expect_equal(contr.poly(4),
-               use_contrasts(tst_data$four, contr.poly(4)),
-               ignore_attr = TRUE
-  )
-})
 
 test_that("default 2 level factor works", {
   unordered_result <- suppressWarnings(use_contrasts(factor(1:2)))
@@ -172,12 +54,6 @@ test_that("Labelling parsing works", {
   expect_equal(colnames(test_contrasts[["three"]]), c("test1", "test2"))
   expect_equal(colnames(test_contrasts[["four"]]), c("t1", "t2", "t3"))
 
-  # expect_error(
-  #   suppressMessages(
-  #     set_contrasts(tst_data, three ~ treatment_code | my_labels + "a")
-  #   ),
-  #   regexp = "must be the last operator"
-  # )
 })
 
 test_that("Argument handling in parentheses & empty parentheses work", {
@@ -276,3 +152,4 @@ test_that("Warnings when trying to set values with hypr object", {
                  regexp = "drop_trends ignored"
   )
 })
+

@@ -48,18 +48,21 @@ test_that("Glimpse with variables works", {
   a <- 3
   b <- 4
   c <- 5
+  tstdf$vs <- factor(tstdf$vs)
   mat <- scaled_sum_code(3)
   tst <- suppressWarnings(glimpse_contrasts(tstdf,
                                             carb ~ contr.poly - a:c,
                                             gear ~ mat + c * b,
                                             cyl ~ scaled_sum_code + b * b,
                                             minimal = FALSE,
+                                            show_all_factors = TRUE,
                                             verbose = FALSE))
 
-  expect_equal(tst$scheme, c("contr.poly", "custom", "scaled_sum_code"))
-  expect_equal(tst$intercept, c("grand mean", "grand mean", "mean(4)"),
+  expect_equal(tst$scheme, c("contr.poly", "custom", "scaled_sum_code", "contr.treatment"))
+  expect_equal(tst$intercept, c("grand mean", "mean(4)", "mean(4)", "mean(0)"),
                ignore_attr = TRUE)
-  expect_equal(tst$dropped_trends, c("3,4,5", NA, NA))
+  expect_equal(tst$dropped_trends, c("3,4,5", NA, NA, NA))
+  expect_equal(tst$explicitly_set, c(TRUE, TRUE, TRUE, FALSE))
 })
 
 test_that("Append namespace to scheme names", {

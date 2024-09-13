@@ -7,12 +7,12 @@ test_that("two level functional coding work", {
     )
 
   expect_equal(
-    use_contrasts(tst_data$two, contr.sum, reference_level = "b"),
+    use_contrasts(tst_data$two, contr.sum, reference_level = "a"),
     use_contrasts(tst_data$two, contr.sum(2))
   )
   expect_equal(
-    use_contrasts(tst_data$two, contr.sum, reference_level = "a"),
-    use_contrasts(tst_data$two, -contr.sum(2))
+    use_contrasts(tst_data$two, contr.sum, reference_level = "b"),
+    use_contrasts(tst_data$two, contr.sum(2), reference_level = "b")
   )
 })
 

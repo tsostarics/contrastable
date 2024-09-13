@@ -180,55 +180,16 @@ use_contrasts.function <- function(factor_col,
       }
     )
 
-  if (!as_is) {
-    # Get indices for the default reference level and user-specified level
-    if (is.function(reference_level))
-      stop(
-        cli::format_error(
-          c(
-            "Reference level is a function instead of an atomic type object.",
-            " " = "Is the contrast object/function in the wrong place? See example:",
-            "x" = "var ~ 1 + sum_code",
-            "v" = "var ~ sum_code + 1"
-          )
-        )
-      )
 
-
-    new_reference_index <- which(matrix_labels[[1]] == reference_level)
-
-    # Switch reference level if needed, along with various error handling
-    new_contrasts <- .switch_reference_if_needed(
-      new_contrasts,
-      reference_level,
-      new_reference_index
-    )
-
-
-    # Set the contrast labels, reorder as needed
-    dimnames(new_contrasts) <- matrix_labels
-    new_contrasts <- .reset_comparison_labels(new_contrasts, dots[["symchar"]])
-  }
-  # If an intercept was specified, set it here
-  if (!is.na(set_intercept)) {
-    new_contrasts <- .set_intercept(new_contrasts, set_intercept)
-  }
-
-  # If one of the polynomial coding functions was used & the user wants to
-  # drop one or more of the trends, do so here
-  if (.is_polynomial_scheme(code_by) && !any(is.na(drop_trends))) {
-    new_contrasts <- new_contrasts[, -drop_trends]
-  }
-
-  if (!is.null(labels)) {
-    stopifnot("Provided labels must be same length as number of columns in contrast matrix." = ncol(new_contrasts) == length(labels)) # nolint
-    colnames(new_contrasts) <- labels
-  }
-
-  if (as_is && is.null(colnames(new_contrasts))) {
-    warning("No comparison labels set and as_is=TRUE, contrast labels will be column indices.") # nolint
-  }
-  new_contrasts
+  .postprocess_matrix(new_contrasts,
+                      code_by,
+                      reference_level,
+                      set_intercept,
+                      drop_trends,
+                      matrix_labels,
+                      labels,
+                      as_is,
+                      dots)
 }
 
 #' Matrix method for use_contrasts
@@ -266,6 +227,9 @@ use_contrasts.matrix <- function(factor_col,
     stop("This factor has more than 2 levels, please provide a matrix.")
   }
 
+  dots <- rlang::dots_list(...)
+
+
   preset_comparisons <- colnames(code_by)
   matrix_labels <- dimnames(stats::contrasts(factor_col))
 
@@ -287,22 +251,23 @@ use_contrasts.matrix <- function(factor_col,
   }
 
   new_contrasts <- code_by
-  dimnames(new_contrasts) <- matrix_labels
 
   # If we want to use the matrix as-is, return now
-  if (!is.null(preset_comparisons) || as_is) {
+  if (!is.null(preset_comparisons) &&
+      !identical(preset_comparisons, matrix_labels[[2L]])) {
     return(new_contrasts)
   }
 
 
-  # If we provide new labels, as with the | operator, use those
-  if (!is.null(labels)) {
-    colnames(new_contrasts) <- labels
-    return(new_contrasts)
-  }
-
-  # If we didn't provide any labels, use the default ones
-  .reset_comparison_labels(new_contrasts)
+  .postprocess_matrix(new_contrasts,
+                      code_by,
+                      reference_level,
+                      set_intercept,
+                      drop_trends,
+                      matrix_labels,
+                      labels,
+                      as_is,
+                      dots)
 }
 
 #' Default method for use_contrasts

@@ -1,6 +1,6 @@
 .reset_comparison_labels <- function(contr_mat, coding_fx = NULL) {
   # Early exit if this isn't a valid contrast matrix
-  .check_if_valid_contrmat(contr_mat)
+  .is_valid_contrmat(contr_mat)
   n <- nrow(contr_mat)
   levelnames <- rownames(contr_mat)
 
