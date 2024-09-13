@@ -172,6 +172,8 @@ glimpse_contrasts <- function(model_data,
     glimpse[["scheme"]] <- .add_namespace(glimpse[["scheme"]])
   }
 
+  rownames(glimpse) <- NULL
+
   # TODO: Rewrite so that the additional columns are only computed if FALSE
   if (minimal) {
     glimpse <- glimpse[, c(

@@ -111,18 +111,17 @@ contrast_schemes <- list(
 glimpse_contrasts(my_data,
                   contrast_schemes,
                   add_namespace = TRUE,
-                  show_all_factors = TRUE
-) |>
+                  show_all_factors = TRUE) |>
   knitr::kable()
 #> Expect contr.treatment or contr.poly for unset factors: gear
 ```
 
-|      | factor |   n | level_names | scheme                        | reference | intercept  |
-|:-----|:-------|----:|:------------|:------------------------------|:----------|:-----------|
-| 1    | cyl    |   3 | 4, 6, 8     | contrastable::scaled_sum_code | 6         | grand mean |
-| 2    | carb   |   6 | 1, 2, 3,….  | contrastable::helmert_code    | NA        | grand mean |
-| 3    | vs     |   2 | 0, 1        | contrastable::treatment_code  | 1         | mean(1)    |
-| gear | gear   |   3 | 3, 4, 5     | stats::contr.poly             | NA        | grand mean |
+| factor |   n | level_names | scheme                        | reference | intercept  |
+|:-------|----:|:------------|:------------------------------|:----------|:-----------|
+| cyl    |   3 | 4, 6, 8     | contrastable::scaled_sum_code | 6         | grand mean |
+| carb   |   6 | 1, 2, 3,….  | contrastable::helmert_code    | NA        | grand mean |
+| vs     |   2 | 0, 1        | contrastable::treatment_code  | 1         | mean(1)    |
+| gear   |   3 | 3, 4, 5     | stats::contr.poly             | NA        | grand mean |
 
 `enlist_contrasts` can be used to generate a named list of contrasts
 that can be used in the `contrasts` argument of various modeling

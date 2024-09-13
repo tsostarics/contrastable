@@ -107,8 +107,7 @@ contrast_schemes <- list(
 glimpse_contrasts(my_data,
                   contrast_schemes,
                   add_namespace = TRUE,
-                  show_all_factors = TRUE
-) |>
+                  show_all_factors = TRUE) |>
   knitr::kable()
 ```
 
