@@ -91,7 +91,7 @@ glimpse_contrasts <- function(model_data,
 
   # We do need to compute the contrast matrices so we can get information
   # about orthogonality, centering, etc.
-  contrast_list <- enlist_contrasts(model_data, ..., "verbose" = verbose)
+  contrast_list <- enlist_contrasts(model_data, ..., verbose = FALSE)
 
   # The formulas need to be expanded to extract the parameters correctly,
   # but we still need the unexpanded formulas provided by the user so we
@@ -125,7 +125,7 @@ glimpse_contrasts <- function(model_data,
   factor_sizes <- vapply(contrast_list, nrow, 1L, USE.NAMES = FALSE)
   level_names <- unname(lapply(contrast_list, rownames))
   scheme_labels <- .get_scheme_labels(params, formulas)
-  reference_levels <- .get_from_params("reference_level", params, formulas)
+  reference_levels <- .get_reference_levels(contrast_list, params, formulas)
   intercept_interpretations <- vapply(contrast_list,
                                       interpret_intercept,
                                       character(1),
@@ -464,23 +464,6 @@ glimpse_contrasts <- function(model_data,
   schemes_to_use
 }
 
-.get_dropped_trends <- function(params, formulas) {
-  vapply(
-    seq_along(params),
-    function(i) {
-      trends <- eval(
-        params[[i]][["drop_trends"]],
-        rlang::get_env(formulas[[i]])
-      )
-      # trends is NA if nothing was passed
-      if (NA %in% trends) {
-        return(NA_character_)
-      }
-      paste(trends, collapse = ",")
-    },
-    "char"
-  )
-}
 
 .get_scheme_labels <- function(params, formulas) {
   vapply(seq_along(params), \(i) {
@@ -525,11 +508,7 @@ glimpse_contrasts <- function(model_data,
     stop("Contrast matrix is NULL, did you try to index a list of contrasts by a name that didn't exist in names(list)?") # nolint
   }
 
-  if (diff(dim(cmat)) != -1L) {
-    stop(paste0("Contrast matrix has invalid size: ",
-                paste0(dim(cmat),
-                       collapse = ", ")))
-  }
+  .is_valid_contrmat(cmat)
 
   # Compute the inverse matrix of the contrast matrix. The reference level is
   # the index of the column that has the same positive value in each row.
@@ -562,20 +541,29 @@ glimpse_contrasts <- function(model_data,
                                   params = NULL,
                                   formulas = NULL) {
   params_available <- !is.null(params) & !is.null(formulas)
+  param_references <- c()
+
+  # .get_from_params is already vectorized, so just get the results
+  if (params_available) {
+    param_references <- .get_from_params("reference_level",
+                                         params,
+                                         formulas)
+    names(param_references) <- names(params)
+  }
+
   vapply(names(contrast_list),
          \(x) {
            reference_level <- NA
 
            # Grab the reference level if it's set in the params
-           if (params_available & x %in% names(params)) {
-             reference_level <- .get_from_params("reference_level",
-                                                           params,
-                                                           formulas)
+           # if the params aren't provided, then x %in% names(NULL) = FALSE
+           if (x %in% names(param_references)) {
+             reference_level <- param_references[x]
            }
 
            # If the reference level is still missing, try to determine it from
            # the contrast matrix directly
-           if (is.na(reference_level)){
+           if (identical(reference_level, NA)){
              contr_mat <- contrast_list[[x]]
              if (.is_valid_contrmat(contr_mat)) {
                reference_index <- .get_reference_level(contr_mat)

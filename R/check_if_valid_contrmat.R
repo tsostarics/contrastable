@@ -6,6 +6,13 @@
 #' @param contr_mat Contrast matrix
 #' @return invisibly returns TRUE
 .is_valid_contrmat <- function(contr_mat) {
+
+  if (diff(dim(contr_mat)) != -1L) {
+    stop(paste0("Contrast matrix has invalid size: ",
+                paste0(dim(contr_mat),
+                       collapse = ", ")))
+  }
+
   tryCatch(.contrasts_to_hypotheses(contr_mat, nrow(contr_mat)),
     error = function(c) {
       err <- conditionMessage(c)

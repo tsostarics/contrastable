@@ -76,6 +76,21 @@ test_that("Append namespace to scheme names", {
       "stats::contr.sum",
       "contrastable::scaled_sum_code")
   )
+
+  expect_equal(
+    suppressWarnings(glimpse_contrasts(mtcars,
+                                       cyl ~ contrastable:::sum_code,
+                                       verbose = FALSE)[['scheme']]),
+    "contrastable:::sum_code"
+  )
+
+  expect_equal(
+  suppressWarnings(glimpse_contrasts(mtcars,
+                                     cyl ~ sum_code,
+                                     verbose = FALSE,
+                                     add_namespace = TRUE)[['scheme']]),
+  "contrastable::sum_code"
+  )
 })
 
 test_that("Nonexistant namespace returns original name", {

@@ -3,5 +3,5 @@ test_that("Error messages for valid contrast matrix work", {
     regexp = "is invalid for contrasts"
   )
   expect_error(.is_valid_contrmat(orth_polynomial_code(5)[, -1]),
-               regexp = "must be square")
+               regexp = "invalid size")
 })
