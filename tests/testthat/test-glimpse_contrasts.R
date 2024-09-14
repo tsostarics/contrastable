@@ -85,11 +85,11 @@ test_that("Append namespace to scheme names", {
   )
 
   expect_equal(
-  suppressWarnings(glimpse_contrasts(mtcars,
-                                     cyl ~ sum_code,
-                                     verbose = FALSE,
-                                     add_namespace = TRUE)[['scheme']]),
-  "contrastable::sum_code"
+    suppressWarnings(glimpse_contrasts(mtcars,
+                                       cyl ~ sum_code,
+                                       verbose = FALSE,
+                                       add_namespace = TRUE)[['scheme']]),
+    "contrastable::sum_code"
   )
 })
 
@@ -102,7 +102,7 @@ test_that("Nonexistant namespace returns original name", {
 
 test_that("Glimpse shows namespace when requested", {
   gtbl <- suppressWarnings(glimpse_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE,
-                    add_namespace = TRUE))
+                                             add_namespace = TRUE))
 
   expect_equal("contrastable::sum_code", gtbl$scheme)
 })
@@ -236,3 +236,32 @@ test_that("Reference levels reported correctly", {
   expect_equal(tst$reference, c("b", NA, "a"))
 })
 
+
+test_that("Readme example unchanged", {
+  contrast_schemes <- list(
+    cyl ~ scaled_sum_code + 6,
+    carb ~ helmert_code,
+    vs ~ treatment_code + 1
+  )
+
+  my_data <- mtcars
+  my_data$gear <- ordered(my_data$gear) # Set as ordered factor in dataframe
+
+  # Get information about our contrasts, even those we didn't explicitly set
+  # (gear is ordered, and so uses contr.poly by default)
+  expect_warning(glimpse_contrasts(my_data,
+                                   contrast_schemes,
+                                   add_namespace = TRUE,
+                                   show_all_factors = TRUE,
+                                   verbose = FALSE))
+
+  expect_snapshot(
+    glimpse_contrasts(
+      set_contrasts(my_data,
+                    contrast_schemes,
+                    verbose = FALSE),
+      contrast_schemes,
+      add_namespace = TRUE,
+      show_all_factors = TRUE,
+      verbose = FALSE))
+})

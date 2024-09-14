@@ -64,7 +64,14 @@ glimpse_contrasts <- function(model_data,
   # ensyms(...) when ... is not a symbol will throw an error, in which case we
   # can just use "..." as in the function definition
   dots_names <- tryCatch(as.character(rlang::ensyms(...)), error = \(e) "...")
-  model_data_name <- as.character(rlang::ensym(model_data))
+  model_data_name <- tryCatch(as.character(rlang::ensym(model_data)),
+                              error = \(e) {
+                                if (conditionMessage.condition(e) ==
+                                    "Can't convert to a symbol.")
+                                  return (model_data)
+
+                                stop(e)
+                              })
 
   # If no formulas are provided but we want to glimpse all factors, use
   # glimpse_default_factors and return early. If all.factors is FALSE, then
@@ -567,6 +574,9 @@ glimpse_contrasts <- function(model_data,
              contr_mat <- contrast_list[[x]]
              if (.is_valid_contrmat(contr_mat)) {
                reference_index <- .get_reference_level(contr_mat)
+               if (is.na(reference_index))
+                 return(NA_character_)
+
                reference_level <- rownames(contr_mat)[reference_index]
              }
            }
