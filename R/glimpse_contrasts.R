@@ -138,14 +138,21 @@ glimpse_contrasts <- function(model_data,
                                       character(1),
                                       USE.NAMES = FALSE)
 
-  orthogonal_contrasts <- is_orthogonal(contrast_list)
-  centered_contrasts <- is_centered(contrast_list)
+  # Don't bother computing these if we're just going to drop them later anyways
+  if (minimal) {
+    orthogonal_contrasts <- NA
+    centered_contrasts   <- NA
+    dropped_trends       <- NA
+  } else{
+    orthogonal_contrasts <- is_orthogonal(contrast_list)
+    centered_contrasts   <- is_centered(contrast_list)
 
 
-  # Double check that dropped trends are only included for polynomial contrasts
-  dropped_trends <- .get_from_params("drop_trends", params, formulas)
-  which_are_polynomials <- vapply(scheme_labels, .is_polynomial_scheme, TRUE)
-  dropped_trends[!which_are_polynomials] <- NA
+    # Double check that dropped trends only included for polynomial contrasts
+    dropped_trends <- .get_from_params("drop_trends", params, formulas)
+    which_are_polynomials <- vapply(scheme_labels, .is_polynomial_scheme, TRUE)
+    dropped_trends[!which_are_polynomials] <- NA
+  }
 
   glimpse <- data.frame(
     "factor" = set_factors,
@@ -161,7 +168,6 @@ glimpse_contrasts <- function(model_data,
   )
 
 
-
   if (show_all_factors) {
     glimpse <- rbind(
       glimpse,
@@ -169,6 +175,7 @@ glimpse_contrasts <- function(model_data,
         model_data,
         set_factors,
         show_one_level_factors,
+        minimal,
         verbose
       )
     )
@@ -180,7 +187,6 @@ glimpse_contrasts <- function(model_data,
 
   rownames(glimpse) <- NULL
 
-  # TODO: Rewrite so that the additional columns are only computed if FALSE
   if (minimal) {
     glimpse <- glimpse[, c(
       "factor",
@@ -238,17 +244,15 @@ glimpse_contrasts <- function(model_data,
 #' `options('contrasts')`. Reference level is assumed to be the first level for
 #' unordered factors and nonexistent for ordered factors.
 #'
-#' @param model_data Dataframe
 #' @param set_factors Explicitly set columns to ignore
-#' @param show_one_level_factors Should factor columns with only 1 level be
-#'   included? Default FALSE
-#' @param verbose Defaults to FALSE, should messages and warnings be printed?
+#' @inheritParams glimpse_contrasts
 #'
 #' @return A table with information about the contrasts for all remaining factor
 #'   columns
 .glimpse_default_factors <- function(model_data,
                                      set_factors = NULL,
                                      show_one_level_factors = FALSE,
+                                     minimal = TRUE,
                                      verbose = TRUE) {
   fct_info <- .get_factor_info(model_data, set_factors, verbose)
   unset_factors <- fct_info[["unset_factors"]]
@@ -293,11 +297,17 @@ glimpse_contrasts <- function(model_data,
                                       character(1),
                                       USE.NAMES = FALSE
   )
-  orthogonal_contrasts <- is_orthogonal(default_contrasts)
-  centered_contrasts <- is_centered(default_contrasts)
 
-  # Trends are never dropped w/ R's defaults
+  # Trends are never dropped with R's defaults
   dropped_trends <- rep(NA, length(unset_factors))
+
+  if (minimal) {
+    orthogonal_contrasts <- rep(NA, length(unset_factors))
+    centered_contrasts   <- rep(NA, length(unset_factors))
+  } else{
+    orthogonal_contrasts <- is_orthogonal(default_contrasts)
+    centered_contrasts   <- is_centered(default_contrasts)
+  }
 
   # Check if any factors have not been specified in the call but are
   # different from the defaults. Reporting the default scheme is misleading,
@@ -662,7 +672,7 @@ glimpse_contrasts <- function(model_data,
     if (!identical(mismatched_varnames, character(0))) {
       mismatched_varnames <- paste0(" - ", mismatched_varnames, collapse = "\n")
       WARN_mismatched_contrasts <-
-        glue::glue("Contrasts for factors in `{model_data_name}` don't match matrices in formulas:\n{mismatched_varnames}") # nolint
+        glue::glue("Contrasts for these factors in `{model_data_name}` don't match formulas:\n{mismatched_varnames}") # nolint
     }
 
     if (!identical(mismatched_labels, character(0))) {

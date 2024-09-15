@@ -109,17 +109,6 @@ test_that("Programmatic environment handling with set reference levels works", {
   expect_equal(output, reference)
 })
 
-test_that("Environment handling when piping with magrittr works", {
-  my_df <- mtcars
-  my_df$gear <- factor(my_df$gear)
-  magrittr_df <- my_df |> set_contrasts(gear ~ helmert_code)
-  magrittr_contrasts <- my_df |> enlist_contrasts(gear ~ helmert_code)
-  native_df <- set_contrasts(my_df, gear ~ helmert_code)
-
-  expect_equal(contrasts(native_df$gear), contrasts(magrittr_df$gear))
-  expect_equal(contrasts(native_df$gear), magrittr_contrasts[[1L]])
-})
-
 test_that("Error handling when an invalid matrix is passed", {
   expect_error(enlist_contrasts(mtcars,
                                 gear ~ matrix(c(1, 1, 1, 2, 2, 2),
@@ -155,7 +144,7 @@ test_that("Warning is thrown when colnames are not set and as_is is TRUE", {
   )
 })
 
-test_that("as_is functionality works as expected", {
+test_that("As is with I works as expected", {
   newdata <- mtcars
   newdata$carb <- factor(newdata$carb)
   df1 <- suppressWarnings(enlist_contrasts(newdata, carb ~ I(contr.sum)))

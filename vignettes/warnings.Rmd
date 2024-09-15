@@ -85,11 +85,11 @@ enlist_contrasts(my_data, foo ~ sum_code, boo ~ sum_code)
 Related to the above, if the user only sets contrasts on factors that have only one level, an error will be thrown.
 The above warning will also be shown.
 
-```{r, eval=FALSE}
+```{r}
 my_data <- data.frame(foo = factor("A"),
                       boo = factor(c("B", "C")))
 
-enlist_contrasts(my_data, foo ~ sum_code)
+try(enlist_contrasts(my_data, foo ~ sum_code))
 ```
 
 Contrastable provides some flexibility in how contrasts are passed to formulas.
@@ -201,7 +201,7 @@ my_data <- data.frame(foo = factor(c("A", "B", "C")),
 
 hypr_object <- hypr::hypr(A ~ B, A ~ C)
 
-set_contrasts(my_data, foo ~ hypr_object, boo ~ sum_code)
+enlist_contrasts(my_data, foo ~ hypr_object, boo ~ sum_code)
 ```
 
 

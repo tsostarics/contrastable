@@ -8,18 +8,22 @@
   model_data,
   set_factors = NULL,
   show_one_level_factors = FALSE,
+  minimal = TRUE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{model_data}{Dataframe}
+\item{model_data}{Data to be passed to a model fitting function}
 
 \item{set_factors}{Explicitly set columns to ignore}
 
-\item{show_one_level_factors}{Should factor columns with only 1 level be
-included? Default FALSE}
+\item{show_one_level_factors}{Logical, should factors with only one level be
+included in the output? Default is FALSE to omit}
 
-\item{verbose}{Defaults to FALSE, should messages and warnings be printed?}
+\item{minimal}{Logical, default TRUE, whether to omit the orthogonal,
+centered, dropped_trends, and explicitly_set columns from the output table}
+
+\item{verbose}{Logical, defaults to TRUE, whether messages should be printed}
 }
 \value{
 A table with information about the contrasts for all remaining factor

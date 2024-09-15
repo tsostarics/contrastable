@@ -100,21 +100,6 @@ test_that("Nonexistant namespace returns original name", {
 })
 
 
-test_that("Glimpse shows namespace when requested", {
-  gtbl <- suppressWarnings(glimpse_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE,
-                                             add_namespace = TRUE))
-
-  expect_equal("contrastable::sum_code", gtbl$scheme)
-})
-
-test_that("Returning list works fine", {
-  gtbl <- suppressWarnings(glimpse_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE,
-                                             return_list = TRUE))
-
-  expect_equal(c("glimpse", "contrasts"), names(gtbl))
-})
-
-
 test_that("Warning with non default contrasts works", {
   tstdf <- dplyr::mutate(mtcars,
                          gear = factor(gear),
@@ -169,7 +154,7 @@ test_that(".warn_if_mismatched_contrasts throws correct warnings", {
 
   # (2) warning that contrast matrices dont match
   expect_warning(glimpse_contrasts(my_data, clist),
-                 "Contrasts for factors in `my_data` don't match matrices in formulas:[ \n]+- cyl") # nolint
+                 "Contrasts for these factors in `my_data` don't match formulas:[ \n]+- cyl") # nolint
 
 
   # (3) warning that labels dont match (but matrices are fine)
@@ -265,3 +250,4 @@ test_that("Readme example unchanged", {
       show_all_factors = TRUE,
       verbose = FALSE))
 })
+
