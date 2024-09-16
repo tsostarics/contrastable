@@ -4,14 +4,6 @@
   n <- nrow(contr_mat)
   levelnames <- rownames(contr_mat)
 
-  # Need to explicitly check if this is polynomial coding since the labels
-  # for that one are handled differently
-  if (identical(unname(contr_mat),
-            unname(stats::contr.poly(n)),
-            ignore.environment = TRUE)) {
-    colnames(contr_mat) <- colnames(stats::contr.poly(n))
-    return(contr_mat)
-  }
 
 
   # Default column names will be the rows with positive values
@@ -20,6 +12,15 @@
 
 
   if (is.null(coding_fx)) {
+    # Need to explicitly check if this is polynomial coding since the labels
+    # for that one are handled differently
+    if (n <= 95 && identical(unname(contr_mat),
+                             unname(stats::contr.poly(n)),
+                             ignore.environment = TRUE)) {
+      colnames(contr_mat) <- colnames(stats::contr.poly(n))
+      return(contr_mat)
+    }
+
     colnames(contr_mat) <- default_colnames
     return(contr_mat)
   }

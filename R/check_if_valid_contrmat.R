@@ -19,7 +19,7 @@
       if (!grepl("Lapack", err)) {
         stop(c)
       }
-      msg <- crayon::red("This usually means your matrix is invalid for contrasts, try a different matrix.") # nolint
+      msg <- "This usually means your matrix is invalid for contrasts, try a different matrix." # nolint
       stop(paste(err, msg, sep = "\n"))
     }
   )

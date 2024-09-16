@@ -36,7 +36,7 @@
 #' @examples
 #'
 #' my_contrasts <- list(cyl ~ sum_code, carb ~ helmert_code)
-#' my_data <- set_contrasts(mtcars, my_contrasts)
+#' my_data <- set_contrasts(mtcars, my_contrasts, verbose = FALSE)
 #' my_data$gear <- factor(my_data$gear) # Make gear a factor manually
 #'
 #' # View information about contrasts; gear will use default for unordered
@@ -264,8 +264,25 @@ glimpse_contrasts <- function(model_data,
     unset_factors[!unset_factors %in% fct_info[["one_level_factors"]]]
 
   # Extract contrasts from the factor columns
-  default_contrasts <- lapply(unset_factors,
-                              function(x) stats::contrasts(model_data[[x]]))
+  default_contrasts <-
+
+
+    lapply(unset_factors,
+           function(x) {
+             tryCatch(stats::contrasts(model_data[[x]]),
+                      error = \(e) {
+                        err <- conditionMessage(e)
+                        if (!grepl("cannot be represented accurately", err)) {
+                          stop(c)
+                        }
+                        n <- nlevels(model_data[[x]])
+                        msg <- paste0("Polynomial contrasts can only be used with <95 levels.\n",
+                                      glue::glue("Convert `{x}` to unordered with  `as.unordered` or use a non-polynomial scheme."))
+                        stop(paste(err, msg, sep = "\n"))
+
+                      })
+             })
+
   names(default_contrasts) <- unset_factors
 
   # Extract the number of levels levels for each factor

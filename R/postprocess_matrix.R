@@ -60,6 +60,7 @@
 
   # Set the contrast labels, reorder as needed
   dimnames(new_contrasts) <- matrix_labels
+
   new_contrasts <- .reset_comparison_labels(new_contrasts, dots[["symchar"]])
 
 

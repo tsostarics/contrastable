@@ -91,17 +91,3 @@
 
 
 }
-
-#' Check for unordered factor
-#'
-#' Helper to check if a factor is exclusively unordered. is.factor(x) is TRUE
-#' when x is unordered OR ordered.
-#'
-#' @param x a vector of data
-#'
-#' @return logical, TRUE if x is an unordered factor, FALSE if x is not a
-#' factor or is an ordered factor
-#' @export
-is.unordered <- function(x) {
-  is.factor(x) & !is.ordered(x)
-}

@@ -58,7 +58,7 @@ information.
 \examples{
 
 my_contrasts <- list(cyl ~ sum_code, carb ~ helmert_code)
-my_data <- set_contrasts(mtcars, my_contrasts)
+my_data <- set_contrasts(mtcars, my_contrasts, verbose = FALSE)
 my_data$gear <- factor(my_data$gear) # Make gear a factor manually
 
 # View information about contrasts; gear will use default for unordered

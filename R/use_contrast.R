@@ -258,6 +258,9 @@ use_contrasts.matrix <- function(factor_col,
     return(new_contrasts)
   }
 
+  # Prevents .reset_comparison_labels from treating this as a function
+  dots["symchar"] <- list(NULL)
+
 
   .postprocess_matrix(new_contrasts,
                       code_by,
@@ -441,7 +444,19 @@ use_contrasts.hypr <- function(factor_col,
 }
 
 .get_dimnames <- function(factor_col) {
-  labels <- dimnames(stats::contrasts(factor_col))
+  labels <- tryCatch(dimnames(stats::contrasts(factor_col)),
+                     error = \(e) {
+                       err <- conditionMessage(e)
+                       if (!grepl("cannot be represented accurately", err)) {
+                         stop(c)
+                       }
+                       n <- nlevels(factor_col)
+                       msg <- paste0("Polynomial contrasts can only be used with <95 levels.\n",
+                                     "Convert to unordered with  `as.unordered()` or use a non-polynomial scheme")
+                       stop(paste(err, msg, sep = "\n"))
+
+                     })
+
   if (is.null(labels[[1L]])) {
     labels[[1L]] <- levels(factor_col)
   }
@@ -450,6 +465,7 @@ use_contrasts.hypr <- function(factor_col,
   }
   labels
 }
+
 
 .set_intercept <- function(contrast_matrix, intercept_level) {
   if (!intercept_level %in% rownames(contrast_matrix)) {
