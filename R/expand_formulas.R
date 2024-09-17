@@ -47,20 +47,10 @@
     lapply(formulas,
            \(formula) {
              lhs <-
-               tryCatch(rlang::f_lhs(formula),
+               tryMatch(rlang::f_lhs(formula),
+                        "must be a formula" =
+                          "Did you use = instead of ~ when setting the contrast?")
 
-                        error = function(c) {
-                          err <- conditionMessage(c)
-                          if (!grepl("must be a formula", err)) {
-                            stop(c)
-                          }
-                          stop(
-                            paste(err,
-                                  "Did you use = instead of ~ when setting the contrast?", # nolint
-                                  sep = "\n")
-                          )
-                        }
-               )
 
              rhs <- rlang::f_rhs(formula)
              env <- rlang::f_env(formula)
@@ -81,13 +71,8 @@
            }
     )
 
-  tryCatch(purrr::list_flatten(formulas, name_repair = "check_unique"),
-           error = \(c) {
-             err <- conditionMessage(c)
-             stop(paste(err,
-                        "Left hand side of multiple formulas evaluated to the same column name", # nolint
-                        sep = "\n"))
-           })
+  tryMatch(purrr::list_flatten(formulas, name_repair = "check_unique"),
+           "." = "Left hand side of multiple formulas evaluated to the same column name") # nolint
 
 
 }

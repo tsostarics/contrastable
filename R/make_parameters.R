@@ -38,15 +38,15 @@
   # Is the current node an operator for the package syntax? if so, process
   # the arguments for that operator appropriately and continue recursing.
   # if not, then we're at the top level and need to process the whole formula
-    switch(
-      .get_reserved_operator(node),
-      "~" = {params <- .process_factor_col(cur_expr, params, env, verbose)},
-      "+" = {params <- set("reference_level")},
-      "-" = {params <- set("drop_trends")},
-      "*" = {params <- set("intercept_level")},
-      "|" = {params <- set("labels")},
-      {params <- .process_code_by(formula, params, env, verbose)}
-    )
+  switch(
+    .get_reserved_operator(node),
+    "~" = {params <- .process_factor_col(cur_expr, params, env, verbose)},
+    "+" = {params <- set("reference_level")},
+    "-" = {params <- set("drop_trends")},
+    "*" = {params <- set("intercept_level")},
+    "|" = {params <- set("labels")},
+    {params <- .process_code_by(formula, params, env, verbose)}
+  )
 
   params
 }
@@ -103,16 +103,19 @@
 #' @return `params`
 .set_param <- function(cur_expr, params, env, which_param, verbose) {
   LHS <- cur_expr[[2L]]
-  RHS <- tryCatch(cur_expr[[3L]],
-                  error = \(e) {
-                    err <- conditionMessage(e)
-                    stop(
-                      cli::format_error(c(err,
-                                          " " = "Is the contrast object/function in the wrong place? See example:",
-                                          "x" = "var ~ +1 + sum_code",
-                                          "v" = "var ~ sum_code + 1"))
-                    )
-                  })
+  RHS <-
+    tryCatch(
+      cur_expr[[3L]],
+      error = \(e) {
+        err <- conditionMessage(e)
+        stop(
+          cli::format_error(
+            c(err,
+              " " = "Is the contrast object/function in the wrong place? See example:", # nolint
+              "x" = "var ~ +1 + sum_code",
+              "v" = "var ~ sum_code + 1"))
+        )
+      })
 
   if (which_param == "labels") {
     already_set <- !is.null(params[[which_param]])
@@ -157,15 +160,17 @@
 
   # Remove parentheses to treat as symbol
   if (is.call(formula) && length(formula) == 1L) {
-      formula <- formula[[1]]
+    formula <- formula[[1]]
   }
 
   params[["code_by"]] <- formula
+  has_drop_trends <- !identical(params[['drop_trends']], NA)
+  is_not_polynomial <- !.is_polynomial_scheme(as.character(params[['code_by']]))
 
-  if (!identical(params[['drop_trends']], NA) && !.is_polynomial_scheme(as.character(params[['code_by']]))) {
+  if (has_drop_trends && is_not_polynomial) {
     params[['drop_trends']] <- NA
     if (verbose)
-      warning("Ignoring the `-` operator: should only be used with polynomial contrasts",
+      warning("Ignoring the `-` operator: should only be used with polynomial contrasts", # nolint
               call. = FALSE)
   }
 

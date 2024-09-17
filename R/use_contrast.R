@@ -163,7 +163,7 @@ use_contrasts.function <- function(factor_col,
   # Extract labels to use for contrast matrix
   dots <- rlang::dots_list(...)
 
-  matrix_labels <- .get_dimnames(factor_col)
+  matrix_labels <- .get_dimnames(as.unordered(factor_col))
   params <- .bundle_params(factor_col, ...)
 
   n <- params[["n"]]
@@ -176,7 +176,14 @@ use_contrasts.function <- function(factor_col,
     tryCatch(
       do.call(code_by, params),
       error = \(e) {
-        do.call(code_by, c(n, params))
+        if (grepl('argument "n" is missing', conditionMessage(e)))
+          do.call(code_by, c(n, params))
+
+        stopWithMatch(e,
+                      "cannot be represented accurately" =
+                        c("Polynomial contrasts can only be used with <95 levels.", # nolint
+                          "Convert to unordered with  `as.unordered` or use a non-polynomial scheme.")) # nolint
+        stop(e)
       }
     )
 
@@ -444,18 +451,12 @@ use_contrasts.hypr <- function(factor_col,
 }
 
 .get_dimnames <- function(factor_col) {
-  labels <- tryCatch(dimnames(stats::contrasts(factor_col)),
-                     error = \(e) {
-                       err <- conditionMessage(e)
-                       if (!grepl("cannot be represented accurately", err)) {
-                         stop(c)
-                       }
-                       n <- nlevels(factor_col)
-                       msg <- paste0("Polynomial contrasts can only be used with <95 levels.\n",
-                                     "Convert to unordered with  `as.unordered()` or use a non-polynomial scheme")
-                       stop(paste(err, msg, sep = "\n"))
-
-                     })
+  labels <-
+    tryMatch(dimnames(stats::contrasts(factor_col)),
+             "cannot be represented accurately" =
+               c("Polynomial contrasts can only be used with <95 levels.",
+                 "Convert to unordered with  `as.unordered` or use a non-polynomial scheme.")
+    )
 
   if (is.null(labels[[1L]])) {
     labels[[1L]] <- levels(factor_col)

@@ -265,23 +265,14 @@ glimpse_contrasts <- function(model_data,
 
   # Extract contrasts from the factor columns
   default_contrasts <-
-
-
     lapply(unset_factors,
-           function(x) {
-             tryCatch(stats::contrasts(model_data[[x]]),
-                      error = \(e) {
-                        err <- conditionMessage(e)
-                        if (!grepl("cannot be represented accurately", err)) {
-                          stop(c)
-                        }
-                        n <- nlevels(model_data[[x]])
-                        msg <- paste0("Polynomial contrasts can only be used with <95 levels.\n",
-                                      glue::glue("Convert `{x}` to unordered with  `as.unordered` or use a non-polynomial scheme."))
-                        stop(paste(err, msg, sep = "\n"))
-
-                      })
-             })
+           function(x)
+             tryMatch(
+               stats::contrasts(model_data[[x]]),
+               "cannot be represented accurately" =
+                 c("Polynomial contrasts can only be used with <95 levels.",
+                   glue::glue("Convert `{x}` to unordered with  `as.unordered` or use a non-polynomial scheme."))
+             ))
 
   names(default_contrasts) <- unset_factors
 
