@@ -300,6 +300,12 @@ use_contrasts.matrix <- function(factor_col,
 #' @return Contrast matrix, using the ordered or unordered default from
 #' `options()`
 #' @export
+#'
+#' @examples
+#' use_contrasts(gl(5,1), helmert_code) # a function
+#' my_matrix <- helmert_code(5)
+#' use_contrasts(gl(5,1), my_matrix) # a matrix
+#'
 use_contrasts.default <- function(factor_col,
                                   code_by = NA,
                                   reference_level = NA,
@@ -353,6 +359,12 @@ use_contrasts.default <- function(factor_col,
 #'
 #' @return Contrast matrix specified by the hypr object
 #' @export
+#'
+#' @examplesIf rlang::is_installed("hypr")
+#' hypr_obj <- hypr::hypr(a ~ b, c ~ b) # centered pairwise comparisons to b
+#'
+#' use_contrasts(factor(c('a', 'b', 'c')), hypr_obj)
+#'
 use_contrasts.hypr <- function(factor_col,
                                code_by = NA,
                                reference_level = NA,

@@ -19,3 +19,8 @@ Given a contrast matrix or list of contrast matrices (eg from
 \code{enlist_contrasts}), return a logical vector of whether each contrast is
 centered or not.
 }
+\examples{
+is_centered(treatment_code(5)) # FALSE
+is_centered(scaled_sum_code(5)) # TRUE
+
+}

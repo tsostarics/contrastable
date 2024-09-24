@@ -91,6 +91,11 @@ else. If you want to drop contrasts you'll need to use something like
 \code{enlist_contrasts(df, x ~ contr.poly - 3:5)} and pass this to the
 \code{contrasts} argument in the model fitting function.
 }
+\examples{
+
+set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+
+}
 \seealso{
 \code{\link[=enlist_contrasts]{enlist_contrasts()}}
 }

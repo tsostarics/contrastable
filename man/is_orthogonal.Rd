@@ -19,3 +19,8 @@ Given a contrast matrix or list of contrast matrices (eg from
 \code{enlist_contrasts}), return a logical vector of whether each contrast is
 orthogonal or not.
 }
+\examples{
+
+is_orthogonal(treatment_code(5)) # FALSE
+is_orthogonal(helmert_code(5)) # TRUE
+}

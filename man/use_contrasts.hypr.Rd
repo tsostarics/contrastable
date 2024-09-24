@@ -38,3 +38,10 @@ Contrast matrix specified by the hypr object
 \description{
 Use a hypr object for contrasts
 }
+\examples{
+\dontshow{if (rlang::is_installed("hypr")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+hypr_obj <- hypr::hypr(a ~ b, c ~ b) # centered pairwise comparisons to b
+
+use_contrasts(factor(c('a', 'b', 'c')), hypr_obj)
+\dontshow{\}) # examplesIf}
+}

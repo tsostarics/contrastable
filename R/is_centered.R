@@ -7,6 +7,11 @@
 #' @inherit is_orthogonal params
 #' @return Logical vector, will retain names of a passed list
 #' @export
+#'
+#' @examples
+#' is_centered(treatment_code(5)) # FALSE
+#' is_centered(scaled_sum_code(5)) # TRUE
+#'
 is_centered <- function(contrast_matrices, USE.NAMES = FALSE) {
   if (is.matrix(contrast_matrices)) {
     contrast_matrices <- list(contrast_matrices)

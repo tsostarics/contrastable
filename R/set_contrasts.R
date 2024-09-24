@@ -16,6 +16,10 @@
 #' @export
 #'
 #' @importFrom stats contrasts<-
+#' @examples
+#'
+#' set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+#'
 set_contrasts <- function(model_data,
                           ...,
                           verbose = getOption("contrastable.verbose"),

@@ -95,6 +95,7 @@ test_that("Argument handling in parentheses & empty parentheses work", {
 })
 
 test_that("Setting contrast with hypr object works", {
+  testthat::skip_if_not_installed("hypr")
   tst_data <-
     data.frame(three = factor(c("a", "b", "c", "a")))
 
@@ -111,6 +112,8 @@ test_that("Setting contrast with hypr object works", {
 
 
 test_that("Warning with missing level hypr object works", {
+  testthat::skip_if_not_installed("hypr")
+
   tst_data <-
     data.frame(three = factor(c("a", "b", "c", "a")))
 
@@ -127,6 +130,8 @@ test_that("Warning with missing level hypr object works", {
 })
 
 test_that("No warning when factor passed to use_contrasts directly", {
+  testthat::skip_if_not_installed("hypr")
+
   hypr_object <- hypr::hypr(b ~ a, d ~ a)
   expect_equal(use_contrasts(factor(c("a", "b", "c", "a")), hypr_object),
                scaled_sum_code(3),
@@ -135,6 +140,8 @@ test_that("No warning when factor passed to use_contrasts directly", {
 })
 
 test_that("Warnings when trying to set values with hypr object", {
+  testthat::skip_if_not_installed("hypr")
+
   hypr_object <- hypr::hypr(b ~ a, d ~ a)
   expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
                                hypr_object,

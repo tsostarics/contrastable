@@ -43,3 +43,9 @@ If a user doesn't specify a contrast matrix, use the defaults from options().
 If the user tries to use something we don't know how to work with, throw a
 warning that we'll be using the defaults from options().
 }
+\examples{
+use_contrasts(gl(5,1), helmert_code) # a function
+my_matrix <- helmert_code(5)
+use_contrasts(gl(5,1), my_matrix) # a matrix
+
+}
