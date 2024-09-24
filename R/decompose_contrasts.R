@@ -34,7 +34,7 @@
 #' @param remove_original Logical, whether to remove the original columns in
 #' the data frame after decomposing into separate columns. Default `FALSE`.
 #'
-#' @return model_data but with new columns corresponding to the numeric coding
+#' @return `model_data` but with new columns corresponding to the numeric coding
 #'   of the given factor's contrasts
 #'
 #' @export
@@ -47,7 +47,8 @@
 #'     carb ~ scaled_sum_code,
 #'     gear ~ contr.sum | c("4-mean", "5-mean")
 #'   ) |>
-#'   decompose_contrasts(~ carb + gear)
+#'   decompose_contrasts(~ carb + gear) |>
+#'   str()
 #'
 #' # Decompose an interaction term between the two factors
 #' mtcars |>
@@ -55,7 +56,8 @@
 #'     carb ~ scaled_sum_code,
 #'     gear ~ contr.sum | c("4-mean", "5-mean")
 #'   ) |>
-#'   decompose_contrasts(~ carb * gear)
+#'   decompose_contrasts(~ carb * gear) |>
+#'   str()
 #'
 #' @importFrom stats contrasts
 decompose_contrasts <- function(model_data,

@@ -12,7 +12,7 @@
 \item{vars_in_model}{Variables to check against}
 }
 \value{
-Nothing, sends a message
+Nothing, messages the user
 }
 \description{
 Ordered factors use orthogonal polynomials (contr.poly) by default with

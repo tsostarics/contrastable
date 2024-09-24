@@ -12,9 +12,9 @@
 \item{specified_vars}{variables specified by the user from formulas}
 }
 \value{
-nothing, just sends a message if needed
+Nothing, messages the user if needed
 }
 \description{
-Sends a message if the user has factor columns in their model data frame
+messages the user if the user has factor columns in their model data frame
 that weren't specified along with any factors they DID set contrasts for.
 }

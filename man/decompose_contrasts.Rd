@@ -25,7 +25,7 @@ to the intercept. Default \code{TRUE}  since it's always just a column of 1s}
 the data frame after decomposing into separate columns. Default \code{FALSE}.}
 }
 \value{
-model_data but with new columns corresponding to the numeric coding
+\code{model_data} but with new columns corresponding to the numeric coding
 of the given factor's contrasts
 }
 \description{
@@ -63,7 +63,8 @@ mtcars |>
     carb ~ scaled_sum_code,
     gear ~ contr.sum | c("4-mean", "5-mean")
   ) |>
-  decompose_contrasts(~ carb + gear)
+  decompose_contrasts(~ carb + gear) |>
+  str()
 
 # Decompose an interaction term between the two factors
 mtcars |>
@@ -71,6 +72,7 @@ mtcars |>
     carb ~ scaled_sum_code,
     gear ~ contr.sum | c("4-mean", "5-mean")
   ) |>
-  decompose_contrasts(~ carb * gear)
+  decompose_contrasts(~ carb * gear) |>
+  str()
 
 }

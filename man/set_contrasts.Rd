@@ -93,7 +93,9 @@ else. If you want to drop contrasts you'll need to use something like
 }
 \examples{
 
-set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+head(
+   set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+)
 
 }
 \seealso{

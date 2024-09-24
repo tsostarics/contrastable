@@ -70,6 +70,7 @@ tryMatch <- function(expr, ..., .parent = TRUE) {
 #'
 #' foo <- function(a) {
 #' tryCatch(a, error = \(e) {
+#'   set.seed(111)
 #'   message("An error! have a random number: ", rnorm(1))
 #'   contrastable:::stopWithMatch(e, "not found" = "how sad!")
 #'  })

@@ -887,16 +887,16 @@ useful if you explicitly create a matrix and want to make sure the
 reference level isn’t shifted around.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> <span class="fu">I</span>(contr.sum))</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; Warning in use_contrasts.function(factor_col = get(params[[&quot;factor_col&quot;]], : No</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; Warning in .postprocess_matrix(new_contrasts, code_by, reference_level, : No</span></span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co">#&gt; comparison labels set and as_is=TRUE, contrast labels will be column indices.</span></span>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co">#&gt; $carb</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt;   [,1] [,2] [,3] [,4] [,5]</span></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; 1    1    0    0    0    0</span></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co">#&gt; 2    0    1    0    0    0</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; 3    0    0    1    0    0</span></span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; 4    0    0    0    1    0</span></span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; 5    0    0    0    0    1</span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; 6   -1   -1   -1   -1   -1</span></span></code></pre></div>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt;    1  2  3  4  5</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; 1  1  0  0  0  0</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co">#&gt; 2  0  1  0  0  0</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; 3  0  0  1  0  0</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; 4  0  0  0  1  0</span></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; 5  0  0  0  0  1</span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; 6 -1 -1 -1 -1 -1</span></span></code></pre></div>
 <p>One last quick note is that you can keep the parentheses with the
 function, so if your tab-autocomplete puts parentheses you don’t have to
 worry about it.</p>
@@ -1014,13 +1014,13 @@ specify the matrix yourself and then pass it to set_contrasts:</p>
 <span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(mdl_data, carb <span class="sc">~</span> my_matrix)</span>
 <span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel</span></span>
 <span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt; $carb</span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt;      1    2    3    4    6</span></span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; 1  0.5  0.0  0.0  0.0  0.0</span></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; 2  0.0  0.5  0.0  0.0  0.0</span></span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; 3  0.0  0.0  0.5  0.0  0.0</span></span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; 4  0.0  0.0  0.0  0.5  0.0</span></span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; 6  0.0  0.0  0.0  0.0  0.5</span></span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; 8 -0.5 -0.5 -0.5 -0.5 -0.5</span></span></code></pre></div>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt;      2    3    4    6    8</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; 1 -0.5 -0.5 -0.5 -0.5 -0.5</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; 2  0.5  0.0  0.0  0.0  0.0</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; 3  0.0  0.5  0.0  0.0  0.0</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; 4  0.0  0.0  0.5  0.0  0.0</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; 6  0.0  0.0  0.0  0.5  0.0</span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; 8  0.0  0.0  0.0  0.0  0.5</span></span></code></pre></div>
 <p>You can also specify a list of formulas and pass that to different
 functions.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> <span class="fu">list</span>(carb <span class="sc">~</span> contr.sum, gear <span class="sc">~</span> scaled_sum_code)</span>
@@ -1072,14 +1072,14 @@ contrasts.</p>
 <span id="cb25-18"><a href="#cb25-18" tabindex="-1"></a></span>
 <span id="cb25-19"><a href="#cb25-19" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(mdl_data13, my_contrasts)</span>
 <span id="cb25-20"><a href="#cb25-20" tabindex="-1"></a><span class="co">#&gt;     factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb25-21"><a href="#cb25-21" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
+<span id="cb25-21"><a href="#cb25-21" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum      &lt;NA&gt; grand mean</span></span>
 <span id="cb25-22"><a href="#cb25-22" tabindex="-1"></a><span class="co">#&gt; 2     gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
-<span id="cb25-23"><a href="#cb25-23" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code         a    mean(b)</span></span>
+<span id="cb25-23"><a href="#cb25-23" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code      &lt;NA&gt;    mean(b)</span></span>
 <span id="cb25-24"><a href="#cb25-24" tabindex="-1"></a><span class="co">#&gt; 4      cyl 3      4, 6, 8    helmert_code      &lt;NA&gt; grand mean</span></span></code></pre></div>
 <p>Note that if you haven’t actually set your contrasts to the dataset,
 you’ll receive a series of warnings:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(mdl_data, my_contrasts)</span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for factors in `mdl_data` don&#39;t match matrices in formulas:</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for these factors in `mdl_data` don&#39;t match formulas:</span></span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="co">#&gt;  - gear</span></span>
 <span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="co">#&gt;  - twolevel</span></span>
@@ -1087,9 +1087,9 @@ you’ll receive a series of warnings:</p>
 <span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="co">#&gt; To fix, be sure to run:</span></span>
 <span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a><span class="co">#&gt; mdl_data &lt;- set_contrasts(mdl_data, my_contrasts)</span></span>
 <span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="co">#&gt;     factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum      &lt;NA&gt; grand mean</span></span>
 <span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="co">#&gt; 2     gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
-<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code         a    mean(b)</span></span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code      &lt;NA&gt;    mean(b)</span></span>
 <span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a><span class="co">#&gt; 4      cyl 3      4, 6, 8    helmert_code      &lt;NA&gt; grand mean</span></span></code></pre></div>
 <p>You can also specify the formulas directly, like with
 <code>set_contrasts</code> and <code>enlist_contrasts</code>— but
@@ -1102,9 +1102,9 @@ to get the summary table.</p>
 <span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>                  twolevel <span class="sc">~</span> scaled_sum_code <span class="sc">*</span> <span class="st">&quot;b&quot;</span>,</span>
 <span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>                  cyl <span class="sc">~</span> helmert_code)</span>
 <span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="co">#&gt;     factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum      &lt;NA&gt; grand mean</span></span>
 <span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="co">#&gt; 2     gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
-<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code         a    mean(b)</span></span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="co">#&gt; 3 twolevel 2         a, b scaled_sum_code      &lt;NA&gt;    mean(b)</span></span>
 <span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="co">#&gt; 4      cyl 3      4, 6, 8    helmert_code      &lt;NA&gt; grand mean</span></span></code></pre></div>
 <p>If you don’t provide any contrast information,
 <code>glimpse_contrasts</code> will assume that factors should be using
@@ -1112,15 +1112,15 @@ their default contrasts. If the contrasts are not the same as the
 defaults, you’ll receive warnings:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(mdl_data)  <span class="co"># no warnings</span></span>
 <span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="co">#&gt;            factor n  level_names          scheme reference intercept orthogonal</span></span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="co">#&gt; cyl           cyl 3      4, 6, 8 contr.treatment         4   mean(4)      FALSE</span></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co">#&gt; gear         gear 3      3, 4, 5 contr.treatment         3   mean(3)      FALSE</span></span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="co">#&gt; carb         carb 6 1, 2, 3,.... contr.treatment         1   mean(1)      FALSE</span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="co">#&gt; cyl           cyl 3      4, 6, 8 contr.treatment         4   mean(4)         NA</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co">#&gt; gear         gear 3      3, 4, 5 contr.treatment         3   mean(3)         NA</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="co">#&gt; carb         carb 6 1, 2, 3,.... contr.treatment         1   mean(1)         NA</span></span>
 <span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt; twolevel twolevel 2         a, b contr.treatment         a   mean(a)         NA</span></span>
 <span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt;          centered dropped_trends explicitly_set</span></span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; cyl         FALSE             NA          FALSE</span></span>
-<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; gear        FALSE             NA          FALSE</span></span>
-<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; carb        FALSE             NA          FALSE</span></span>
-<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt; twolevel    FALSE             NA          FALSE</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; cyl            NA             NA          FALSE</span></span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; gear           NA             NA          FALSE</span></span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; carb           NA             NA          FALSE</span></span>
+<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt; twolevel       NA             NA          FALSE</span></span>
 <span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(mdl_data13) <span class="co"># warnings</span></span>
 <span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="co">#&gt; Warning in .warn_if_nondefault(default_contrasts, unset_factors, factor_sizes, : Unset factors do not use default contr.treatment or contr.poly. Glimpse table may be unreliable.</span></span>
 <span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a><span class="co">#&gt;  - cyl</span></span>
@@ -1128,37 +1128,36 @@ defaults, you’ll receive warnings:</p>
 <span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
 <span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a><span class="co">#&gt;  - twolevel</span></span>
 <span id="cb28-18"><a href="#cb28-18" tabindex="-1"></a><span class="co">#&gt;            factor n  level_names scheme reference  intercept orthogonal</span></span>
-<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a><span class="co">#&gt; cyl           cyl 3      4, 6, 8    ???      &lt;NA&gt; grand mean       TRUE</span></span>
-<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a><span class="co">#&gt; gear         gear 3      3, 4, 5    ???         4    mean(4)      FALSE</span></span>
-<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a><span class="co">#&gt; carb         carb 6 1, 2, 3,....    ???         1 grand mean      FALSE</span></span>
+<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a><span class="co">#&gt; cyl           cyl 3      4, 6, 8    ???      &lt;NA&gt; grand mean         NA</span></span>
+<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a><span class="co">#&gt; gear         gear 3      3, 4, 5    ???         4    mean(4)         NA</span></span>
+<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a><span class="co">#&gt; carb         carb 6 1, 2, 3,....    ???         1 grand mean         NA</span></span>
 <span id="cb28-22"><a href="#cb28-22" tabindex="-1"></a><span class="co">#&gt; twolevel twolevel 2         a, b    ???         a    mean(b)         NA</span></span>
 <span id="cb28-23"><a href="#cb28-23" tabindex="-1"></a><span class="co">#&gt;          centered dropped_trends explicitly_set</span></span>
-<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a><span class="co">#&gt; cyl          TRUE             NA          FALSE</span></span>
-<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a><span class="co">#&gt; gear        FALSE             NA          FALSE</span></span>
-<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a><span class="co">#&gt; carb         TRUE             NA          FALSE</span></span>
-<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a><span class="co">#&gt; twolevel     TRUE             NA          FALSE</span></span></code></pre></div>
+<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a><span class="co">#&gt; cyl            NA             NA          FALSE</span></span>
+<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a><span class="co">#&gt; gear           NA             NA          FALSE</span></span>
+<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a><span class="co">#&gt; carb           NA             NA          FALSE</span></span>
+<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a><span class="co">#&gt; twolevel       NA             NA          FALSE</span></span></code></pre></div>
 <p>If there are mismatches between the data and the contrasts specified
 by the formulas, you’ll also get warnings:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(mdl_data, </span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>                  carb <span class="sc">~</span> contr.sum, </span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a>                  gear <span class="sc">~</span> treatment_code <span class="sc">*</span> <span class="dv">4</span>,</span>
 <span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>                  cyl <span class="sc">~</span> contr.treatment <span class="sc">|</span> <span class="fu">c</span>(<span class="st">&quot;diff1&quot;</span>, <span class="st">&quot;diff2&quot;</span>))</span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; Expect contr.treatment or contr.poly for unset factors: twolevel</span></span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for factors in `mdl_data` don&#39;t match matrices in formulas:</span></span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
-<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt;  - gear</span></span>
-<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt; Comparison labels for contrasts in `mdl_data` don&#39;t match:</span></span>
-<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt;  - cyl   (expected `diff1, diff2` but found `6, 8`)</span></span>
-<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; To fix, be sure to run:</span></span>
-<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt; mdl_data &lt;- set_contrasts(mdl_data, </span></span>
-<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt;                           carb ~ contr.sum,</span></span>
-<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt;                           gear ~ treatment_code * 4,</span></span>
-<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt;                           cyl ~ contr.treatment | c(&quot;diff1&quot;, &quot;diff2&quot;))</span></span>
-<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt;            factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; 1            carb 6 1, 2, 3,....       contr.sum         1 grand mean</span></span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt; 2            gear 3      3, 4, 5  treatment_code         4    mean(4)</span></span>
-<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; 3             cyl 3      4, 6, 8 contr.treatment         4    mean(4)</span></span>
-<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co">#&gt; twolevel twolevel 2         a, b contr.treatment         a    mean(a)</span></span></code></pre></div>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; Warning: Contrasts for these factors in `mdl_data` don&#39;t match formulas:</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt;  - carb</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt;  - gear</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt; Comparison labels for contrasts in `mdl_data` don&#39;t match:</span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt;  - cyl   (expected `diff1, diff2` but found `6, 8`)</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt; To fix, be sure to run:</span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; mdl_data &lt;- set_contrasts(mdl_data, </span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt;                           carb ~ contr.sum,</span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt;                           gear ~ treatment_code * 4,</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt;                           cyl ~ contr.treatment | c(&quot;diff1&quot;, &quot;diff2&quot;))</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt;     factor n  level_names          scheme reference  intercept</span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt; 1     carb 6 1, 2, 3,....       contr.sum      &lt;NA&gt; grand mean</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; 2     gear 3      3, 4, 5  treatment_code      &lt;NA&gt;    mean(4)</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt; 3      cyl 3      4, 6, 8 contr.treatment      &lt;NA&gt;    mean(4)</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; 4 twolevel 2         a, b contr.treatment         a    mean(a)</span></span></code></pre></div>
 <p>Remember that <code>set_contrasts</code> will automatically coerce
 dataframe columns into factors when specifying a contrast, but
 <code>glimpse_contrasts</code> does <em>not</em> because it does not
@@ -1400,9 +1399,9 @@ preregistration:</p>
 <span id="cb38-38"><a href="#cb38-38" tabindex="-1"></a><span class="co"># Show a summary</span></span>
 <span id="cb38-39"><a href="#cb38-39" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(final_data, my_contrasts)</span>
 <span id="cb38-40"><a href="#cb38-40" tabindex="-1"></a><span class="co">#&gt;   factor n  level_names          scheme reference  intercept</span></span>
-<span id="cb38-41"><a href="#cb38-41" tabindex="-1"></a><span class="co">#&gt; 1   carb 6 1, 2, 3,....        sum_code         1 grand mean</span></span>
-<span id="cb38-42"><a href="#cb38-42" tabindex="-1"></a><span class="co">#&gt; 2    cyl 3      4, 6, 8 scaled_sum_code         4 grand mean</span></span>
-<span id="cb38-43"><a href="#cb38-43" tabindex="-1"></a><span class="co">#&gt; 3   gear 3      3, 4, 5        sum_code         3 grand mean</span></span>
+<span id="cb38-41"><a href="#cb38-41" tabindex="-1"></a><span class="co">#&gt; 1   carb 6 1, 2, 3,....        sum_code      &lt;NA&gt; grand mean</span></span>
+<span id="cb38-42"><a href="#cb38-42" tabindex="-1"></a><span class="co">#&gt; 2    cyl 3      4, 6, 8 scaled_sum_code      &lt;NA&gt; grand mean</span></span>
+<span id="cb38-43"><a href="#cb38-43" tabindex="-1"></a><span class="co">#&gt; 3   gear 3      3, 4, 5        sum_code      &lt;NA&gt; grand mean</span></span>
 <span id="cb38-44"><a href="#cb38-44" tabindex="-1"></a></span>
 <span id="cb38-45"><a href="#cb38-45" tabindex="-1"></a><span class="co"># Fit the model with contrasts set</span></span>
 <span id="cb38-46"><a href="#cb38-46" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> carb, <span class="at">data =</span> final_data)</span></code></pre></div>

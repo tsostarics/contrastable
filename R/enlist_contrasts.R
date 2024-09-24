@@ -127,8 +127,8 @@
 #' enlist_contrasts(my_df, gear ~ scaled_sum_code)
 #'
 #' # Use MASS::fractions to pretty print matrices for academic papers:
-#' enlist_contrasts(my_df, gear ~ scaled_sum_code, carb ~ helmert_code) |>
-#' lapply(MASS::fractions)
+#' lapply(enlist_contrasts(my_df, gear ~ scaled_sum_code, carb ~ helmert_code),
+#'        MASS::fractions)
 #'
 #' # Use a list of formulas to use the same contrasts with different datasets
 #' my_contrasts <- list(gear ~ scaled_sum_code, carb ~ helmert_code)

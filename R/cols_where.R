@@ -11,7 +11,8 @@
 #' @param return_names Whether names (where the fx returns TRUE) should be
 #' returned instead of a logical vector. Overwrites use.names.
 #'
-#' @return optionally named logical vector or character vector
+#' @return Optionally named logical vector or character vector depending on
+#' values of `use_names` and `return_names`
 .cols_where <- function(model_data,
                         fx,
                         use_names = FALSE,

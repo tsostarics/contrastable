@@ -19,7 +19,9 @@
 #' @importFrom MASS fractions
 #' @examples
 #'
-#' set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+#' head(
+#'    set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)
+#' )
 #'
 set_contrasts <- function(model_data,
                           ...,

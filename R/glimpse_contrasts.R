@@ -41,15 +41,6 @@
 #'
 #' # View information about contrasts; gear will use default for unordered
 #' glimpse_contrasts(my_data, my_contrasts)
-#'
-#' \dontrun{
-#' # Not passing the contrasts to `glimpse_contrasts` will show various warnings
-#' glimpse_contrasts(my_data)
-#'
-#' # A warning is thrown if the contrasts don't match what's on the dataset,
-#' # my_data$gear uses contr.treatment, not sum_code
-#' glimpse_contrasts(my_data, my_contrasts, gear ~ sum_code)
-#' }
 glimpse_contrasts <- function(model_data,
                               ...,
                               return_list = FALSE,

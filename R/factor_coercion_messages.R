@@ -8,7 +8,7 @@
 #' @param model_data Data frame to be used with the model
 #' @param vars_in_model Variables to check against
 #'
-#' @return Nothing, sends a message
+#' @return Nothing, messages the user
 .msg_if_ordered_reset <- function(model_data, vars_in_model) {
   which_are_ordered <- vapply(model_data[vars_in_model], is.ordered, TRUE)
 
@@ -39,7 +39,7 @@
 #' @param model_data Model data to look for factor columns
 #' @param attempting_factors Factor column names to check
 #'
-#' @return Warns if factors with only one level are detected.
+#' @return Nothing, warns if factors with only one level are detected.
 .warn_if_onelevel <- function(one_level_factors = NULL,
                               model_data = NULL,
                               attempting_factors = NULL) {
@@ -72,12 +72,12 @@
 
 #' Alert user when factor coercion happens
 #'
-#' Sends a message if columns in the dataset have been coerced to a factor,
+#' messages the user if columns in the dataset have been coerced to a factor,
 #' useful if you accidentally set a column with continuous data to a factor.
 #'
 #' @param which_to_factors Names of columns that have been coerced to factors
 #'
-#' @return Nothing, sends a message if needed
+#' @return Nothing, messages the user if needed
 .msg_if_coerced_to_factors <- function(which_to_factors) {
   varnames <- crayon::blue(paste(which_to_factors, collapse = " "))
   message(glue::glue("Converting to factors: {varnames}"))
@@ -86,13 +86,13 @@
 
 #' Alert user if there are more factors
 #'
-#' Sends a message if the user has factor columns in their model data frame
+#' messages the user if the user has factor columns in their model data frame
 #' that weren't specified along with any factors they DID set contrasts for.
 #'
 #' @param model_data Model data
 #' @param specified_vars variables specified by the user from formulas
 #'
-#' @return nothing, just sends a message if needed
+#' @return Nothing, messages the user if needed
 .msg_if_remaining_factors <- function(model_data, specified_vars) {
 
   which_are_factors  <- .cols_where(model_data, is.factor, use_names = TRUE)

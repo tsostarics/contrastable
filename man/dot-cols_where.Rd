@@ -18,7 +18,8 @@ Usually either \code{is.factor} or \code{is.ordered}}
 returned instead of a logical vector. Overwrites use.names.}
 }
 \value{
-optionally named logical vector or character vector
+Optionally named logical vector or character vector depending on
+values of \code{use_names} and \code{return_names}
 }
 \description{
 Helper to avoid the use of tidyselect and dplyr::select, returns either a

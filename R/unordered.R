@@ -7,8 +7,8 @@
 #'
 #' @param x a vector of data
 #'
-#' @return logical, TRUE if x is an unordered factor, FALSE if x is not a
-#' factor or is an ordered factor
+#' @return TRUE if x is an unordered factor, FALSE if x is not a factor or is an
+#'   ordered factor
 #' @export
 #'
 #' @examples

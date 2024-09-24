@@ -18,7 +18,7 @@
 \item{attempting_factors}{Factor column names to check}
 }
 \value{
-Warns if factors with only one level are detected.
+Nothing, warns if factors with only one level are detected.
 }
 \description{
 Factors with only one level happen if a character vector is converted to a

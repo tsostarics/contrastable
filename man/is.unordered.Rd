@@ -10,8 +10,8 @@ is.unordered(x)
 \item{x}{a vector of data}
 }
 \value{
-logical, TRUE if x is an unordered factor, FALSE if x is not a
-factor or is an ordered factor
+TRUE if x is an unordered factor, FALSE if x is not a factor or is an
+ordered factor
 }
 \description{
 Helper to check if a factor is exclusively unordered. is.factor(x) is TRUE
