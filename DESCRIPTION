@@ -11,6 +11,7 @@ Imports:
     cli,
     crayon,
     glue,
+    MASS,
     purrr,
     rlang (>= 0.1.2),
     stats,
@@ -20,9 +21,7 @@ Suggests:
     dplyr,
     knitr,
     testthat (>= 3.0.0),
-    lme4,
     roxygen2,
-    MASS,
     rmarkdown,
     covr,
     hypr

@@ -16,6 +16,7 @@
 #' @export
 #'
 #' @importFrom stats contrasts<-
+#' @importFrom MASS fractions
 #' @examples
 #'
 #' set_contrasts(mtcars, carb + cyl ~ helmert_code, print_contrasts = TRUE)

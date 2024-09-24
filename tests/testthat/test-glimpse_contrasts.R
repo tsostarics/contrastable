@@ -101,10 +101,11 @@ test_that("Nonexistant namespace returns original name", {
 
 
 test_that("Warning with non default contrasts works", {
-  tstdf <- dplyr::mutate(mtcars,
-                         gear = factor(gear),
-                         cyl = factor(cyl),
-                         carb = ordered(carb))
+  tstdf <- mtcars
+  tstdf$gear <- factor(tstdf$gear)
+  tstdf$cyl <- factor(tstdf$cyl)
+  tstdf$carb <- ordered(tstdf$carb)
+
   tstdf <- set_contrasts(tstdf,
                          cyl ~ contr.sum,
                          carb ~ raw_polynomial_code,
@@ -115,10 +116,12 @@ test_that("Warning with non default contrasts works", {
 })
 
 test_that("List output works", {
-  schemes <- list(
-    cyl ~ helmert_code,
-    gear ~ orth_polynomial_code
-  )
+  schemes <-
+    list(
+      cyl ~ helmert_code,
+      gear ~ orth_polynomial_code
+    )
+
   my_data <- set_contrasts(mtcars, schemes, verbose = FALSE)
   glimpse_list <- glimpse_contrasts(my_data,
                                     schemes,

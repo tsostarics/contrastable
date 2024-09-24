@@ -1,13 +1,14 @@
 test_that("set contrast equivalent to manual contrast codes", {
-  tst_df <- set_contrasts(dplyr::mutate(mtcars, gear = factor(gear)),
-    gear ~ helmert_code,
-    cyl ~ contr.sum,
-    verbose = FALSE
-  )
+  tst_df <-
+    set_contrasts(mtcars,
+                  gear ~ helmert_code,
+                  cyl ~ contr.sum,
+                  verbose = FALSE)
 
-  comparison_df <- dplyr::mutate(mtcars,
-                                 gear = factor(gear),
-                                 cyl = factor(cyl))
+  comparison_df <- mtcars
+  comparison_df$gear <- factor(comparison_df$gear)
+  comparison_df$cyl <- factor(comparison_df$cyl)
+
   contrasts(comparison_df$cyl) <-
     use_contrasts(comparison_df$cyl, contr.sum)
   contrasts(comparison_df$gear) <-
@@ -30,16 +31,16 @@ test_that("Ignoring dropped levels in orthogonal polynomial contrasts", {
   expect_warning(set_contrasts(mtcars,
                                carb ~ contr.poly - 4:6,
                                verbose = FALSE),
-    regexp = r"(Cannot use ... with set_contrasts.)"
+                 regexp = r"(Cannot use ... with set_contrasts.)"
   )
   testdf <- suppressWarnings(set_contrasts(mtcars,
-                          carb ~ contr.poly - 4:6,
-                          verbose = FALSE))
+                                           carb ~ contr.poly - 4:6,
+                                           verbose = FALSE))
 
   expect_warning(set_contrasts(mtcars,
                                gear ~ contr.sum - 2:3,
                                verbose = FALSE),
-    regexp = "only be used with polynomial contrasts"
+                 regexp = "only be used with polynomial contrasts"
   )
 
 
@@ -53,8 +54,8 @@ test_that("Contrasts print when asked for", {
                     gear ~ helmert_code,
                     print_contrasts = TRUE,
                     verbose = FALSE)
-      )
     )
+  )
 })
 
 
