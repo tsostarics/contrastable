@@ -97,7 +97,7 @@
 
   which_are_factors  <- .cols_where(model_data, is.factor, use_names = TRUE)
   which_are_ordered  <- .cols_where(model_data, is.ordered, use_names = TRUE)
-  which_are_onelevel <- .cols_where(model_data, .is.onelevel, use_names = TRUE)
+  which_are_onelevel <- .cols_where(model_data, \(x) nlevels(x) == 1L, use_names = TRUE)
   which_are_factors  <- which_are_factors[!which_are_onelevel]
   which_are_ordered  <- which_are_ordered[!which_are_onelevel]
 

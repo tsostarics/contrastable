@@ -397,7 +397,7 @@ glimpse_contrasts <- function(model_data,
   # Filter out any factors that only have 1 level to avoid undefined contrasts
   # Happens when character vectors with only 1 value are converted to a factor
   # without specifying the levels parameter in factor()
-  is_one_level <- .cols_where(model_data, .is.onelevel, use_names = TRUE)
+  is_one_level <- .cols_where(model_data, \(x) nlevels(x) == 1L, use_names = TRUE)
   is_one_level <- is_one_level[names(is_one_level) %in% unset_factors]
   is_ordered_factor <- is_ordered_factor[!is_one_level]
   unset_factors <- unset_factors[!is_one_level]

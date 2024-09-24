@@ -31,7 +31,3 @@
   }
   cols
 }
-
-.is.onelevel <- function(x) {
-  nlevels(x) == 1L
-}
