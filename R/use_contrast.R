@@ -253,7 +253,8 @@ use_contrasts.matrix <- function(factor_col,
       "Matrix given to code_by is size ",
       paste(given_matrix_size, collapse = "x"),
       " but factor_col contrast matrix is size ",
-      paste(factor_size, collapse = "x"), "."
+      paste(factor_size, collapse = "x"),
+      "."
     )
   }
 
@@ -330,9 +331,10 @@ use_contrasts.default <- function(factor_col,
 
   if (!is.matrix(code_by) && is.atomic(code_by)) {
     stop(
-      cli::format_error(c("Can't set contrasts with atomic type object, see example below:",
-                          "x" = "var ~ 1 + sum_code",
-                          "v" = "var ~ sum_code + 1"))
+      cli::format_error(
+        c("Can't set contrasts with atomic type object, see example below:",
+          "x" = "var ~ 1 + sum_code",
+          "v" = "var ~ sum_code + 1"))
     )
   }
 
@@ -464,10 +466,11 @@ use_contrasts.hypr <- function(factor_col,
 
 .get_dimnames <- function(factor_col) {
   labels <-
-    tryMatch(dimnames(stats::contrasts(factor_col)),
-             "cannot be represented accurately" =
-               c("Polynomial contrasts can only be used with <95 levels.",
-                 "Convert to unordered with  `as.unordered` or use a non-polynomial scheme.")
+    tryMatch(
+      dimnames(stats::contrasts(factor_col)),
+      "cannot be represented accurately" =
+        c("Polynomial contrasts can only be used with <95 levels.",
+          "Convert to unordered with  `as.unordered` or use a non-polynomial scheme.") # nolint
     )
 
   if (is.null(labels[[1L]])) {
@@ -499,4 +502,3 @@ use_contrasts.hypr <- function(factor_col,
   dimnames(new_contrasts) <- dimnames(contrast_matrix)
   new_contrasts
 }
-

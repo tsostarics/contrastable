@@ -51,5 +51,5 @@ test_that("is.unordered works", {
   expect_equal(names(enlist_contrasts(tstdf,
                                       where(is.unordered) ~ sum_code,
                                       verbose = FALSE)),
-               c('a', 'b'))
+               c("a", "b"))
 })

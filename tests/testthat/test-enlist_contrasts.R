@@ -205,7 +205,7 @@ test_that("error when no formula provided", {
                regexp = "No contrast formulas provided")
 })
 
-test_that("Warnings when reference level is attempted to be changed work properly", { # nolint
+test_that("Warnings when reference level is attempted to be changed work", {
   expect_error(
     enlist_contrasts(mtcars, cyl ~ helmert_code + "a", verbose = FALSE),
     regexp = "Reference level not found"
@@ -233,8 +233,10 @@ test_that("Error on illformed formula", {
 
 
 test_that("Error on illformed formula", {
-  expect_error(enlist_contrasts(mtcars, cyl ~ c("3", "4") + contr.sum, verbose = FALSE),
-               regexp = "Reference level is a function")
+  expect_error(
+    enlist_contrasts(mtcars, cyl ~ c("3", "4") + contr.sum, verbose = FALSE),
+    regexp = "Reference level is a function"
+  )
 })
 
 

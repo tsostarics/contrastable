@@ -27,7 +27,7 @@ test_that("Unknown nonatomic object throws warning", {
   class(foo) <- "foo"
 
   expect_warning(use_contrasts(factor(c(1, 2, 3)), foo),
-               regexp = "Can't set contrasts with object of class foo")
+                 regexp = "Can't set contrasts with object of class foo")
 
 })
 
@@ -73,17 +73,20 @@ test_that("Argument handling in parentheses & empty parentheses work", {
       four ~ contr.poly(scores = c(.1, .2, .5, .9))
     )
 
-  expect_equal(test_contrasts[["two"]],
-               contr.poly(2),
-               ignore_attr = TRUE
+  expect_equal(
+    test_contrasts[["two"]],
+    contr.poly(2),
+    ignore_attr = TRUE
   )
-  expect_equal(test_contrasts[["three"]],
-               contr.poly(3),
-               ignore_attr = TRUE
+  expect_equal(
+    test_contrasts[["three"]],
+    contr.poly(3),
+    ignore_attr = TRUE
   )
-  expect_equal(test_contrasts[["four"]],
-               contr.poly(4, scores = c(.1, .2, .5, .9)),
-               ignore_attr = TRUE
+  expect_equal(
+    test_contrasts[["four"]],
+    contr.poly(4, scores = c(.1, .2, .5, .9)),
+    ignore_attr = TRUE
   )
 
   expect_error(
@@ -143,20 +146,23 @@ test_that("Warnings when trying to set values with hypr object", {
   testthat::skip_if_not_installed("hypr")
 
   hypr_object <- hypr::hypr(b ~ a, d ~ a)
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
-                               hypr_object,
-                               reference_level = "b"),
-                 regexp = "reference_level ignored"
+  expect_warning(
+    use_contrasts(factor(c("a", "b", "c", "a")),
+                  hypr_object,
+                  reference_level = "b"),
+    regexp = "reference_level ignored"
   )
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
-                               hypr_object,
-                               set_intercept = "b"),
-                 regexp = "set_intercept ignored"
+  expect_warning(
+    use_contrasts(factor(c("a", "b", "c", "a")),
+                  hypr_object,
+                  set_intercept = "b"),
+    regexp = "set_intercept ignored"
   )
-  expect_warning(use_contrasts(factor(c("a", "b", "c", "a")),
-                               hypr_object,
-                               drop_trends = "b"),
-                 regexp = "drop_trends ignored"
+  expect_warning(
+    use_contrasts(factor(c("a", "b", "c", "a")),
+                  hypr_object,
+                  drop_trends = "b"),
+    regexp = "drop_trends ignored"
   )
 })
 

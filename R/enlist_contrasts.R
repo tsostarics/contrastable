@@ -238,7 +238,9 @@ enlist_contrasts <- function(model_data,
         seq_along(formulas),
         function(i) {
           # Reference value bindings
-          .process_contrasts(model_data, raw_formula = formulas[[i]], is_embedded)
+          .process_contrasts(model_data,
+                             raw_formula = formulas[[i]],
+                             is_embedded)
         }
       ),
       lhs_variables
@@ -275,14 +277,14 @@ enlist_contrasts <- function(model_data,
   # the parameters and warn the user that the - operator can't be used
   # (the missing comparisons are filled in with something else)
   if (omit_drop) {
-    if (!identical(params[['drop_trends']], NA))
+    if (!identical(params[["drop_trends"]], NA))
       warning(
         paste0("Cannot use `-` with set_contrasts, ignoring in ",
                deparse1(raw_formula),
                ".\n  Use enlist_contrasts instead."),
         call. = FALSE
       )
-    params[['drop_trends']] <- NA
+    params[["drop_trends"]] <- NA
   }
 
 

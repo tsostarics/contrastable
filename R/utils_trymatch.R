@@ -16,12 +16,12 @@
 tryMatch <- function(expr, ..., .parent = TRUE) {
   # Defuse the expression so it can be deparsed into a string
   defused_expr <- rlang::enquo(expr)
-  if (.parent){
+  if (.parent) {
     exprstr <- deparse1(sys.call(1))
   } else {
     exprstr <- deparse1(rlang::quo_get_expr(defused_expr))
   }
-  # browser()
+
   tryCatch(
     rlang::eval_tidy(defused_expr),
     error = \(e) {
@@ -104,7 +104,7 @@ stopWithMatch <- function(e, ..., exprstr = deparse1(sys.call(1))) {
       # First element of each match should use i, subsequent elements
       # should just be indented
       bullet_types <-
-        unlist(lapply(show_msgs, \(l) c("i", rep(" ", length(l)-1L))))
+        unlist(lapply(show_msgs, \(l) c("i", rep(" ", length(l) - 1L))))
       show_msgs <- unlist(show_msgs)
       names(show_msgs) <- bullet_types
 

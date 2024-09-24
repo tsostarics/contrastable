@@ -55,24 +55,28 @@ glimpse_contrasts <- function(model_data,
   # ensyms(...) when ... is not a symbol will throw an error, in which case we
   # can just use "..." as in the function definition
   dots_names <- tryCatch(as.character(rlang::ensyms(...)), error = \(e) "...")
-  model_data_name <- tryCatch(as.character(rlang::ensym(model_data)),
-                              error = \(e) {
-                                if (conditionMessage.condition(e) ==
-                                    "Can't convert to a symbol.")
-                                  return (model_data)
+  model_data_name <-
+    tryCatch(
+      as.character(rlang::ensym(model_data)),
+      error = \(e) {
+        if (conditionMessage.condition(e) == "Can't convert to a symbol.")
+          return (model_data)
 
-                                stop(e)
-                              })
+        stop(e)
+      }
+    )
 
   # If no formulas are provided but we want to glimpse all factors, use
   # glimpse_default_factors and return early. If all.factors is FALSE, then
   # we're going to get an error from enlist_contrasts anyways
   if (identical(formulas, list()) && show_all_factors) {
-    glimpse <- .glimpse_default_factors(model_data,
-                                        set_factors = c(),
-                                        show_one_level_factors,
-                                        verbose
-    )
+    glimpse <-
+      .glimpse_default_factors(
+        model_data,
+        set_factors = c(),
+        show_one_level_factors,
+        verbose
+      )
 
     if (add_namespace) {
       glimpse$scheme <- .add_namespace(glimpse$scheme)
@@ -256,14 +260,17 @@ glimpse_contrasts <- function(model_data,
 
   # Extract contrasts from the factor columns
   default_contrasts <-
-    lapply(unset_factors,
-           function(x)
-             tryMatch(
-               stats::contrasts(model_data[[x]]),
-               "cannot be represented accurately" =
-                 c("Polynomial contrasts can only be used with <95 levels.",
-                   glue::glue("Convert `{x}` to unordered with  `as.unordered` or use a non-polynomial scheme."))
-             ))
+    lapply(
+      unset_factors,
+      function(x) {
+        tryMatch(
+          stats::contrasts(model_data[[x]]),
+          "cannot be represented accurately" =
+            c("Polynomial contrasts can only be used with <95 levels.",
+              glue::glue("Convert `{x}` to unordered with  `as.unordered` or use a non-polynomial scheme.")) # nolint
+        )
+      }
+    )
 
   names(default_contrasts) <- unset_factors
 
@@ -294,8 +301,7 @@ glimpse_contrasts <- function(model_data,
   intercept_interpretations <- vapply(default_contrasts,
                                       interpret_intercept,
                                       character(1),
-                                      USE.NAMES = FALSE
-  )
+                                      USE.NAMES = FALSE)
 
   # Trends are never dropped with R's defaults
   dropped_trends <- rep(NA, length(unset_factors))
@@ -303,7 +309,7 @@ glimpse_contrasts <- function(model_data,
   if (minimal) {
     orthogonal_contrasts <- rep(NA, length(unset_factors))
     centered_contrasts   <- rep(NA, length(unset_factors))
-  } else{
+  } else {
     orthogonal_contrasts <- is_orthogonal(default_contrasts)
     centered_contrasts   <- is_centered(default_contrasts)
   }

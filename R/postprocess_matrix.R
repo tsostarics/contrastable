@@ -43,7 +43,7 @@
       cli::format_error(
         c(
           "Reference level is a function instead of an atomic type object.",
-          " " = "Is the contrast object/function in the wrong place? See example:",
+          " " = "Is the contrast object/function in the wrong place? See example:", # nolint
           "x" = "var ~ 1 + sum_code",
           "v" = "var ~ sum_code + 1"
         )

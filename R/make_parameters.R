@@ -38,15 +38,16 @@
   # Is the current node an operator for the package syntax? if so, process
   # the arguments for that operator appropriately and continue recursing.
   # if not, then we're at the top level and need to process the whole formula
-  switch(
-    .get_reserved_operator(node),
-    "~" = {params <- .process_factor_col(cur_expr, params, env, verbose)},
-    "+" = {params <- set("reference_level")},
-    "-" = {params <- set("drop_trends")},
-    "*" = {params <- set("intercept_level")},
-    "|" = {params <- set("labels")},
-    {params <- .process_code_by(formula, params, env, verbose)}
-  )
+  params <-
+    switch(
+      .get_reserved_operator(node),
+      "~" = .process_factor_col(cur_expr, params, env, verbose),
+      "+" = set("reference_level"),
+      "-" = set("drop_trends"),
+      "*" = set("intercept_level"),
+      "|" = set("labels"),
+      .process_code_by(formula, params, env, verbose)
+    )
 
   params
 }
@@ -140,14 +141,15 @@
 }
 
 .process_code_by <- function(formula, params, env, verbose) {
+  node_is_I <- \(f) identical(f[[1]], sym("I"))
 
   # Check if the formula contains AsIs specification
-  if (length(formula) > 1L && (identical(formula[[1]], sym("I")))) {
+  if (length(formula) > 1L && node_is_I(formula)) {
 
     not_singleton <- TRUE
 
     # Unwrap nested I()s
-    while(not_singleton && identical(formula[[1]], sym("I"))){
+    while(not_singleton && node_is_I(formula)) {
       formula <- formula[[2L]]
       not_singleton <- length(formula) > 1
     }
@@ -164,11 +166,11 @@
   }
 
   params[["code_by"]] <- formula
-  has_drop_trends <- !identical(params[['drop_trends']], NA)
+  has_drop_trends <- !identical(params[["drop_trends"]], NA)
   is_not_polynomial <- !.is_polynomial_scheme(as.character(params[['code_by']]))
 
   if (has_drop_trends && is_not_polynomial) {
-    params[['drop_trends']] <- NA
+    params[["drop_trends"]] <- NA
     if (verbose)
       warning("Ignoring the `-` operator: should only be used with polynomial contrasts", # nolint
               call. = FALSE)

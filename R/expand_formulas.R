@@ -44,35 +44,36 @@
 #' @importFrom tidyselect eval_select
 .expand_formulas <- function(formulas, data) {
   formulas <-
-    lapply(formulas,
-           \(formula) {
-             lhs <-
-               tryMatch(rlang::f_lhs(formula),
-                        "must be a formula" =
-                          "Did you use = instead of ~ when setting the contrast?")
+    lapply(
+      formulas,
+      \(formula) {
+        lhs <-
+          tryMatch(rlang::f_lhs(formula),
+                   "must be a formula" =
+                     "Did you use = instead of ~ when setting the contrast?")
 
 
-             rhs <- rlang::f_rhs(formula)
-             env <- rlang::f_env(formula)
+        rhs <- rlang::f_rhs(formula)
+        env <- rlang::f_env(formula)
 
-             # convert LHS like cyl + gear to c(cyl, gear), eval_select
-             # will check if the columns exist in the data & handle any
-             # selecting helpers like where(is.numeric)
-             expanded_expression <- .plus_to_c(lhs)
-             varnames <- names(eval_select(expanded_expression, data, env))
+        # convert LHS like cyl + gear to c(cyl, gear), eval_select
+        # will check if the columns exist in the data & handle any
+        # selecting helpers like where(is.numeric)
+        expanded_expression <- .plus_to_c(lhs)
+        varnames <- names(eval_select(expanded_expression, data, env))
 
-             formulas <- lapply(rlang::syms(varnames),
-                                \(varname) {
-                                  rlang::new_formula(varname, rhs, env)
-                                })
+        formulas <- lapply(rlang::syms(varnames),
+                           \(varname) {
+                             rlang::new_formula(varname, rhs, env)
+                           })
 
-             names(formulas) <- varnames
-             formulas
-           }
+        names(formulas) <- varnames
+        formulas
+      }
     )
 
-  tryMatch(purrr::list_flatten(formulas, name_repair = "check_unique"),
-           "." = "Left hand side of multiple formulas evaluated to the same column name") # nolint
-
-
+  tryMatch(
+    purrr::list_flatten(formulas, name_repair = "check_unique"),
+    "." = "Left hand side of multiple formulas evaluated to the same column name" # nolint
+    )
 }
