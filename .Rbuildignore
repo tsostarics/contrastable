@@ -6,3 +6,4 @@
 ^Meta$
 ^codecov\.yml$
 ^\.github$
+^cran-comments\.md$
