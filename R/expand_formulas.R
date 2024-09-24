@@ -75,5 +75,5 @@
   tryMatch(
     purrr::list_flatten(formulas, name_repair = "check_unique"),
     "." = "Left hand side of multiple formulas evaluated to the same column name" # nolint
-    )
+  )
 }
