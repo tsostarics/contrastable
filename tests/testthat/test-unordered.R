@@ -17,4 +17,5 @@ test_that("unordered coercions work", {
   # Otherwise the vector will be converted to an unordered factor with levels
   # in the default alphabetical order
   expect_equal(c("a", "b", "c"), levels(as.unordered(c("c", "a", "b"))))
+  expect_equal(as.character(1:4), levels(as.unordered(4:1)))
 })

@@ -43,6 +43,8 @@ is.unordered <- function(x) {
 #' # in the default alphabetical order
 #' as.unordered(c("c", "a", "b"))
 #'
+#' # Note that coercing integer values will sort the values to use as the levels
+#' as.unordered(4:1)
 as.unordered <- function(x) {
 
   if (is.unordered(x)){

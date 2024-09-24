@@ -30,4 +30,6 @@ as.unordered(ordered(c("a", "b", "c"), levels = c("c", "a", "b")))
 # in the default alphabetical order
 as.unordered(c("c", "a", "b"))
 
+# Note that coercing integer values will sort the values to use as the levels
+as.unordered(4:1)
 }
