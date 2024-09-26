@@ -125,8 +125,8 @@ use_contrasts.name <- function(factor_col,
   code_by <- get(code_by,envir = parent.frame())
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
-  method_call[[1]] <- use_contrasts
-  eval(method_call)
+  method_call[[1]] <- quote(use_contrasts)
+  eval(method_call, envir = parent.frame())
 }
 
 

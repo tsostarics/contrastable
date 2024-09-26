@@ -6,12 +6,26 @@ test_that("AsIs method dispatch works", {
 
 })
 
-test_that("name method dispatch works", {
+test_that("name method dispatch works with aliasing", {
   aliased_scheme <- sum_code
   contrast_scheme <- rlang::sym("aliased_scheme")
 
   expect_equal(use_contrasts(gl(5,1), contrast_scheme),
                use_contrasts.name(gl(5,1), contrast_scheme))
+})
+
+test_that("name method dispatch works with symbol manipulation", {
+  fx_sym <- rlang::sym("sum_code")
+  reference_value <- sum_code(3)
+  expect_equal(use_contrasts(gl(3,1), fx_sym),
+               reference_value,
+               ignore_attr = TRUE)
+
+  expect_equal(enlist_contrasts(data.frame(x = gl(3,1)),
+                                x ~ fx_sym,
+                                verbose = FALSE)[[1]],
+               reference_value,
+               ignore_attr = TRUE)
 })
 
 test_that("Matrix handling works", {
