@@ -1,8 +1,8 @@
 ---
-title: "contrasts"
+title: "Contrastable Overview"
 output: rmarkdown::html_vignette
 vignette: >
- %\VignetteIndexEntry{contrasts}
+ %\VignetteIndexEntry{Contrastable Overview}
  %\VignetteEngine{knitr::rmarkdown}
  %\VignetteEncoding{UTF-8}
 ---
@@ -754,7 +754,7 @@ If you want additional examples, see my blog posts below:
 
 
  - [Introduction to Contrasts using Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
- - [https://tsostaricsblog.netlify.app/posts/helmert/](On Helmert Coding)
+ - [On Helmert Coding](https://tsostaricsblog.netlify.app/posts/helmert/)
  
 If you need additional information regarding the various warnings and messages
 this package throws, you can check out the `warnings` vignette in this package.

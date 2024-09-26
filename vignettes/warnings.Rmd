@@ -1,8 +1,8 @@
 ---
-title: "Warnings and Messages"
+title: "Warnings, Messages, and Errors"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{warnings}
+  %\VignetteIndexEntry{Warnings, Messages, and Errors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
