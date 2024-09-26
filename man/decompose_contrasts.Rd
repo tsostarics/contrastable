@@ -76,3 +76,6 @@ mtcars |>
   str()
 
 }
+\seealso{
+\code{\link[=set_contrasts]{set_contrasts()}}
+}

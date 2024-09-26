@@ -58,3 +58,4 @@ foo2 <- function(a) {
 try(foo(a + 1))
 try(foo2(a + 1))
 }
+\keyword{internal}

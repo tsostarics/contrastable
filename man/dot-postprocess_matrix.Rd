@@ -17,9 +17,9 @@
 )
 }
 \arguments{
-\item{new_contrasts}{Contrast matrix passed from \code{use_contrasts}}
+\item{new_contrasts}{Contrast matrix passed from \code{\link[=use_contrasts]{use_contrasts()}}}
 
-\item{code_by}{What to code with, passed from \code{use_contrasts}}
+\item{code_by}{What to code with, passed from \code{\link[=use_contrasts]{use_contrasts()}}}
 
 \item{reference_level}{Reference level specification}
 
@@ -39,8 +39,12 @@
 Contrast matrix
 }
 \description{
-When using \code{use_contrasts} with a function or matrix, there are shared
+When using \code{\link[=use_contrasts]{use_contrasts()}} with a function or matrix, there are shared
 postprocessing steps for manipulating the contrasts to set the reference
 level, intercept, and labels. If as_is is TRUE, then these post processing
 steps aren't included.
 }
+\seealso{
+\code{\link[=use_contrasts]{use_contrasts()}}
+}
+\keyword{internal}

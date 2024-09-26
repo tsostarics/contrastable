@@ -16,7 +16,7 @@ Logical vector, will retain names of a passed list
 }
 \description{
 Given a contrast matrix or list of contrast matrices (eg from
-\code{enlist_contrasts}), return a logical vector of whether each contrast is
+\code{\link[=enlist_contrasts]{enlist_contrasts()}} ), return a logical vector of whether each contrast is
 orthogonal or not.
 }
 \examples{

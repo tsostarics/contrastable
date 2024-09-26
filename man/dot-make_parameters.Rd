@@ -25,12 +25,14 @@ check whether a function is actually a function.}
 if used incorrectly}
 }
 \value{
-Named list of parameters that can be evaluated in \code{enlist_contrasts}
+Named list of parameters that can be evaluated in
+\code{\link[=.process_contrasts]{.process_contrasts()}}
 }
 \description{
 Given a formula, recursively go through the abstract syntax tree and
-extract the necessary parameters for \code{use_contrasts}. While this method is
+extract the necessary parameters for \code{\link[=use_contrasts]{use_contrasts()}}. While this method is
 more involved than extracting from a parsed string representation, I think
 it handles matrix calls better since it plucks the call right out of
 the syntax tree.
 }
+\keyword{internal}

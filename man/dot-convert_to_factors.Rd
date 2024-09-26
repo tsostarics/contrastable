@@ -19,3 +19,4 @@ model_data with specified columns coerced to factors
 \description{
 Helper to convert columns to factors if they aren't already
 }
+\keyword{internal}

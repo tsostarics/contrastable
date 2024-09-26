@@ -9,12 +9,13 @@
 \arguments{
 \item{model_data}{Model data}
 
-\item{specified_vars}{variables specified by the user from formulas}
+\item{specified_vars}{Variables specified by the user from formulas}
 }
 \value{
-Nothing, messages the user if needed
+Nothing, messages the user if needed.
 }
 \description{
 messages the user if the user has factor columns in their model data frame
 that weren't specified along with any factors they DID set contrasts for.
 }
+\keyword{internal}

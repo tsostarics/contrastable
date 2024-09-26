@@ -20,3 +20,4 @@ replaces the \code{+} operators with \code{c} so that the LHS becomes \code{c(cy
 This function doesn't recurse into other function calls, for example:
 \code{cyl + gear + factor(1 + 2)} evaluates to \code{c(cyl, gear, factor(1+2))}.
 }
+\keyword{internal}

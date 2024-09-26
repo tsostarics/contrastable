@@ -7,6 +7,7 @@
 #' @param verbose Should messages be sent? Defaults to TRUE
 #'
 #' @return model_data with specified columns coerced to factors
+#' @keywords internal
 .convert_to_factors <- function(model_data, vars_in_model, verbose = TRUE) {
   which_not_factors <- vapply(
     model_data[vars_in_model],

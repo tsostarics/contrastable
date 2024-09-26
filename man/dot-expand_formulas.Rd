@@ -18,3 +18,4 @@ Named list of formulas
 Uses \code{{tidyselect}} functionality to expand the left hand side of a formula
 into multiple formulas. See examples of \code{enlist_contrasts} for examples.
 }
+\keyword{internal}

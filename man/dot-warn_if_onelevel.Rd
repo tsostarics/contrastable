@@ -27,3 +27,4 @@ parameter. If you try to access or set the contrasts for a one-level factor,
 you'll get an error that contrasts are undefined because you have 0 degrees
 of freedom.
 }
+\keyword{internal}

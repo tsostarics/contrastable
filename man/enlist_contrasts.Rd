@@ -21,18 +21,18 @@ can be removed using \code{-}.}
 List of named contrast matrices. Internally, if called within
 set_contrasts, will return a named list with \code{contrasts} equal to the list
 of named contrast matrices and \code{data} equal to the passed \code{model_data} with
-any factor coercions applied (so that \code{set_contrasts} doesn't need to do
+any factor coercions applied (so that \code{\link[=set_contrasts]{set_contrasts()}} doesn't need to do
 it a second time).
 }
 \description{
 Returns a named list of contrast matrices to use with modeling
-functions directly. See \link[contrastable]{set_contrasts} for a function
+functions directly. See \code{\link[=set_contrasts]{set_contrasts()}} for a function
 to set contrasts directly to the dataframe. See details for syntax
 information
 }
 \details{
-\link[contrastable]{enlist_contrasts}, \link[contrastable]{set_contrasts},
-and \link[contrastable]{glimpse_contrasts} use special syntax to set
+\code{\link[=enlist_contrasts]{enlist_contrasts()}}, \code{\link[=set_contrasts]{set_contrasts()}},
+and \code{\link[=glimpse_contrasts]{glimpse_contrasts()}} use special syntax to set
 contrasts for multiple factors. The syntax consists of two-sided formulas
 with the desired factor column on the left hand side and the contrast
 specification on the right hand side. For example, \code{varname ~ scaled_sum_code}. Many contrasts support additional kinds of contrast
@@ -40,10 +40,10 @@ manipulations using overloaded operators:
 \itemize{
 \item \code{+ X}: Set the reference level to the level named X. Only supported for
 schemes that have a singular reference level such as
-\link[contrastable]{sum_code}, \link[contrastable]{scaled_sum_code},
-\link[contrastable]{treatment_code}, \link[stats]{contr.treatment},
-\link[stats]{contr.sum}, \link[stats]{contr.SAS}. Ignored for schemes like
-\link[contrastable]{helmert_code}.
+\code{\link[=sum_code]{sum_code()}}, \code{\link[=scaled_sum_code]{scaled_sum_code()}},
+\code{\link[=treatment_code]{treatment_code()}}, \code{\link[stats:contrast]{stats::contr.treatment()}},
+\code{\link[stats:contrast]{stats::contr.sum()}}, \code{\link[stats:contrast]{stats::contr.SAS()}}. Ignored for schemes like
+\code{\link[=helmert_code]{helmert_code()}}.
 \item \verb{* X}: Overwrite the intercept to the mean of the level named X
 \item \code{- A:B}: For polynomial coding schemes only, drop comparisons A through B.
 \item \verb{| c(...)}: Change the comparison labels for the contrast matrix to the
@@ -65,17 +65,17 @@ enlist_contrasts(model_data, x~sum_code))}. Often, this will call
 \code{enlist_contrasts} twice, rather than just once.
 
 For some model fitting functions, like \code{brms::brm}, there is no
-contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
+contrasts argument. For such cases, use \code{\link[=set_contrasts]{set_contrasts()}} to
 set contrasts directly to the factors in a dataframe.
 
-One good way to use \link[contrastable]{enlist_contrasts} is in conjunction
-with \link[MASS]{fractions} to create a list of matrices that can be printed
+One good way to use \code{\link[=enlist_contrasts]{enlist_contrasts()}} is in conjunction
+with \code{\link[MASS:fractions]{MASS::fractions()}} to create a list of matrices that can be printed
 to explicitly show the entire contrast matrices you're using for your models.
 This can be especially helpful for supplementary materials in an academic
 paper.
 
 Sometimes when using orthogonal polynomial contrasts from
-\link[stats]{contr.poly}, people will drop higher level polynomials for
+\code{\link[stats:contrast]{stats::contr.poly()}} people will drop higher level polynomials for
 parsimony. Note however that these do capture some amount of variation, so
 even though they're orthogonal contrasts the lower level polynomials will
 have their estimates changed. Moreover, you cannot reduce a contrast matrix
@@ -169,12 +169,12 @@ all.equal(contr_list2, contr_list3)
 all.equal(contr_list3, contr_list4)
 all.equal(contr_list4, contr_list5)
 
-# You can also do something like this:
+# You can also use [tidyselect::where()] with class checking helpers:
 contr_list6 <- enlist_contrasts(mtcars,
                                 where(is.numeric) ~ sum_code,
                                 verbose = FALSE)
 
-# Each variable name must only be set ONCE, eg these will fail:
+# Each variable name must only be set ONCE, e.g. these will fail:
 try(enlist_contrasts(mtcars,
                      cyl ~ sum_code,
                      cyl ~ scaled_sum_code,
@@ -189,5 +189,5 @@ try(enlist_contrasts(mtcars,
                      verbose = FALSE))
 }
 \seealso{
-\code{\link[=set_contrasts]{set_contrasts()}}
+\code{\link[=set_contrasts]{set_contrasts()}} \code{\link[=glimpse_contrasts]{glimpse_contrasts()}}
 }

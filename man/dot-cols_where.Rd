@@ -26,3 +26,4 @@ Helper to avoid the use of tidyselect and dplyr::select, returns either a
 logical vector (optionally named) or a character vector of which columns
 satisfy the given function
 }
+\keyword{internal}

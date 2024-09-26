@@ -1,10 +1,10 @@
 #' Glimpse contrasts in dataframe
 #'
-#' Uses the same syntax as \link[contrastable]{enlist_contrasts} and
-#' \link[contrastable]{set_contrasts}. Returns a summary table of the contrasts
-#' you've set. If you set `return.list=TRUE` then you can access a list of
-#' contrasts in the second element of the resulting list. The glimpse dataframe
-#' is the first element. `FALSE` will return just the glimpse data frame.
+#' Uses the same syntax as [enlist_contrasts()] and
+#' [set_contrasts()]. Returns a summary table of the contrasts you've set. If
+#' you set `return.list=TRUE` then you can access a list of contrasts in the
+#' second element of the resulting list. The glimpse dataframe is the first
+#' element. `FALSE` will return just the glimpse data frame.
 #'
 #' @details
 #' Generally, `glimpse_contrasts` will give warnings about mismatches between
@@ -28,7 +28,7 @@
 #'   centered, dropped_trends, and explicitly_set columns from the output table
 #' @param verbose Logical, defaults to TRUE, whether messages should be printed
 #'
-#' @inherit enlist_contrasts details
+#' @seealso [enlist_contrasts()] [set_contrasts()]
 #' @return A dataframe if return.list is FALSE, a list with a dataframe and list
 #'   of named contrasts if TRUE.
 #' @export
@@ -244,6 +244,7 @@ glimpse_contrasts <- function(model_data,
 #'
 #' @return A table with information about the contrasts for all remaining factor
 #'   columns
+#' @keywords internal
 .glimpse_default_factors <- function(model_data,
                                      set_factors = NULL,
                                      show_one_level_factors = FALSE,
@@ -364,6 +365,7 @@ glimpse_contrasts <- function(model_data,
 #' @param one_level_factors Which factors are one level
 #'
 #' @return A data.frame with limited information about one level factors
+#' @keywords internal
 .make_placeholder_glimpse <- function(model_data, one_level_factors) {
   # Will be a list of 1-length character vectors to match list column type
   level_names <- lapply(
@@ -487,9 +489,19 @@ glimpse_contrasts <- function(model_data,
 }
 
 
-.get_scheme_labels <- function(params, formulas) {
-  vapply(seq_along(params), \(i) {
-    scheme <- deparse1(params[[i]][["code_by"]]) # code_by param is a sym or NA
+#' Get contrast scheme labels for glimpse table
+#'
+#' Looks up contrast functions from formulas and appends the necessary
+#' namespaces
+#'
+#' @param list_params List of params, see [.make_parameters()]
+#' @param formulas Formulas passed by the user
+#'
+#' @return Character vector
+#' @keywords internal
+.get_scheme_labels <- function(list_params, formulas) {
+  vapply(seq_along(list_params), \(i) {
+    scheme <- deparse1(list_params[[i]][["code_by"]]) # code_by param is a sym or NA
     # If it's a matrix call then it's taken to be custom contrasts
     if (grepl("^matrix\\(", scheme)) {
       return("custom")
@@ -525,16 +537,24 @@ glimpse_contrasts <- function(model_data,
 }
 
 
-.get_reference_level <- function(cmat) {
-  if (is.null(cmat)) {
-    stop("Contrast matrix is NULL, did you try to index a list of contrasts by a name that didn't exist in names(list)?") # nolint
+#' Get reference level of contrast matrix
+#'
+#' Compute the reference level manually if the information isn't available
+#' via parameters
+#'
+#' @param contrast_matrix Contrast matrix, if NULL will throw an error
+#' @seealso [.get_reference_levels()]
+#' @keywords internal
+.get_reference_level <- function(contrast_matrix) {
+  if (is.null(contrast_matrix)) {
+    stop("Contrast matrix is NULL, did you index a list of contrasts by a name that didn't exist in names(list)?") # nolint
   }
 
-  .is_valid_contrmat(cmat)
+  .is_valid_contrmat(contrast_matrix)
 
   # Compute the inverse matrix of the contrast matrix. The reference level is
   # the index of the column that has the same positive value in each row.
-  inverse_matrix <- solve(.contrasts_to_hypotheses(cmat))
+  inverse_matrix <- solve(.contrasts_to_hypotheses(contrast_matrix))
   find_same_col(inverse_matrix)
 }
 
@@ -549,8 +569,9 @@ glimpse_contrasts <- function(model_data,
 #'
 #'
 #' @param contrast_list List of contrasts, does not need to be named
-#' @param params Optional list of parameters from `.make_parameters()`, if NULL,
-#'   then the reference level is determined from the contrast matrix directly.
+#' @param list_params Optional list of parameters, see [.make_parameters()], if
+#'   NULL, then the reference level is determined from the contrast matrix
+#'   directly.
 #' @param formulas Optional list of formulas, needed if `params` are passed.
 #'   Used to get the correct environment for evaluating expressions in `params`.
 #'   If NULL, then the reference level is determiend from the contrast matrix
@@ -559,18 +580,19 @@ glimpse_contrasts <- function(model_data,
 #' @return Character vector of reference levels. If a contrast matrix is not
 #'   specified for row names, the character value will denote the integer index
 #'   of the row for the reference level (usually 1).
+#' @keywords internal
 .get_reference_levels <- function(contrast_list,
-                                  params = NULL,
+                                  list_params = NULL,
                                   formulas = NULL) {
-  params_available <- !is.null(params) & !is.null(formulas)
+  params_available <- !is.null(list_params) & !is.null(formulas)
   param_references <- c()
 
   # .get_from_params is already vectorized, so just get the results
   if (params_available) {
     param_references <- .get_from_params("reference_level",
-                                         params,
+                                         list_params,
                                          formulas)
-    names(param_references) <- names(params)
+    names(param_references) <- names(list_params)
   }
 
   vapply(names(contrast_list),
@@ -601,13 +623,22 @@ glimpse_contrasts <- function(model_data,
 
 }
 
-.get_from_params <- function(what, params, formulas) {
-  stopifnot(what %in% names(params[[1]]))
+#' Retrieve value from param list
+#'
+#' Helper to evaluate param entries.
+#'
+#' @param what Which parameter to retrieve
+#' @param list_params List of params, see [.make_parameters()]
+#' @param formulas Formulas used to set contrasts
+#'
+#' @return Requested value for each parameter as a string
+.get_from_params <- function(what, list_params, formulas) {
+  stopifnot(what %in% names(list_params[[1]]))
 
   vapply(
-    seq_along(params),
+    seq_along(list_params),
     function(i) {
-      param_symbol <- params[[i]][[what]]
+      param_symbol <- list_params[[i]][[what]]
 
       # Will evaluate variables and syntactic literals accordingly
       value <- eval(param_symbol, rlang::get_env(formulas[[i]]))
@@ -620,6 +651,23 @@ glimpse_contrasts <- function(model_data,
   )
 }
 
+#' Diagnose glimpse issues and send warnings
+#'
+#' [glimpse_contrasts()] does not modify the dataframe passed to it, which can
+#' result in mismatches between the data the user will use and the glimpse
+#' information presented. This runs many diagnostics to inform the use of such
+#' mismatches and provides suggestions on how to fix the issue.
+#'
+#' @param model_data Data user passed to [glimpse_contrasts()]
+#' @param contrast_list List of contrasts created by [enlist_contrasts()]
+#' @param model_data_name Name of the dataframe passed to the user, will be
+#' truncated if it's a long expression that has (likely) been piped
+#' @param dots_names Usually "...", in this case, the `...` filled in by the
+#' user (ie contrast formulas) will need to be expanded in the suggested fixes
+#' @param formulas Formulas passed by the user
+#'
+#' @return Nothing, issues warnings to the user.
+#' @keywords internal
 .warn_if_mismatched_contrasts <- function(model_data,
                                           contrast_list,
                                           model_data_name,

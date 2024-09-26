@@ -13,6 +13,7 @@
 #'
 #' @return The value of `eval(expr)` if no error, otherwise thows a formatted
 #' error
+#' @keywords internal
 tryMatch <- function(expr, ..., .parent = TRUE) {
   # Defuse the expression so it can be deparsed into a string
   defused_expr <- rlang::enquo(expr)
@@ -62,7 +63,7 @@ tryMatch <- function(expr, ..., .parent = TRUE) {
 #' @return Nothing, throws an error with the matches. When using this, the
 #' original calling function should be followed by a `stop()` call in case there
 #' are no matches.
-#'
+#' @keywords internal
 #' @examples
 #' try(contrastable:::tryMatch(a + 1,
 #'                             "not found" = "there is no a object!",

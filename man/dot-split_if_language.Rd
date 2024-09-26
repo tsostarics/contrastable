@@ -26,3 +26,4 @@ be evaluated in the original environment, for example if
 list would not evaluate the \code{c(...)} call, yielding an error that the scores
 argument isn't the right length (because it would be length 1, not 3).
 }
+\keyword{internal}

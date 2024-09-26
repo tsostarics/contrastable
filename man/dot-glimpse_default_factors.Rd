@@ -36,3 +36,4 @@ get a glimpse at how they're treated by the defaults specified in
 \code{options('contrasts')}. Reference level is assumed to be the first level for
 unordered factors and nonexistent for ordered factors.
 }
+\keyword{internal}

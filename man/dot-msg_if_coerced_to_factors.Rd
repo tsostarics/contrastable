@@ -10,9 +10,10 @@
 \item{which_to_factors}{Names of columns that have been coerced to factors}
 }
 \value{
-Nothing, messages the user if needed
+Nothing, messages the user if needed.
 }
 \description{
 messages the user if columns in the dataset have been coerced to a factor,
 useful if you accidentally set a column with continuous data to a factor.
 }
+\keyword{internal}

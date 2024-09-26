@@ -9,7 +9,7 @@
 #'
 #' @return A matrix with the reordered rows and correct values for the reference
 #'   level
-#' @export
+#' @keywords internal
 .switch_reference_level <- function(contrast_matrix,
                                     old_reference,
                                     new_reference) {
@@ -57,7 +57,18 @@
   as.matrix(contrast_matrix[, comparison_order])
 }
 
-.switch_reference_if_needed <- function(cmat,
+#' Check if reference switching is necessary
+#'
+#' Check if the contrast matrix is able to switch reference levels, and if it
+#' is requested, do so
+#'
+#' @param contrast_matrix Contrast matrix
+#' @param new_reference_label Name of the level to use
+#' @param new_reference_index Index of the level to use
+#'
+#' @return Contrast matrix with reference level swapped if needed
+#' @keywords internal
+.switch_reference_if_needed <- function(contrast_matrix,
                                         new_reference_label = NA,
                                         new_reference_index) {
   if (!is.na(new_reference_label) &&
@@ -65,7 +76,7 @@
     stop("Reference level not found in factor levels")
   }
 
-  default_reference_index <- .get_reference_level(cmat)
+  default_reference_index <- .get_reference_level(contrast_matrix)
 
   if (is.na(default_reference_index)) {
     if (!is.na(new_reference_label)) {
@@ -77,12 +88,12 @@
     if (identical(new_reference_index, integer(0))) {
       new_reference_index <- 1L
     }
-    cmat <- .switch_reference_level(
-      cmat,
+    contrast_matrix <- .switch_reference_level(
+      contrast_matrix,
       default_reference_index,
       new_reference_index
     )
   }
 
-  cmat
+  contrast_matrix
 }

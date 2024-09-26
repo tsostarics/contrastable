@@ -5,7 +5,7 @@
 #' the unweighted mean of multiple levels. Anything else would indicate custom
 #' weights that the user provided, hence they should know how to interpret it.
 #'
-#' @param contr_mat Contrast matrix
+#' @param contrast_matrix Contrast matrix
 #'
 #' @return A string describing how to interpret the effect on the intercept
 #' this coding scheme has
@@ -25,20 +25,20 @@
 #'
 #' interpret_intercept(unweighted_intercept) # mean(1,2)
 #' interpret_intercept(weighted_intercept) # custom weights
-interpret_intercept <- function(contr_mat) {
-  .nlevels <- nrow(contr_mat)
+interpret_intercept <- function(contrast_matrix) {
+  .nlevels <- nrow(contrast_matrix)
 
   # Account for polynomial contrasts with dropped trends, resulting in
   # non-square matrices
-  if (ncol(contr_mat) < (.nlevels - 1)) {
+  if (ncol(contrast_matrix) < (.nlevels - 1L)) {
     warning(paste0("Expected contrast matrix to have ",
                    .nlevels-1,
                    " columns but found ",
-                   ncol(contr_mat)))
+                   ncol(contrast_matrix)))
     return("grand mean")
   }
 
-  intercept_column <- .contrasts_to_hypotheses(contr_mat, nrow(contr_mat))[, 1]
+  intercept_column <- .contrasts_to_hypotheses(contrast_matrix)[, 1L]
 
   # Check if grand mean (most common), round to avoid floating point errors
   is_grandmean <- all(round(intercept_column - (1 / .nlevels), 10) == 0)
@@ -47,7 +47,7 @@ interpret_intercept <- function(contr_mat) {
   }
 
 
-  level_names <- rownames(contr_mat)
+  level_names <- rownames(contrast_matrix)
   if (is.null(level_names)) {
     level_names <- seq_len(.nlevels)
   }

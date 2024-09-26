@@ -37,3 +37,4 @@ numbers, they are not the same EXCEPT if n=2
 Note that "reference level" here is defined as a level from
 which every other level is compared to via pairwise comparisons.
 }
+\keyword{internal}

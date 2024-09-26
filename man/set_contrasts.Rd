@@ -23,22 +23,22 @@ can be removed using \code{-}.}
 \item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
 
 \item{print_contrasts}{Logical, default FALSE, whether to print the contrasts
-set for each factor. Fractions are displayed using \code{MASS::fractions}}
+set for each factor. Fractions are displayed using \code{\link[MASS:fractions]{MASS::fractions()}}}
 }
 \value{
-the model_data dataframe, but with updated contrasts.
+The \code{model_data} dataframe, but with updated contrasts.
 }
 \description{
-Uses the same syntax as \link[contrastable]{enlist_contrasts},
+Uses the same syntax as \code{\link[=enlist_contrasts]{enlist_contrasts()}},
 but returns the dataframe with the new contrasts applied. Use this when
 your model function doesnt have a contrasts argument and you want to avoid
 writing \verb{contrasts<-} multiple times. See
-\link[contrastable]{enlist_contrasts} for details about the
+\code{\link[=enlist_contrasts]{enlist_contrasts()}} for details about the
 package-specific syntax.
 }
 \details{
-\link[contrastable]{enlist_contrasts}, \link[contrastable]{set_contrasts},
-and \link[contrastable]{glimpse_contrasts} use special syntax to set
+\code{\link[=enlist_contrasts]{enlist_contrasts()}}, \code{\link[=set_contrasts]{set_contrasts()}},
+and \code{\link[=glimpse_contrasts]{glimpse_contrasts()}} use special syntax to set
 contrasts for multiple factors. The syntax consists of two-sided formulas
 with the desired factor column on the left hand side and the contrast
 specification on the right hand side. For example, \code{varname ~ scaled_sum_code}. Many contrasts support additional kinds of contrast
@@ -46,10 +46,10 @@ manipulations using overloaded operators:
 \itemize{
 \item \code{+ X}: Set the reference level to the level named X. Only supported for
 schemes that have a singular reference level such as
-\link[contrastable]{sum_code}, \link[contrastable]{scaled_sum_code},
-\link[contrastable]{treatment_code}, \link[stats]{contr.treatment},
-\link[stats]{contr.sum}, \link[stats]{contr.SAS}. Ignored for schemes like
-\link[contrastable]{helmert_code}.
+\code{\link[=sum_code]{sum_code()}}, \code{\link[=scaled_sum_code]{scaled_sum_code()}},
+\code{\link[=treatment_code]{treatment_code()}}, \code{\link[stats:contrast]{stats::contr.treatment()}},
+\code{\link[stats:contrast]{stats::contr.sum()}}, \code{\link[stats:contrast]{stats::contr.SAS()}}. Ignored for schemes like
+\code{\link[=helmert_code]{helmert_code()}}.
 \item \verb{* X}: Overwrite the intercept to the mean of the level named X
 \item \code{- A:B}: For polynomial coding schemes only, drop comparisons A through B.
 \item \verb{| c(...)}: Change the comparison labels for the contrast matrix to the
@@ -71,17 +71,17 @@ enlist_contrasts(model_data, x~sum_code))}. Often, this will call
 \code{enlist_contrasts} twice, rather than just once.
 
 For some model fitting functions, like \code{brms::brm}, there is no
-contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
+contrasts argument. For such cases, use \code{\link[=set_contrasts]{set_contrasts()}} to
 set contrasts directly to the factors in a dataframe.
 
-One good way to use \link[contrastable]{enlist_contrasts} is in conjunction
-with \link[MASS]{fractions} to create a list of matrices that can be printed
+One good way to use \code{\link[=enlist_contrasts]{enlist_contrasts()}} is in conjunction
+with \code{\link[MASS:fractions]{MASS::fractions()}} to create a list of matrices that can be printed
 to explicitly show the entire contrast matrices you're using for your models.
 This can be especially helpful for supplementary materials in an academic
 paper.
 
 Sometimes when using orthogonal polynomial contrasts from
-\link[stats]{contr.poly}, people will drop higher level polynomials for
+\code{\link[stats:contrast]{stats::contr.poly()}} people will drop higher level polynomials for
 parsimony. Note however that these do capture some amount of variation, so
 even though they're orthogonal contrasts the lower level polynomials will
 have their estimates changed. Moreover, you cannot reduce a contrast matrix
@@ -99,5 +99,5 @@ head(
 
 }
 \seealso{
-\code{\link[=enlist_contrasts]{enlist_contrasts()}}
+\code{\link[=enlist_contrasts]{enlist_contrasts()}} \code{\link[=glimpse_contrasts]{glimpse_contrasts()}}
 }

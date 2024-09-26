@@ -3,15 +3,16 @@
 #' Sometimes a user might pass a matrix that can't actually be used, in which
 #' case we can avoid some calculations by stopping earlier.
 #'
-#' @param contr_mat Contrast matrix
+#' @param contrast_matrix Contrast matrix
 #' @return invisibly returns TRUE
-.is_valid_contrmat <- function(contr_mat) {
-  if (diff(dim(contr_mat)) != -1L) {
+#' @keywords internal
+.is_valid_contrmat <- function(contrast_matrix) {
+  if (diff(dim(contrast_matrix)) != -1L) {
     stop(paste0("Contrast matrix has invalid size: ",
-                paste0(dim(contr_mat), collapse = ", ")))
+                paste0(dim(contrast_matrix), collapse = ", ")))
   }
 
-  tryMatch(.contrasts_to_hypotheses(contr_mat, nrow(contr_mat)),
+  tryMatch(.contrasts_to_hypotheses(contrast_matrix),
            "Lapack" = "This usually means your matrix is invalid for contrasts, try a different matrix.") # nolint
 
   return(invisible(TRUE))

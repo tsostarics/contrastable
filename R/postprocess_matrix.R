@@ -1,21 +1,23 @@
 #' Postprocess contrast matrices
 #'
-#' When using `use_contrasts` with a function or matrix, there are shared
+#' When using [use_contrasts()] with a function or matrix, there are shared
 #' postprocessing steps for manipulating the contrasts to set the reference
 #' level, intercept, and labels. If as_is is TRUE, then these post processing
 #' steps aren't included.
 #'
-#' @param new_contrasts Contrast matrix passed from `use_contrasts`
+#' @param new_contrasts Contrast matrix passed from [use_contrasts()]
 #' @param reference_level Reference level specification
 #' @param matrix_labels Labels from the matrix dimension names
 #' @param labels User-specified labels
 #' @param as_is Whether to use matrix as-is
 #' @param dots Any additional arguments passed with code_by
-#' @param code_by What to code with, passed from `use_contrasts`
+#' @param code_by What to code with, passed from [use_contrasts()]
 #' @param set_intercept Intercept specification
 #' @param drop_trends Any trends to drop
 #'
 #' @return Contrast matrix
+#' @seealso [use_contrasts()]
+#' @keywords internal
 .postprocess_matrix <- function(new_contrasts,
                                 code_by,
                                 reference_level,

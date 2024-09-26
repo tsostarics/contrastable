@@ -14,7 +14,8 @@ If \code{node} is a reserved operator, then return the operator as a
 string. Otherwise return the string "none".
 }
 \description{
-This is a helper for \code{.make_parameters}, which takes a symbol and checks
+A helper for \code{\link[=.make_parameters]{.make_parameters()}}, which takes a symbol and checks
 whether it corresponds to one of the reserved operators for the package
 syntax.
 }
+\keyword{internal}

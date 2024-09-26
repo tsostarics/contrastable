@@ -21,3 +21,4 @@ level
 \description{
 Reorders the rows of a contrast matrix to properly set the reference level
 }
+\keyword{internal}

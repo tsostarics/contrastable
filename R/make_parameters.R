@@ -1,7 +1,7 @@
 #' Make parameters for contrast code call
 #'
 #' Given a formula, recursively go through the abstract syntax tree and
-#' extract the necessary parameters for `use_contrasts`. While this method is
+#' extract the necessary parameters for [use_contrasts()]. While this method is
 #' more involved than extracting from a parsed string representation, I think
 #' it handles matrix calls better since it plucks the call right out of
 #' the syntax tree.
@@ -14,7 +14,9 @@
 #' @param verbose Logical, default `TRUE`, whether to show drop_trends warning
 #' if used incorrectly
 #'
-#' @return Named list of parameters that can be evaluated in `enlist_contrasts`
+#' @return Named list of parameters that can be evaluated in
+#' [.process_contrasts()]
+#' @keywords internal
 .make_parameters <- function(formula,
                              params = list(
                                "factor_col" = NA,
@@ -54,7 +56,7 @@
 
 #' Check for reserved operators
 #'
-#' This is a helper for `.make_parameters`, which takes a symbol and checks
+#' A helper for [.make_parameters()], which takes a symbol and checks
 #' whether it corresponds to one of the reserved operators for the package
 #' syntax.
 #'
@@ -62,6 +64,7 @@
 #'
 #' @return If `node` is a reserved operator, then return the operator as a
 #' string. Otherwise return the string "none".
+#' @keywords internal
 .get_reserved_operator <- function(node) {
   for (op_symbol in c("~","+", "-", "*", "|")) {
     if (identical(node, sym(op_symbol)))
@@ -71,8 +74,22 @@
   "none"
 }
 
+#' Check if node is a contrast-manipulation operator
+#'
+#' Some symbols are reserved for the special syntax implemented by the package.
+#' This function checks if a given node (i.e., a call) is one or more of
+#' `+ - * |`
+#'
+#' @param node List element
+#' @param check_sym If NULL (default), check all reserved operators. Otherwise,
+#' a string that will be converted to a symbol.
+#'
+#' @return `TRUE` if `node` is identical to a reserved operator, otherwise
+#' `FALSE`
+#' @export
+#' @keywords internal
 .is_reserved_operator <- function(node, check_sym = NULL) {
-  if (!missing(check_sym)) {
+  if (!is.null(check_sym)) {
     ops <- syms(check_sym)
   } else {
     ops <- syms(c("+", "-", "*", "|"))
@@ -84,6 +101,16 @@
 ## Process each of the various operators and assign the relevant parameters
 ## while recursing into the rest of the expression
 
+#' Process factor column
+#'
+#' This is usually the first thing to be processed in a formula like
+#' `varname ~ x`; ensures that `varname` is treated as a factor vector
+#'
+#' @param cur_expr Current expression, see [.make_parameters()]
+#' @inherit .make_parameters params
+#'
+#' @return Parameter list with `factor_col` updated
+#' @keywords internal
 .process_factor_col <- function(cur_expr, params, env, verbose) {
   params[["factor_col"]] <- cur_expr[[2L]]
   params <- .make_parameters(cur_expr[[3L]], params, env, verbose)
@@ -94,14 +121,16 @@
 #' Process and set parameter
 #'
 #' Unpacks the given expression to set the parameter specified by `which_param`
-#' to `params`. Continues recursively setting parameters via `make_parameters`.
+#' to `params`. Continues recursively setting parameters via
+#' [.make_parameters()].
 #'
 #' @param cur_expr Current expression, a formula or list representation thereof
-#' @param which_param Which parameter to set, a string, see `make_parameters`
+#' @param which_param Which parameter to set, a string
 #' for usage
 #' @inheritParams .make_parameters
-#'
+#' @seealso [.make_parameters()]
 #' @return `params`
+#' @keywords internal
 .set_param <- function(cur_expr, params, env, which_param, verbose) {
   LHS <- cur_expr[[2L]]
   RHS <-
@@ -140,6 +169,18 @@
   params
 }
 
+#' Process code_by
+#'
+#' Handles the `code_by` parameter and checks to make sure whether we can
+#' safely drop trends or not. Also handles any usage of [I()]
+#'
+#' @param formula Formula used to set contrast
+#' @param params Parameter list
+#' @param env Not used
+#' @param verbose Whether to throw the warning about invalid `-` usage
+#'
+#' @return Modified parameter list with updated `code_by`
+#' @keywords internal
 .process_code_by <- function(formula, params, env, verbose) {
   node_is_I <- \(f) identical(f[[1]], sym("I"))
 

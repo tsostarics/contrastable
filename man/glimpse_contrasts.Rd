@@ -42,11 +42,11 @@ A dataframe if return.list is FALSE, a list with a dataframe and list
 of named contrasts if TRUE.
 }
 \description{
-Uses the same syntax as \link[contrastable]{enlist_contrasts} and
-\link[contrastable]{set_contrasts}. Returns a summary table of the contrasts
-you've set. If you set \code{return.list=TRUE} then you can access a list of
-contrasts in the second element of the resulting list. The glimpse dataframe
-is the first element. \code{FALSE} will return just the glimpse data frame.
+Uses the same syntax as \code{\link[=enlist_contrasts]{enlist_contrasts()}} and
+\code{\link[=set_contrasts]{set_contrasts()}}. Returns a summary table of the contrasts you've set. If
+you set \code{return.list=TRUE} then you can access a list of contrasts in the
+second element of the resulting list. The glimpse dataframe is the first
+element. \code{FALSE} will return just the glimpse data frame.
 }
 \details{
 Generally, \code{glimpse_contrasts} will give warnings about mismatches between
@@ -63,4 +63,7 @@ my_data$gear <- factor(my_data$gear) # Make gear a factor manually
 
 # View information about contrasts; gear will use default for unordered
 glimpse_contrasts(my_data, my_contrasts)
+}
+\seealso{
+\code{\link[=enlist_contrasts]{enlist_contrasts()}} \code{\link[=set_contrasts]{set_contrasts()}}
 }

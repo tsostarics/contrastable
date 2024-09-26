@@ -38,6 +38,7 @@
 #'   of the given factor's contrasts
 #'
 #' @export
+#' @seealso [set_contrasts()]
 #' @examples
 #'
 #' # Decompose contrasts for carb and gear columns into new columns, using
@@ -69,12 +70,12 @@ decompose_contrasts <- function(model_data,
 
   # Model matrix gives us an intercept column that we usually do not care about
   if (remove_intercept)
-    components <- components[, -1]
+    components <- components[, -1L]
 
   # Remove the original columns as needed
   if (remove_original) {
     original_varnames <-
-      as.character(attr(stats::terms(extract), "variables")[-1])
+      as.character(attr(stats::terms(extract), "variables")[-1L])
     model_data <- model_data[, !colnames(model_data) %in% original_varnames]
   }
 

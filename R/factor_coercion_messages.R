@@ -8,7 +8,8 @@
 #' @param model_data Data frame to be used with the model
 #' @param vars_in_model Variables to check against
 #'
-#' @return Nothing, messages the user
+#' @return Nothing, messages the user.
+#' @keywords internal
 .msg_if_ordered_reset <- function(model_data, vars_in_model) {
   which_are_ordered <- vapply(model_data[vars_in_model], is.ordered, TRUE)
 
@@ -40,6 +41,7 @@
 #' @param attempting_factors Factor column names to check
 #'
 #' @return Nothing, warns if factors with only one level are detected.
+#' @keywords internal
 .warn_if_onelevel <- function(one_level_factors = NULL,
                               model_data = NULL,
                               attempting_factors = NULL) {
@@ -77,7 +79,8 @@
 #'
 #' @param which_to_factors Names of columns that have been coerced to factors
 #'
-#' @return Nothing, messages the user if needed
+#' @return Nothing, messages the user if needed.
+#' @keywords internal
 .msg_if_coerced_to_factors <- function(which_to_factors) {
   varnames <- crayon::blue(paste(which_to_factors, collapse = " "))
   message(glue::glue("Converting to factors: {varnames}"))
@@ -90,9 +93,10 @@
 #' that weren't specified along with any factors they DID set contrasts for.
 #'
 #' @param model_data Model data
-#' @param specified_vars variables specified by the user from formulas
+#' @param specified_vars Variables specified by the user from formulas
 #'
-#' @return Nothing, messages the user if needed
+#' @return Nothing, messages the user if needed.
+#' @keywords internal
 .msg_if_remaining_factors <- function(model_data, specified_vars) {
 
   which_are_factors  <- .cols_where(model_data, is.factor, use_names = TRUE)

@@ -4,10 +4,10 @@
 \alias{.is_valid_contrmat}
 \title{Check if valid contrast}
 \usage{
-.is_valid_contrmat(contr_mat)
+.is_valid_contrmat(contrast_matrix)
 }
 \arguments{
-\item{contr_mat}{Contrast matrix}
+\item{contrast_matrix}{Contrast matrix}
 }
 \value{
 invisibly returns TRUE
@@ -16,3 +16,4 @@ invisibly returns TRUE
 Sometimes a user might pass a matrix that can't actually be used, in which
 case we can avoid some calculations by stopping earlier.
 }
+\keyword{internal}

@@ -1,7 +1,7 @@
 #' Check for orthogonality
 #'
 #' Given a contrast matrix or list of contrast matrices (eg from
-#' `enlist_contrasts`), return a logical vector of whether each contrast is
+#' [enlist_contrasts()]), return a logical vector of whether each contrast is
 #' centered or not.
 #'
 #' @inherit is_orthogonal params

@@ -1,18 +1,18 @@
 #' Set contrasts to dataframe
 #'
-#' @description Uses the same syntax as \link[contrastable]{enlist_contrasts},
+#' @description Uses the same syntax as [enlist_contrasts()],
 #'   but returns the dataframe with the new contrasts applied. Use this when
 #'   your model function doesnt have a contrasts argument and you want to avoid
 #'   writing `contrasts<-` multiple times. See
-#'   \link[contrastable]{enlist_contrasts} for details about the
+#'   [enlist_contrasts()] for details about the
 #'   package-specific syntax.
 #'
 #' @inherit enlist_contrasts params details
 #' @param print_contrasts Logical, default FALSE, whether to print the contrasts
-#' set for each factor. Fractions are displayed using `MASS::fractions`
-#' @seealso [enlist_contrasts()]
+#' set for each factor. Fractions are displayed using [MASS::fractions()]
+#' @seealso [enlist_contrasts()] [glimpse_contrasts()]
 #'
-#' @return the model_data dataframe, but with updated contrasts.
+#' @return The `model_data` dataframe, but with updated contrasts.
 #' @export
 #'
 #' @importFrom stats contrasts<-

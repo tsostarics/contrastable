@@ -25,6 +25,7 @@
 #'
 #' @return Integer index of the reference level, if there is
 #' no reference level, NA is returned
+#' @keywords internal
 find_same_col <- function(invmatrix) {
   ncols <- ncol(invmatrix)
   indices <- seq.int(2, nrow(invmatrix))

@@ -19,3 +19,4 @@ If the user wants factors with only one level included, this will create
 the table to present that information. It's a lot of NAs because contrasts
 aren't defined for only 1 level.
 }
+\keyword{internal}

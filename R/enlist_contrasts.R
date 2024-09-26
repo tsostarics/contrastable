@@ -1,14 +1,14 @@
 #' List of contrast matrices
 #'
 #' @description Returns a named list of contrast matrices to use with modeling
-#'   functions directly. See \link[contrastable]{set_contrasts} for a function
+#'   functions directly. See [set_contrasts()] for a function
 #'   to set contrasts directly to the dataframe. See details for syntax
 #'   information
 #'
 #' @details
 #'
-#' \link[contrastable]{enlist_contrasts}, \link[contrastable]{set_contrasts},
-#' and \link[contrastable]{glimpse_contrasts} use special syntax to set
+#' [enlist_contrasts()], [set_contrasts()],
+#' and [glimpse_contrasts()] use special syntax to set
 #' contrasts for multiple factors. The syntax consists of two-sided formulas
 #' with the desired factor column on the left hand side and the contrast
 #' specification on the right hand side. For example, `varname ~
@@ -17,10 +17,10 @@
 #'
 #'  - `+ X`: Set the reference level to the level named X. Only supported for
 #' schemes that have a singular reference level such as
-#' \link[contrastable]{sum_code}, \link[contrastable]{scaled_sum_code},
-#' \link[contrastable]{treatment_code}, \link[stats]{contr.treatment},
-#' \link[stats]{contr.sum}, \link[stats]{contr.SAS}. Ignored for schemes like
-#' \link[contrastable]{helmert_code}.
+#' [sum_code()], [scaled_sum_code()],
+#' [treatment_code()], [stats::contr.treatment()],
+#' [stats::contr.sum()], [stats::contr.SAS()]. Ignored for schemes like
+#' [helmert_code()].
 #'  - `* X`: Overwrite the intercept to the mean of the level named X
 #'  - `- A:B`: For polynomial coding schemes only, drop comparisons A through B.
 #'  - `| c(...)`: Change the comparison labels for the contrast matrix to the
@@ -41,17 +41,17 @@
 #' `enlist_contrasts` twice, rather than just once.
 #'
 #' For some model fitting functions, like `brms::brm`, there is no
-#' contrasts argument. For such cases, use \link[contrastable]{set_contrasts} to
+#' contrasts argument. For such cases, use [set_contrasts()] to
 #' set contrasts directly to the factors in a dataframe.
 #'
-#' One good way to use \link[contrastable]{enlist_contrasts} is in conjunction
-#' with \link[MASS]{fractions} to create a list of matrices that can be printed
+#' One good way to use [enlist_contrasts()] is in conjunction
+#' with [MASS::fractions()] to create a list of matrices that can be printed
 #' to explicitly show the entire contrast matrices you're using for your models.
 #' This can be especially helpful for supplementary materials in an academic
 #' paper.
 #'
 #' Sometimes when using orthogonal polynomial contrasts from
-#' \link[stats]{contr.poly}, people will drop higher level polynomials for
+#' [stats::contr.poly()] people will drop higher level polynomials for
 #' parsimony. Note however that these do capture some amount of variation, so
 #' even though they're orthogonal contrasts the lower level polynomials will
 #' have their estimates changed. Moreover, you cannot reduce a contrast matrix
@@ -72,9 +72,9 @@
 #' @return List of named contrast matrices. Internally, if called within
 #' set_contrasts, will return a named list with `contrasts` equal to the list
 #' of named contrast matrices and `data` equal to the passed `model_data` with
-#' any factor coercions applied (so that `set_contrasts` doesn't need to do
+#' any factor coercions applied (so that [set_contrasts()] doesn't need to do
 #' it a second time).
-#' @seealso [set_contrasts()]
+#' @seealso [set_contrasts()] [glimpse_contrasts()]
 #' @export
 #'
 #'@importFrom rlang expr enquo enquos sym syms := ensym ensyms f_rhs f_lhs
@@ -164,12 +164,12 @@
 #' all.equal(contr_list3, contr_list4)
 #' all.equal(contr_list4, contr_list5)
 #'
-#' # You can also do something like this:
+#' # You can also use [tidyselect::where()] with class checking helpers:
 #' contr_list6 <- enlist_contrasts(mtcars,
 #'                                 where(is.numeric) ~ sum_code,
 #'                                 verbose = FALSE)
 #'
-#' # Each variable name must only be set ONCE, eg these will fail:
+#' # Each variable name must only be set ONCE, e.g. these will fail:
 #' try(enlist_contrasts(mtcars,
 #'                      cyl ~ sum_code,
 #'                      cyl ~ scaled_sum_code,
@@ -268,6 +268,7 @@ enlist_contrasts <- function(model_data,
 #' enlist_contrasts)
 #'
 #' @return A contrast matrix
+#' @keywords internal
 .process_contrasts <- function(model_data, raw_formula, omit_drop) {
   var_envir <- rlang::get_env(raw_formula)
 
@@ -321,6 +322,7 @@ enlist_contrasts <- function(model_data,
 #' @return Parameter list with `code_by` set to the correct symbol & an
 #' additional list entry for other arguments, which will be empty if no
 #' arguments are provided.
+#' @keywords internal
 .split_if_language <- function(params, var_envir) {
 
   params[["other_args"]] <- list()

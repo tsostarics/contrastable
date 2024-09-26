@@ -20,13 +20,7 @@ the `contrasts` vignette with `vignette('contrasts', 'contrastable')`.
 
 ## Installation
 
-You can install the latest version from CRAN with:
-
-``` r
-install.packages("contrastable")
-```
-
-Or you can install the development version from
+You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r

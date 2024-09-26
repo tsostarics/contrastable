@@ -4,13 +4,14 @@
 \alias{.get_reference_levels}
 \title{Get reference levels from a (possibly set) list of contrasts}
 \usage{
-.get_reference_levels(contrast_list, params = NULL, formulas = NULL)
+.get_reference_levels(contrast_list, list_params = NULL, formulas = NULL)
 }
 \arguments{
 \item{contrast_list}{List of contrasts, does not need to be named}
 
-\item{params}{Optional list of parameters from \code{.make_parameters()}, if NULL,
-then the reference level is determined from the contrast matrix directly.}
+\item{list_params}{Optional list of parameters, see \code{\link[=.make_parameters]{.make_parameters()}}, if
+NULL, then the reference level is determined from the contrast matrix
+directly.}
 
 \item{formulas}{Optional list of formulas, needed if \code{params} are passed.
 Used to get the correct environment for evaluating expressions in \code{params}.
@@ -29,3 +30,4 @@ the parameters to look up the reference level for each contrast matrix. If
 the parameters have not been computed (usually because the contrasts are
 using the defaults) then look up the reference level manually.
 }
+\keyword{internal}

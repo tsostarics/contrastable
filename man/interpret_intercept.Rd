@@ -4,10 +4,10 @@
 \alias{interpret_intercept}
 \title{Interpret intercept from contrasts}
 \usage{
-interpret_intercept(contr_mat)
+interpret_intercept(contrast_matrix)
 }
 \arguments{
-\item{contr_mat}{Contrast matrix}
+\item{contrast_matrix}{Contrast matrix}
 }
 \value{
 A string describing how to interpret the effect on the intercept

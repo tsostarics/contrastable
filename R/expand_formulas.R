@@ -10,6 +10,7 @@
 #' @param plus_expr Expression
 #'
 #' @return A new expression where `+` is replaced with `c()`
+#' @keywords internal
 .plus_to_c <- function(plus_expr) {
 
   is_plus <- tryCatch(identical(plus_expr[[1]],
@@ -42,6 +43,7 @@
 #'
 #' @return Named list of formulas
 #' @importFrom tidyselect eval_select
+#' @keywords internal
 .expand_formulas <- function(formulas, data) {
   formulas <-
     lapply(

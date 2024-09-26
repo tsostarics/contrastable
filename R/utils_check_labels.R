@@ -1,3 +1,16 @@
+#' Reset comparison labels of matrix to defaults
+#'
+#' Given a contrast matrix and a coding function used to generate it, check
+#' whether we have default labels implemented. If so, use them if the matrix
+#' doesn't have unique ones. If no function is provided, just use what the
+#' matrix has or use numeric indices
+#'
+#' @param contr_mat Contrast matrix
+#' @param coding_fx Function name as a string
+#'
+#' @return Matrix with column names changed if necessary
+#'
+#' @keywords internal
 .reset_comparison_labels <- function(contr_mat, coding_fx = NULL) {
   # Early exit if this isn't a valid contrast matrix
   .is_valid_contrmat(contr_mat)

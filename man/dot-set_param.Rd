@@ -15,7 +15,7 @@
 pulled from \code{formula} and then passed to subsequent recursions. Needed to
 check whether a function is actually a function.}
 
-\item{which_param}{Which parameter to set, a string, see \code{make_parameters}
+\item{which_param}{Which parameter to set, a string
 for usage}
 
 \item{verbose}{Logical, default \code{TRUE}, whether to show drop_trends warning
@@ -26,5 +26,10 @@ if used incorrectly}
 }
 \description{
 Unpacks the given expression to set the parameter specified by \code{which_param}
-to \code{params}. Continues recursively setting parameters via \code{make_parameters}.
+to \code{params}. Continues recursively setting parameters via
+\code{\link[=.make_parameters]{.make_parameters()}}.
 }
+\seealso{
+\code{\link[=.make_parameters]{.make_parameters()}}
+}
+\keyword{internal}

@@ -12,7 +12,7 @@
 \item{vars_in_model}{Variables to check against}
 }
 \value{
-Nothing, messages the user
+Nothing, messages the user.
 }
 \description{
 Ordered factors use orthogonal polynomials (contr.poly) by default with
@@ -20,3 +20,4 @@ k number of levels -1 (k-1) of trend comparisons. If you use these functions
 to set the contrasts to something else, the ordered class (hence ordering
 to the levels) will remain but the contrasts will be set to something else.
 }
+\keyword{internal}

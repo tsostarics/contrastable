@@ -1,5 +1,3 @@
-
-
 #' Check for unordered factor
 #'
 #' Helper to check if a factor is exclusively unordered. is.factor(x) is TRUE

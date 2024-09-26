@@ -22,3 +22,4 @@ A contrast matrix
 Processes a formula and any arguments for the contrast matrix and sets up
 the use_contrasts call
 }
+\keyword{internal}
