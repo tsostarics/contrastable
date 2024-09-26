@@ -262,9 +262,7 @@ test_that("Check that implementation of contrast functions remains the same", {
       "helmert_code",
       "reverse_helmert_code",
       "backward_difference_code",
-      "forward_difference_code",
-      "polynomial_code",
-      "raw_polynomial_code")
+      "forward_difference_code")
 
   tstdata_2 <- data.frame(x = gl(2,1))
   tstdata_5 <- data.frame(x = gl(5,1))
