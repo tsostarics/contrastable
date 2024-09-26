@@ -445,7 +445,17 @@ use_contrasts.hypr <- function(factor_col,
   contrast_matrix
 }
 
-# Extract parameters to coding function call from user-supplied dots
+#' Extract parameters from dots
+#'
+#' If there are any other arguments passed to a contrast coding function by
+#' the user, ensure they're bundled together correctly. This is especially
+#' important for setting the number of levels correctly.
+#'
+#' @param factor_col Factor to set contrasts to
+#' @param ... Other arguments passed by the user
+#'
+#' @return Function call parameters as a list
+#' @keywords internal
 .bundle_params <- function(factor_col, ...) {
   n <- nlevels(factor_col)
   other_args <- rlang::dots_list(...)[["other"]]
@@ -464,6 +474,16 @@ use_contrasts.hypr <- function(factor_col,
   params
 }
 
+#' Get dimnames of contrasts from factor
+#'
+#' Given a factor, extract the row and column names of the contrasts. If they're
+#' not set, then use default values. Also helps to catch invalid usage of
+#' polynomial contrasts.
+#'
+#' @param factor_col Factor to extract contrasts from
+#'
+#' @return List of rownames and column names
+#' @keywords internal
 .get_dimnames <- function(factor_col) {
   labels <-
     tryMatch(
@@ -483,6 +503,17 @@ use_contrasts.hypr <- function(factor_col,
 }
 
 
+#' Set intercept for contrast matrix
+#'
+#' Given a contrast matrix and a desired level, change the intercept via
+#' manipulating underlying hypothesis matrix.
+#'
+#' @param contrast_matrix Contrast matrix to use
+#' @param intercept_level Level to use as intercept, must be present in the
+#' row names of the contrast matrix
+#'
+#' @return Manipulated contrast matrix
+#' @keywords internal
 .set_intercept <- function(contrast_matrix, intercept_level) {
   if (!intercept_level %in% rownames(contrast_matrix)) {
     stop("Specified level to use as intercept not found in factor level names")
@@ -490,7 +521,7 @@ use_contrasts.hypr <- function(factor_col,
 
   n <- nrow(contrast_matrix)
   # Add back the missing intercept, solve the transpose for hypothesis matrix
-  hypothesis_matrix <- .contrasts_to_hypotheses(contrast_matrix, n)
+  hypothesis_matrix <- .contrasts_to_hypotheses(contrast_matrix)
 
   intercept_column <- rep(0, n)
   intercept_index <- which(rownames(contrast_matrix) == intercept_level)
