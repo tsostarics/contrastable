@@ -1,7 +1,7 @@
 Package: contrastable
 Type: Package
 Title: Consistent Contrast Coding for Factors
-Version: 0.3.5
+Version: 1.0.0
 Authors@R: person("Sostarics", "Thomas", email = "tsostarics@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1178-7967"))
 Description: Quickly set and summarize contrasts for factors prior to regression analyses. Intended comparisons can be explicitly set and documented without the user needing to directly manipulate matrices.
 License: MIT + file LICENSE
