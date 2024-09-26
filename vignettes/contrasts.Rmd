@@ -31,7 +31,7 @@ interpreted, but will describe some of the high level differences. I recommend
 reading the following:
 
 - [UCLA R Library Contrast Coding Systems for Categorical Variables](https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/)
-- [How to capitalize on a priori contrasts in linear (mixed) models: A tutorial](https://www.sciencedirect.com/science/article/pii/S0749596X19300695)
+- [How to capitalize on a priori contrasts in linear (mixed) models: A tutorial](https://doi.org/10.1016/j.jml.2019.104038)
 - [Regresion modeling for linguistic data (preprint)](https://osf.io/pnumg/)
 
 I also have a few blog posts about contrast coding; if you need further
@@ -39,7 +39,7 @@ explanation of contrasts and more working examples beyond this vignette, read
 the first one below:
 
  - [Introduction to Contrasts using Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
- - [https://tsostaricsblog.netlify.app/posts/helmert/](On Helmert Coding)
+ - [On Helmert Coding](https://tsostaricsblog.netlify.app/posts/helmert/)
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(contrastable)

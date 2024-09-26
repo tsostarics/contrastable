@@ -34,6 +34,13 @@ Detailed usage is available in the `contrasts` vignette with
 
 ## Installation
 
+You can install from CRAN with:
+
+```{r}
+install.packages("contrastable")
+```
+
+
 You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
