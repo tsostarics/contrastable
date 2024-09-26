@@ -1,12 +1,12 @@
 test_that("unordered checks work", {
-  expect_true(is.unordered(gl(5,1)))
-  expect_false(is.unordered(gl(5,1,ordered = TRUE)))
+  expect_true(is.unordered(gl(5, 1)))
+  expect_false(is.unordered(gl(5, 1, ordered = TRUE)))
 })
 
 test_that("unordered coercions work", {
 
   # Convert an ordered factor to unordered
-  expect_true(is.unordered(as.unordered(gl(5,1,ordered = TRUE))))
+  expect_true(is.unordered(as.unordered(gl(5, 1, ordered = TRUE))))
 
   # If level order is pre-specified differently from default alphabetical order
   # then the ordering will be retained

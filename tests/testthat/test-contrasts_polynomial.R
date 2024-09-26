@@ -1,8 +1,8 @@
 test_that("Polynomial verification works", {
   cmat <- contr.poly(5)
   cmat2 <- unname(contr.poly(5))
-  tstdf <- data.frame(x = gl(5,1),
-                      y = gl(100,1))
+  tstdf <- data.frame(x = gl(5, 1),
+                      y = gl(100, 1))
 
   poly_results1 <- enlist_contrasts(tstdf, x ~ cmat | c("a", "b", "c", "d"),
                                     verbose = FALSE)
@@ -30,7 +30,7 @@ test_that("Error with too many levels", {
   )
 
   expect_error(
-    glimpse_contrasts(tstdf,show_all_factors = TRUE, verbose = FALSE),
+    glimpse_contrasts(tstdf, show_all_factors = TRUE, verbose = FALSE),
     "Convert `b` to unordered"
   )
 })

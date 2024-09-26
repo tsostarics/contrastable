@@ -1,11 +1,10 @@
 # Check that implementation of contrast functions remains the same
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code
@@ -52,12 +51,11 @@
 ---
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- suppressWarnings(rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx +
           2)))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code
@@ -104,11 +102,10 @@
 ---
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx * 2))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code
@@ -155,11 +152,10 @@
 ---
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code
@@ -230,11 +226,10 @@
 ---
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx * 3))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code
@@ -305,12 +300,11 @@
 ---
 
     Code
-      sapply(schemes, function(s) {
+      lapply(schemes, function(s) {
         fx <- sym(s)
         cmat <- suppressWarnings(rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx +
           3)))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+        as.character(MASS::fractions(cmat[[1L]]))
       })
     Output
       $sum_code

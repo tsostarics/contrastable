@@ -122,7 +122,7 @@ use_contrasts.name <- function(factor_col,
                                as_is = FALSE, ...) {
 
 
-  code_by <- get(code_by,envir = parent.frame())
+  code_by <- get(code_by, envir = parent.frame())
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
   method_call[[1]] <- quote(use_contrasts)
@@ -383,9 +383,12 @@ use_contrasts.hypr <- function(factor_col,
   # to set contrasts for. If we're successful, this should be a character vector
   # of length 1 containing just the name of the factor column
   potential_factor_name <-
-    as.character(eval(rlang::get_expr(rlang::enquo(factor_col))[[2L]],
-                      envir = rlang::caller_env()
-    ))
+    as.character(
+      eval(
+        rlang::get_expr(rlang::enquo(factor_col))[[2L]],
+        envir = rlang::caller_env()
+      )
+    )
 
   stopifnot(hypr::nlevels(code_by) == nlevels(factor_col))
 

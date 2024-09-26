@@ -27,7 +27,7 @@ is.unordered <- function(x) {
 #'
 #' @return `x` as an unordered factor
 #' @export
-#'
+#' @seealso [as.factor()]
 #' @examples
 #'
 #' # Convert an ordered factor to unordered
@@ -45,11 +45,12 @@ is.unordered <- function(x) {
 #' as.unordered(4:1)
 as.unordered <- function(x) {
 
-  if (is.unordered(x)){
+  if (is.unordered(x)) {
     x
   } else if (is.ordered(x)) {
     class(x) <- "factor"
     x
+    # nocov start
   } else if (!is.object(x) && is.integer(x)) {
     levels <- sort.int(unique.default(x))
     f <- match(x, levels)
@@ -58,7 +59,8 @@ as.unordered <- function(x) {
       names(f) <- nx
     class(f) <- "factor"
     f
+  } else {
+    factor(x)
   }
-  else factor(x)
-
+  # nocov end
 }

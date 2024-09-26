@@ -165,4 +165,3 @@ test_that("Warnings when trying to set values with hypr object", {
     regexp = "drop_trends ignored"
   )
 })
-

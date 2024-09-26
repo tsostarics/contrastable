@@ -77,8 +77,10 @@ test_that("Operator checking works", {
 })
 
 test_that("Multiple operator usage disallowed", {
-  expect_error(enlist_contrasts(mtcars, cyl ~ sum_code + 4 + 4, verbose = FALSE),
-               regex = "You may only use")
+  expect_error(
+    enlist_contrasts(mtcars, cyl ~ sum_code + 4 + 4, verbose = FALSE),
+    regex = "You may only use"
+  )
 })
 
 test_that("Error on illformed expression", {

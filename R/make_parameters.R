@@ -66,7 +66,7 @@
 #' string. Otherwise return the string "none".
 #' @keywords internal
 .get_reserved_operator <- function(node) {
-  for (op_symbol in c("~","+", "-", "*", "|")) {
+  for (op_symbol in c("~", "+", "-", "*", "|")) {
     if (identical(node, sym(op_symbol)))
       return(op_symbol)
   }
@@ -190,7 +190,7 @@
     not_singleton <- TRUE
 
     # Unwrap nested I()s
-    while(not_singleton && node_is_I(formula)) {
+    while (not_singleton && node_is_I(formula)) {
       formula <- formula[[2L]]
       not_singleton <- length(formula) > 1
     }
@@ -208,7 +208,7 @@
 
   params[["code_by"]] <- formula
   has_drop_trends <- !identical(params[["drop_trends"]], NA)
-  is_not_polynomial <- !.is_polynomial_scheme(as.character(params[['code_by']]))
+  is_not_polynomial <- !.is_polynomial_scheme(as.character(params[["code_by"]]))
 
   if (has_drop_trends && is_not_polynomial) {
     params[["drop_trends"]] <- NA

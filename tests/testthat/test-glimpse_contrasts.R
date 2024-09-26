@@ -58,8 +58,14 @@ test_that("Glimpse with variables works", {
                                             show_all_factors = TRUE,
                                             verbose = FALSE))
 
-  expect_equal(tst$scheme, c("contr.poly", "custom", "scaled_sum_code", "contr.treatment"))
-  expect_equal(tst$intercept, c("grand mean", "mean(4)", "mean(4)", "mean(0)"),
+  expect_equal(tst$scheme, c("contr.poly",
+                             "custom",
+                             "scaled_sum_code",
+                             "contr.treatment"))
+  expect_equal(tst$intercept, c("grand mean",
+                                "mean(4)",
+                                "mean(4)",
+                                "mean(0)"),
                ignore_attr = TRUE)
   expect_equal(tst$dropped_trends, c("3,4,5", NA, NA, NA))
   expect_equal(tst$explicitly_set, c(TRUE, TRUE, TRUE, FALSE))
@@ -80,7 +86,7 @@ test_that("Append namespace to scheme names", {
   expect_equal(
     suppressWarnings(glimpse_contrasts(mtcars,
                                        cyl ~ contrastable:::sum_code,
-                                       verbose = FALSE)[['scheme']]),
+                                       verbose = FALSE)[["scheme"]]),
     "contrastable:::sum_code"
   )
 
@@ -88,7 +94,7 @@ test_that("Append namespace to scheme names", {
     suppressWarnings(glimpse_contrasts(mtcars,
                                        cyl ~ sum_code,
                                        verbose = FALSE,
-                                       add_namespace = TRUE)[['scheme']]),
+                                       add_namespace = TRUE)[["scheme"]]),
     "contrastable::sum_code"
   )
 })

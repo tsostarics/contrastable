@@ -32,7 +32,7 @@ interpret_intercept <- function(contrast_matrix) {
   # non-square matrices
   if (ncol(contrast_matrix) < (.nlevels - 1L)) {
     warning(paste0("Expected contrast matrix to have ",
-                   .nlevels-1,
+                   .nlevels - 1,
                    " columns but found ",
                    ncol(contrast_matrix)))
     return("grand mean")

@@ -19,7 +19,7 @@ test_that("Names of resulting list of contrasts correct", {
 test_that("Throw error when factor column not found in model data frame", {
   tst_data <-
     data.frame(
-      x = gl(2,1)
+      x = gl(2, 1)
     )
 
   # Default error message works fine, no need to specify it to something else
@@ -74,7 +74,9 @@ test_that("Matrix doesn't trigger atomic error", {
 
   class(cmat) <- "foo"
   expect_equal(treatment_code(3),
-               suppressWarnings(enlist_contrasts(mtcars, cyl ~ cmat, verbose = FALSE)[[1]]),
+               suppressWarnings(
+                 enlist_contrasts(mtcars, cyl ~ cmat, verbose = FALSE)[[1]]
+                 ),
                ignore_attr = TRUE)
 })
 
@@ -264,23 +266,25 @@ test_that("Check that implementation of contrast functions remains the same", {
       "backward_difference_code",
       "forward_difference_code")
 
-  tstdata_2 <- data.frame(x = gl(2,1))
-  tstdata_5 <- data.frame(x = gl(5,1))
+  names(schemes) <- schemes
+
+  tstdata_2 <- data.frame(x = gl(2, 1))
+  tstdata_5 <- data.frame(x = gl(5, 1))
 
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
         cmat <-
           rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     ))
 
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
@@ -288,52 +292,52 @@ test_that("Check that implementation of contrast functions remains the same", {
           suppressWarnings(
             rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx + 2))
           )
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     ))
 
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
         cmat <-
           rlang::inject(enlist_contrasts(tstdata_2, x ~ !!fx * 2))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     ))
 
   # 5-level cases
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
         cmat <-
           rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     )
   )
 
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
         cmat <-
           rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx * 3))
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     )
   )
 
   expect_snapshot(
-    sapply(
+    lapply(
       schemes,
       \(s) {
         fx <- sym(s)
@@ -341,8 +345,8 @@ test_that("Check that implementation of contrast functions remains the same", {
           suppressWarnings(
             rlang::inject(enlist_contrasts(tstdata_5, x ~ !!fx + 3))
           )
-        cmat <- as.character(MASS::fractions(cmat[[1L]]))
-        list(cmat)
+
+        as.character(MASS::fractions(cmat[[1L]]))
       }
     )
   )

@@ -33,3 +33,6 @@ as.unordered(c("c", "a", "b"))
 # Note that coercing integer values will sort the values to use as the levels
 as.unordered(4:1)
 }
+\seealso{
+\code{\link[=as.factor]{as.factor()}}
+}

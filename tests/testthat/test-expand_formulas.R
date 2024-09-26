@@ -44,9 +44,9 @@ test_that("tidyselect errors work", {
 })
 
 test_that("is.unordered works", {
-  tstdf <- data.frame(a = gl(3,1),
-                      b = gl(3,1),
-                      c = gl(3,1, ordered = TRUE))
+  tstdf <- data.frame(a = gl(3, 1),
+                      b = gl(3, 1),
+                      c = gl(3, 1, ordered = TRUE))
 
   expect_equal(names(enlist_contrasts(tstdf,
                                       where(is.unordered) ~ sum_code,
