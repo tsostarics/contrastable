@@ -8,11 +8,10 @@
 [![Codecov test
 coverage](https://codecov.io/gh/tsostarics/contrastable/branch/main/graph/badge.svg?token=PW2NOWO8NE)](https://app.codecov.io/gh/tsostarics/contrastable?branch=main)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![R-CMD-check](https://github.com/tsostarics/contrastable/workflows/R-CMD-check/badge.svg)](https://github.com/tsostarics/contrastable/actions)
+stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-CMD-check](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11869428.svg)](https://doi.org/10.5281/zenodo.11869428)
 
-[![R-CMD-check](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This package provides utilities to set different common contrast coding
@@ -34,7 +33,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
-package version 0.3.5.
+package version 0.3.3.
 
 A BibTeX entry for LaTeX users is
 
@@ -42,7 +41,7 @@ A BibTeX entry for LaTeX users is
     author = {Thomas Sostarics},
     title = {{contrastable}: Contrast Coding Utilities in {R}},
     year = {2024},
-    note = {R package version 0.3.5},
+    note = {R package version 0.3.3},
     url = {https://github.com/tsostarics/contrastable},
     doi = {10.5281/zenodo.11869427},
     }
