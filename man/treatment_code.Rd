@@ -13,10 +13,10 @@ treatment_code(n)
 A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around \link[stats]{contr.treatment}. Returns a contrast
+Wrapper around \code{\link[stats:contrast]{stats::contr.treatment()}}. Returns a contrast
 matrix where comparisons give differences between each comparison level and a
 baseline reference level, while the intercept equals the first level of the
-factor. See \link[contrastable]{scaled_sum_code} for a function that centers
+factor. See \code{\link[=scaled_sum_code]{scaled_sum_code()}} for a function that centers
 the intercept on the grand mean while retaining pairwise comparisons from a
 reference level.
 }
@@ -30,11 +30,10 @@ where:
 }
 
 Note that this function sets the first level (alphabetically) as the
-reference level while \link[stats]{contr.SAS} sets the LAST level as the
+reference level while  \code{\link[stats:contrast]{stats::contr.SAS()}} sets the LAST level as the
 reference level. However, in functions like
-\link[contrastable]{set_contrasts}, and
-\link[contrastable]{enlist_contrasts}, the reference level is automatically
-set to be the first level alphabetically.
+\code{\link[=set_contrasts]{set_contrasts()}}, and \code{\link[=enlist_contrasts]{enlist_contrasts()}}, the reference level is
+automatically set to be the first level alphabetically.
 }
 \examples{
 mydf <- data.frame(

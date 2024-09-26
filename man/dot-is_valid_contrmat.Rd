@@ -10,7 +10,7 @@
 \item{contrast_matrix}{Contrast matrix}
 }
 \value{
-invisibly returns TRUE
+invisibly returns TRUE if the contrast matrix is valid
 }
 \description{
 Sometimes a user might pass a matrix that can't actually be used, in which

@@ -22,8 +22,8 @@ higher numbers of levels.
 For n levels of factors where k in 1:n, generate a matrix with n-1
 comparisons where each comparison looks for a polynomial trend of degree k,
 where each polynomial may be correlated with the others. Normally you would
-use orthogonal polynomials, see \link[stats]{contr.poly} and
-\link[contrastable]{orth_polynomial_code}
+use orthogonal polynomials, see \code{\link[stats:contrast]{stats::contr.poly()}} and
+\code{\link[=orth_polynomial_code]{orth_polynomial_code()}}
 }
 \examples{
 mydf <- data.frame(

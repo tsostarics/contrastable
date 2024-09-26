@@ -1,6 +1,6 @@
 #' Helmert code
 #'
-#' @description R's \link[stats]{contr.helmert} function is unscaled, meaning
+#' @description R's [stats::contr.helmert()] function is unscaled, meaning
 #' that you need to scale the coefficients of a model fit to get the actual
 #' comparisons of interest. This version will automatically scale the contrast
 #' matrix such that the coefficients are the expected scaled values.

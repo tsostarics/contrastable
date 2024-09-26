@@ -4,7 +4,7 @@
 #' case we can avoid some calculations by stopping earlier.
 #'
 #' @param contrast_matrix Contrast matrix
-#' @return invisibly returns TRUE
+#' @return invisibly returns TRUE if the contrast matrix is valid
 #' @keywords internal
 .is_valid_contrmat <- function(contrast_matrix) {
   if (diff(dim(contrast_matrix)) != -1L) {

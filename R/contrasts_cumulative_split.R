@@ -3,7 +3,6 @@
 #' @description
 #' Contrast coding scheme that repeatedly dichotomizes the factor levels.
 #'
-#'
 #' @details
 #' This scheme is similar to Helmert contrasts, but instead of comparing one
 #' level to the accumulated mean of all previous levels, each comparison with

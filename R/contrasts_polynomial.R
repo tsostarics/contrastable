@@ -1,7 +1,7 @@
 #' Orthogonal Polynomial code
 #'
 #' @description
-#' Wrapper around \link[stats]{contr.poly}. You can also use `polynomial_code`
+#' Wrapper around [stats::contr.poly()]. You can also use [polynomial_code()]
 #' as an alias.
 #'
 #' @details
@@ -49,8 +49,8 @@ polynomial_code <- orth_polynomial_code
 #' For n levels of factors where k in 1:n, generate a matrix with n-1
 #' comparisons where each comparison looks for a polynomial trend of degree k,
 #' where each polynomial may be correlated with the others. Normally you would
-#' use orthogonal polynomials, see \link[stats]{contr.poly} and
-#' \link[contrastable]{orth_polynomial_code}
+#' use orthogonal polynomials, see [stats::contr.poly()] and
+#' [orth_polynomial_code()]
 #'
 #' @inherit scaled_sum_code params return
 #'
@@ -79,6 +79,15 @@ raw_polynomial_code <- function(n) {
 }
 
 
+#' Check if a scheme is a polynomial scheme
+#'
+#' Helper to check if a contrast coding function is one of the polynomial
+#' schemes
+#'
+#' @param scheme Contrast coding function or string of a function name
+#'
+#' @return `TRUE` if polynomial scheme, `FALSE` otherwise
+#' @keywords internal
 .is_polynomial_scheme <- function(scheme) {
   checks <- list(
     stats::contr.poly, orth_polynomial_code,

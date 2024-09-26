@@ -16,7 +16,7 @@ polynomial_code(n)
 A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around \link[stats]{contr.poly}. You can also use \code{polynomial_code}
+Wrapper around \code{\link[stats:contrast]{stats::contr.poly()}}. You can also use \code{\link[=polynomial_code]{polynomial_code()}}
 as an alias.
 }
 \details{
