@@ -80,7 +80,7 @@ use_contrasts.AsIs <- function(factor_col,
   class(code_by) <- class(code_by)[class(code_by) != "AsIs"]
   method_call <- match.call()
   method_call[["code_by"]] <- code_by
-  method_call[[1]] <- use_contrasts
+  method_call[[1]] <- quote(use_contrasts)
   method_call[["as_is"]] <- TRUE
   eval(method_call, envir = parent.frame())
 }
