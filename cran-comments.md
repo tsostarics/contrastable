@@ -1,3 +1,10 @@
+## Resubmission 1.0.2
+Fixed the following documentation issues related to `:::` use in examples of
+unexported functions:
+
+ * Removed .Rd files for .contrasts_to_hypotheses(), .hypotheses_to_contrasts(),
+ stopWithMatch(), and tryMatch().
+
 ## Resubmission
 Following issues have been fixed for resubmission:
 

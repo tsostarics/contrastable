@@ -4,9 +4,7 @@
 #'
 #' @return Hypothesis matrix
 #' @keywords internal
-#' @examples
-#'
-#' contrastable:::.contrasts_to_hypotheses(scaled_sum_code(5))
+#' @noRd
 .contrasts_to_hypotheses <- function(contrast_matrix) {
   n <- nrow(contrast_matrix)
   intercept_matrix <- matrix(c(rep(1, n), contrast_matrix), n)
@@ -19,10 +17,7 @@
 #'
 #' @return Hypothesis matrix
 #' @keywords internal
-#' @examples
-#'
-#' # Treatment coding
-#' contrastable:::.hypotheses_to_contrasts(matrix(c(1,0,-1,1), nrow=2))
+#' @noRd
 .hypotheses_to_contrasts <- function(hypothesis_matrix) {
   result <- solve(t(hypothesis_matrix))[, -1]
 
@@ -44,6 +39,7 @@
 #' @return Hypothesis matrix if passed contrasts, contrast matrix if passed
 #' hypotheses
 #' @keywords internal
+#' @noRd
 .convert_matrix <- function(m) {
   if (nrow(m) == ncol(m)) {
     return(.hypotheses_to_contrasts(m))

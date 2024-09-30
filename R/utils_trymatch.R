@@ -14,6 +14,7 @@
 #' @return The value of `eval(expr)` if no error, otherwise thows a formatted
 #' error
 #' @keywords internal
+#' @noRd
 tryMatch <- function(expr, ..., .parent = TRUE) {
   # Defuse the expression so it can be deparsed into a string
   defused_expr <- rlang::enquo(expr)
@@ -64,21 +65,22 @@ tryMatch <- function(expr, ..., .parent = TRUE) {
 #' original calling function should be followed by a `stop()` call in case there
 #' are no matches.
 #' @keywords internal
+#' @noRd
 #' @examples
-#' try(contrastable:::tryMatch(a + 1,
-#'                             "not found" = "there is no a object!",
-#'                             "'a' not" = c("oh no!", "how sad!")))
+#' try(tryMatch(a + 1,
+#'              "not found" = "there is no a object!",
+#'              "'a' not" = c("oh no!", "how sad!")))
 #'
 #' foo <- function(a) {
 #' tryCatch(a, error = \(e) {
 #'   set.seed(111)
 #'   message("An error! have a random number: ", rnorm(1))
-#'   contrastable:::stopWithMatch(e, "not found" = "how sad!")
+#'   stopWithMatch(e, "not found" = "how sad!")
 #'  })
 #' }
 #'
 #' foo2 <- function(a) {
-#'   contrastable:::tryMatch(a, "not found" = "how sad!")
+#'   tryMatch(a, "not found" = "how sad!")
 #' }
 #'
 #' try(foo(a + 1))
