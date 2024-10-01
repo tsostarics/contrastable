@@ -39,7 +39,7 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 To cite contrastable in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
-package version 1.0.1.
+package version 1.0.2.
 
 A BibTeX entry for LaTeX users is
 
@@ -47,8 +47,8 @@ A BibTeX entry for LaTeX users is
     author = {Thomas Sostarics},
     title = {{contrastable}: Contrast Coding Utilities in {R}},
     year = {2024},
-    note = {R package version 1.0.1},
-    url = {https://github.com/tsostarics/contrastable},
+    note = {R package version 1.0.2},
+    url = {https://CRAN.R-project.org/package=contrastable},
     doi = {10.5281/zenodo.11869427},
     }
 

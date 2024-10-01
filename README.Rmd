@@ -63,7 +63,7 @@ author = {Thomas Sostarics},
 title = {{contrastable}: Contrast Coding Utilities in {R}},
 year = {2024},
 note = {R package version `r packageVersion("contrastable")`},
-url = {https://github.com/tsostarics/contrastable},
+url = {https://CRAN.R-project.org/package=contrastable},
 doi = {10.5281/zenodo.11869427},
 }
 ```
