@@ -1,3 +1,5 @@
+# contrastable (development version)
+
 # contrastable 1.0.2
 
 Accepted on CRAN: https://CRAN.R-project.org/package=contrastable.
