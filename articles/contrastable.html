@@ -75,11 +75,12 @@
 
     
     
-<p># Get started</p>
+<div class="section level2">
+<h2 id="get-started">Get started<a class="anchor" aria-label="anchor" href="#get-started"></a>
+</h2>
 <p>This vignette provides a quick guide to start using this package for
 your analyses. Additional examples with more written detail are
-available in the <code>contrasts</code> vignette and in the following
-blog posts: X X</p>
+available in <code><a href="../articles/contrasts.html">vignette("contrasts")</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="co"># install.packages("contrastable")</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tsostarics/contrastable" class="external-link">contrastable</a></span><span class="op">)</span></span>
@@ -92,9 +93,9 @@ blog posts: X X</p>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="setting-contrasts-to-data-frame-columns">Setting contrasts to data frame columns<a class="anchor" aria-label="anchor" href="#setting-contrasts-to-data-frame-columns"></a>
-</h2>
+<div class="section level3">
+<h3 id="setting-contrasts-to-data-frame-columns">Setting contrasts to data frame columns<a class="anchor" aria-label="anchor" href="#setting-contrasts-to-data-frame-columns"></a>
+</h3>
 <p>There are three main functions which I’ll discuss in order:</p>
 <ul>
 <li>
@@ -152,9 +153,9 @@ to <code>varnameMid-High</code> and <code>varnameLow-High</code>.</li>
 <p>The operators can be used in any order, but
 <code>contrast_scheme</code> always has to be the first thing after the
 <code>~</code>.</p>
-<div class="section level3">
-<h3 id="set_contrasts">set_contrasts<a class="anchor" aria-label="anchor" href="#set_contrasts"></a>
-</h3>
+<div class="section level4">
+<h4 id="set_contrasts">set_contrasts<a class="anchor" aria-label="anchor" href="#set_contrasts"></a>
+</h4>
 <p>Use this to set contrasts directly to a column, coercing it to a
 factor as necessary. Often used as the last step in a wrangling
 pipeline. The result should be assigned to a variable. We can set
@@ -292,9 +293,9 @@ column names.</p>
 <span><span class="co">#&gt; 8    0    0    0    0  5/6</span></span></code></pre></div>
 </div>
 </div>
-<div class="section level2">
-<h2 id="enlist_contrasts">enlist_contrasts<a class="anchor" aria-label="anchor" href="#enlist_contrasts"></a>
-</h2>
+<div class="section level3">
+<h3 id="enlist_contrasts">enlist_contrasts<a class="anchor" aria-label="anchor" href="#enlist_contrasts"></a>
+</h3>
 <p>Used to get a named list of contrast matrices. Useful to pass to the
 <code>contrasts</code> argument of a modeling function if available.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -392,9 +393,9 @@ first level (for sum coding, this is the row with all
 <span><span class="co">#&gt; 2  0  1</span></span>
 <span><span class="co">#&gt; 3 -1 -1</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="glimpse_contrasts">glimpse_contrasts<a class="anchor" aria-label="anchor" href="#glimpse_contrasts"></a>
-</h2>
+<div class="section level3">
+<h3 id="glimpse_contrasts">glimpse_contrasts<a class="anchor" aria-label="anchor" href="#glimpse_contrasts"></a>
+</h3>
 <p>Used to summarize information about the contrast schemes used. Note
 that this is usually used as a 2-step process, as it needs information
 about the contrast specifications and it expects that the same contrasts
@@ -457,9 +458,9 @@ like so:</p>
 <span><span class="co">#&gt; 1 gear_type 2    even, odd scaled_sum_code       odd grand mean</span></span>
 <span><span class="co">#&gt; 2      carb 6 1, 2, 3,....        sum_code      &lt;NA&gt; grand mean</span></span>
 <span><span class="co">#&gt; 3       cyl 3      4, 6, 8        sum_code      &lt;NA&gt; grand mean</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="decompose_contrasts">decompose_contrasts<a class="anchor" aria-label="anchor" href="#decompose_contrasts"></a>
-</h3>
+<div class="section level4">
+<h4 id="decompose_contrasts">decompose_contrasts<a class="anchor" aria-label="anchor" href="#decompose_contrasts"></a>
+</h4>
 <p>Use this function to extract the contrasts of one column into
 separate columns– one for each comparison. This function is particularly
 helpful for pedagogical uses to show students how contrasts are
@@ -486,9 +487,9 @@ represented from the model’s perspective. Below we see that we’ve added
 <span><span class="co">#&gt; Valiant                        -0.5    1    0</span></span></code></pre></div>
 </div>
 </div>
-<div class="section level2">
-<h2 id="contrast-functions">Contrast functions<a class="anchor" aria-label="anchor" href="#contrast-functions"></a>
-</h2>
+<div class="section level3">
+<h3 id="contrast-functions">Contrast functions<a class="anchor" aria-label="anchor" href="#contrast-functions"></a>
+</h3>
 <p>Below is a listing of the different contrast coding functions
 provided by this package. You would use these in the
 <code>contrast_scheme</code> part of the formulas. The intercept is
@@ -581,6 +582,7 @@ comparison labels this package provides. See below.</li>
 <span><span class="co">#&gt; 6    0    0    0  4/5 -1/6</span></span>
 <span><span class="co">#&gt; 8    0    0    0    0  5/6</span></span></code></pre>
 <p>See <code><a href="../articles/contrasts.html">vignette("contrasts")</a></code> for more information.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
