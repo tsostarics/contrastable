@@ -14,10 +14,10 @@ vignette: >
   )
 ```
   
-  # Get started
+# Get started
   
-  This vignette provides a quick guide to start using this package for your analyses.
-  Additional examples with more written detail are available in the `contrasts` vignette and in the following blog posts: X X
+This vignette provides a quick guide to start using this package for your analyses.
+Additional examples with more written detail are available in `vignette("contrasts")`.
   
   
 ```{r setup}
