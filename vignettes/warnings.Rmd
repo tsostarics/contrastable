@@ -6,23 +6,23 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
+  
   
 ```{r, include = FALSE}
- knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
- )
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>"
+)
 ```
-  
-  This vignette provides documentation for the different warnings and messages
-  that are implemented for the package.
-  Results of calls (eg printing of data frames following `set_contrasts`) will
-  be hidden, but warnings and messages will still be shown.
-  Code chunks will be self-contained, so bear with a little repetitiveness.
-  I will primarily be using the `sum_code` function because it is the shortest
-  one to write.
-  
+
+This vignette provides documentation for the different warnings and messages
+that are implemented for the package.
+Results of calls (eg printing of data frames following `set_contrasts`) will
+be hidden, but warnings and messages will still be shown.
+Code chunks will be self-contained, so bear with a little repetitiveness.
+I will primarily be using the `sum_code` function because it is the shortest
+one to write.
+
 ```{r setup, message=FALSE, warning=FALSE}
 library(contrastable)
 library(rlang)
@@ -95,19 +95,20 @@ try(enlist_contrasts(my_data, foo ~ sum_code))
 Contrastable provides some flexibility in how contrasts are passed to formulas.
 Under the hood, methods are defined for the following object classes:
 
- - matrix
- - symbol/name
- - function
- - hypr
- 
+- matrix
+- symbol/name
+- function
+- hypr
+
 You'll receive a warning if you use something else and the default contrast 
 (depending on ordered or unordered) will be used instead.
 
-```{r,results='hide'}
+```{r}
 my_matrix <- sum_code(3)  # current class is "matrix" "array"
 class(my_matrix) <- "foo" # now class is "foo"
 
-set_contrasts(mtcars, cyl ~ my_matrix) # idk what to do with "foo" objects
+set_contrasts(mtcars, cyl ~ my_matrix) |>  # idk what to do with "foo" objects
+  invisible()
 ```
 
 So long as the object *inherits* one of the above classes though it will work
@@ -122,7 +123,7 @@ Note that if you accidentally quote the function name, you will receive an
 error instead because it thinks you're trying to set contrasts with an atomic
 character object.
 
-```{r,results='hide'}
+```{r}
 try(set_contrasts(mtcars, cyl ~ "sum_code")) # sum_code shouldnt be in quotes
 ```
 
@@ -134,8 +135,9 @@ first element to the right hand side is.
 I've tried to document a few cases of illformedness, but I can't do every case.
 
 ```{r, results='hide'}
-try(set_contrasts(mtcars, cyl ~ 4 + sum_code)) # bad!
-try(set_contrasts(mtcars, cyl ~ sum_code + 4)) # good!
+try(set_contrasts(mtcars, cyl ~ 4 + sum_code))    # bad!
+try(set_contrasts(mtcars, cyl ~ sum_code + 4)) |> # good!
+  invisible()
 
 # These give different kinds of errors, all are ill-formed
 try(set_contrasts(mtcars, cyl ~ +4 + sum_code)) 
@@ -166,11 +168,11 @@ set_contrasts(my_data, foo ~ hypr_object + "B" * "B" - "C")
 ```
 Warning messages:
 1: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
-  reference_level ignored when using hypr object
+reference_level ignored when using hypr object
 2: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
-  set_intercept ignored when using hypr object
+set_intercept ignored when using hypr object
 3: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
-  drop_trends ignored when using hypr object
+drop_trends ignored when using hypr object
 ```
 
 hypr objects don't need access to the levels in a factor, so there's an opportunity for mismatches in level names to arise.
@@ -187,7 +189,7 @@ set_contrasts(my_data, foo ~ hypr_object)$foo
 ```
 Warning message:
 In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
-  Levels in hypr object not found in factor column `foo`: varA, varB, varC
+Levels in hypr object not found in factor column `foo`: varA, varB, varC
 Contrasts may be misspecified.
 ```
 
@@ -213,7 +215,7 @@ Special to these warnings is that they will provide written out R code that the 
 
 User will be warned if the contrast matrix for a factor in a dataframe does not match the contrasts defined by the provided formulas.
 
-```{r,results='hide'}
+```{r}
 my_data <- data.frame(foo = factor("A"),
                       boo = factor(c("B", "C")))
 
@@ -222,7 +224,7 @@ glimpse_contrasts(my_data, boo ~ sum_code)
 
 Note that you can also define the contrast formulas in a list, and this will be reflected in the warning as well.
 
-```{r,results='hide'}
+```{r}
 my_data <- data.frame(foo = factor("A"),
                       boo = factor(c("B", "C")))
 
@@ -239,7 +241,7 @@ When using the same contrast generating function in `glimpse_contrast`, the user
 
 Here's an example when the labels are missing:
 
-```{r,results='hide'}
+```{r}
 my_data <- mtcars
 my_data$cyl <- factor(my_data$cyl)
 
@@ -262,7 +264,7 @@ The user will be warned when specifying contrasts with `glimpse_contrasts` for
 a variable that isn't a factor.
 So, `set_contrasts` will coerce the variable to a factor, but `glimpse_contrasts` doesn't modify the dataframe it's given.
 
-```{r,results='hide'}
+```{r}
 my_data <- mtcars
 
 glimpse_contrasts(my_data, cyl ~ sum_code)
@@ -273,7 +275,7 @@ They are combined into a single warning.
 Note that when warned about the *comparison labels* not matching, the numeric matrices are nonetheless the same.
 Typically, when the matrices are different, the labels will *also* be different, so the latter isn't reported when the matrices differ to save space.
 
-```{r,results='hide'}
+```{r}
 my_data <- mtcars
 my_data$cyl <- factor(my_data$cyl) # contr.treatment by default
 my_data$carb <- factor(my_data$carb)
@@ -351,22 +353,22 @@ variable more than once:
 
 ```{r}
 try(set_contrasts(mtcars,
-                         cyl ~ sum_code, 
-                         cyl ~ scaled_sum_code))
+                  cyl ~ sum_code, 
+                  cyl ~ scaled_sum_code))
 
 try(set_contrasts(mtcars, 
-                         cyl + gear ~ sum_code,
-                         cyl ~ scaled_sum_code))
+                  cyl + gear ~ sum_code,
+                  cyl ~ scaled_sum_code))
 
 try(set_contrasts(mtcars, 
-                         where(is.numeric) ~ sum_code, 
-                         cyl ~ scaled_sum_code))
+                  where(is.numeric) ~ sum_code, 
+                  cyl ~ scaled_sum_code))
 
 these_vars <- c("cyl", "gear")
 
 try(set_contrasts(mtcars, 
-                         all_of(these_vars) ~ sum_code, 
-                         where(is.numeric) ~ scaled_sum_code))
+                  all_of(these_vars) ~ sum_code, 
+                  where(is.numeric) ~ scaled_sum_code))
 ```
 
 You'll receive an error if you accidentally forget to pass the dataframe:
@@ -388,6 +390,6 @@ Note that you'll still get the warning message.
 
 ```{r}
 try(set_contrasts(data.frame(a = factor(1)),
-                         a ~ sum_code))
+                  a ~ sum_code))
 ```
 
