@@ -6,9 +6,7 @@
 #' @keywords internal
 #' @noRd
 .contrasts_to_hypotheses <- function(contrast_matrix) {
-  n <- nrow(contrast_matrix)
-  intercept_matrix <- matrix(c(rep(1, n), contrast_matrix), n)
-  solve(t(intercept_matrix))
+  solve(t(cbind(1,contrast_matrix)))
 }
 
 #' Convert hypothesis matrix to contrast matrix
