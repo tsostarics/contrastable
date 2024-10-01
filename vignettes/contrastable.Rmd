@@ -1,0 +1,282 @@
+---
+title: "contrastable"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{contrastable}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+  knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  )
+```
+  
+  # Get started
+  
+  This vignette provides a quick guide to start using this package for your analyses.
+  Additional examples with more written detail are available in the `contrasts` vignette and in the following blog posts: X X
+  
+  
+```{r setup}
+  # install.packages("contrastable")
+library(contrastable)
+library(dplyr)
+```
+
+## Setting contrasts to data frame columns
+
+There are three main functions which I'll discuss in order:
+
+- `set_contrasts`: set contrasts directly to factor columns
+- `enlist_contrasts`: get a list of contrast matrices
+- `glimpse_contrasts`: get a summary table of contrast information
+
+All three use a shared two-sided formula syntax, for example:
+
+```{r,eval = FALSE}
+enlist_contrasts(my_dataframe, 
+                 varname ~ contrast_scheme + reference * intercept - dropped | labels)
+```
+
+- `varname`: The variable name of the column whose contrasts you want to set.
+- `contrast_scheme`: (most often) a function that creates contrast matrices, can also be a variable assigned a matrix (eg `my_mat <- matrix(...)`, `my_mat` can be used) or a `hypr` object.
+- `reference`: Use the `+` operator to set the reference level. This is usually the baseline to use for pairwise comparisons. If the levels of `varname` are `c("High", "Mid", "Low")`, you might set this to Low with `+ "Low"`
+- `intercept`: Use the `*` operator to set the intercept, overwriting whatever the default is for the given contrast scheme. For example, the intercept (and reference level) for `treatment_code` is usually the first level alphabetically, but could be changed. For example, `* "Mid"`
+- `dropped`: Use the `-` operator to remove some comparisons from the contrast matrix. Cannot be used with `set_contrasts()`. Sometimes used with polynomial contrasts.
+- `labels`: Use the `|` operator to set the comparison labels, overwriting the defaults for the contrast scheme. For example, if doing pairwise comparisons for `varname` using `treatment_code` for levels `c("High", "Mid", "Low")` with `High` as the default reference level, the default coefficient names will be `varnameMid` and `varnameLow`. We can use `| c("Mid-High", "Low-High")` to change these in the output to `varnameMid-High` and `varnameLow-High`.
+
+The operators can be used in any order, but `contrast_scheme` always has
+to be the first thing after the `~`.
+
+### set_contrasts
+
+Use this to set contrasts directly to a column, coercing it to a factor as necessary.
+Often used as the last step in a wrangling pipeline.
+The result should be assigned to a variable.
+We can set `print_contrasts = TRUE` to print the contrasts that have been set.
+Below we set the contrasts for a binary `gear_type` variable to use scaled
+sum coding with `odd` as the reference level while setting the comparison
+label to be something informative, which is reflected in the model summary.
+
+```{r}
+model_data <-
+  mtcars |>
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |>
+  set_contrasts(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                print_contrasts = TRUE)
+
+summary(lm(mpg ~ gear_type, data = model_data))
+```
+
+We can set multiple columns at once by listing multiple columns on the left hand side, separated by `+`
+
+```{r}
+model_data <-
+  mtcars |>
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |>
+  set_contrasts(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                print_contrasts = TRUE,
+                carb + cyl ~ helmert_code)
+
+summary(lm(mpg ~ gear_type + carb + cyl, data = model_data))
+```
+
+We can also use `tidyselect` functionality to target multiple columns.
+Note that when doing so, you cannot specify duplicated column names.
+
+```{r}
+model_data <-
+  mtcars |>
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |>
+  set_contrasts(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                vs:carb ~ helmert_code,
+                print_contrasts = TRUE)
+```
+
+## enlist_contrasts
+
+Used to get a named list of contrast matrices.
+Useful to pass to the `contrasts` argument of a modeling function if available.
+
+
+```{r}
+model_contrasts <-
+  mtcars |>
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |>
+  enlist_contrasts(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"))
+
+model_contrasts
+```
+
+
+```{r}
+model_contrasts <-
+  mtcars |>
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |>
+  enlist_contrasts(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                   carb + cyl ~ sum_code)
+
+model_contrasts
+```
+
+We can also use matrix objects when setting contrasts:
+
+```{r}
+carb_contrasts <- scaled_sum_code(6)
+
+enlist_contrasts(mtcars,
+                 cyl ~ sum_code,
+                 carb ~ carb_contrasts)
+```
+
+Note here that the reference level is always the first level in the factor,
+which is typically alphanumeric order.
+For example, `contr.sum` usually sets the last level as the reference, but
+we can see that when using this package's functions it's always the first
+level (for sum coding, this is the row with all `-1`).
+
+```{r}
+contr.sum(3) # third row = reference level
+
+enlist_contrasts(mtcars, cyl ~ contr.sum) # == sum_code
+```
+
+This behavior can be suppressed by wrapping the contrast scheme with `I()`,
+but will issue a warning:
+
+```{r}
+enlist_contrasts(mtcars, cyl ~ I(contr.sum)) # == sum_code
+```
+
+
+## glimpse_contrasts
+
+Used to summarize information about the contrast schemes used.
+Note that this is usually used as a 2-step process, as it needs
+information about the contrast specifications and it expects that
+the same contrasts are set to the dataframe provided.
+For example, if I try to glimpse the contrasts for `mtcars` directly,
+I'll be warned that the dataframe columns aren't actually set to what
+I specified in the formulas, along with a code snippet of how to fix this.
+
+```{r}
+mtcars2 <- 
+  dplyr::mutate(mtcars, gear_type = ifelse(gear %% 2 == 0, "even", "odd"))
+
+glimpse_contrasts(mtcars2,
+                  gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                  carb + cyl ~ sum_code)
+```
+
+I can copy-paste this directly and try again:
+
+```{r}
+mtcars2 <- set_contrasts(mtcars2, 
+                         gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                         carb + cyl ~ sum_code) 
+
+glimpse_contrasts(mtcars2,
+                  gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                  carb + cyl ~ sum_code)
+```
+
+The observation here is that if I don't use `set_contrasts()` on my dataset used
+in my statistical model, the results won't match the information in the
+table from `glimpse_contrasts()`.
+However, this also requires changing the formulas in 2 places if I need to make
+any changes.
+We can make 1 list of contrast formulas that we pass around to different 
+functions like so:
+
+```{r}
+my_contrasts <- list(gear_type ~ scaled_sum_code + "odd" | c("Odd-Even"),
+                     carb + cyl ~ sum_code)
+
+mtcars2 <- 
+  mtcars |> 
+  dplyr::mutate(gear_type = ifelse(gear %% 2 == 0, "even", "odd")) |> 
+  set_contrasts(my_contrasts)
+
+glimpse_contrasts(mtcars2, my_contrasts)
+```
+
+### decompose_contrasts
+
+Use this function to extract the contrasts of one column into separate
+columns-- one for each comparison.
+This function is particularly helpful for pedagogical uses to show students
+how contrasts are represented from the model's perspective.
+Below we see that we've added 3 new columns from decomposing the `gear_type`
+and `cyl` columns into their respective comparisons.
+
+```{r}
+mtcars2 |> 
+  decompose_contrasts(~gear_type + cyl) |> 
+  head()
+```
+
+## Contrast functions
+
+Below is a listing of the different contrast coding functions provided by this
+package.
+You would use these in the `contrast_scheme` part of the formulas.
+The intercept is described for the default case, but can be changed as described
+above using the `*` operator.
+
+ - `treatment_code()`: Pairwise comparisons from a reference level, intercept equals
+ mean of the reference level.
+ - `scaled_sum_code()`: Pairwise comparisons from a reference level, intercept equals
+ the grand mean
+ - `sum_code()`: Pairwise comparisons from the grand mean for all levels except
+ the reference level, intercept equals the grand mean.
+ - `backwards_difference_code()`: Subtract adjacent levels. For levels A, B, C,
+ D (in that order), returns the differences B-A, C-B, and D-C. Intercept equals
+ the grand mean.
+ - `forwards_difference_code()`: Subtract adjacent levels.  For levels A, B, C,
+ D (in that order), returns the differences A-B, B-C, and C-D. Intercept equals
+ the grand mean. 
+ - `helmert_code()`: Nested comparisons starting from the first level. Intercept
+ equals the grand mean.
+ - `reverse_helmert_code()`: Nested comparisons starting from the last level.
+ Intercept equals the grand mean.
+ - `cumulative_split_code()`: Cumulative grouping of levels. For levels A, B,
+ C, D (in that order), returns A-(B+C+D), (A+B)-(C+D), (A+B+C)-D. Intercept
+ equals the grand mean.
+ - `polynomial_code()`: Orthogonal polynomial coding, intercept equals the
+ grand mean.
+ - `raw_polynomial_code()`: Raw polynomial coding, intercept equals the grand 
+ mean.
+ 
+You can use any function that returns contrast matrices.
+Below are some functions from the `stats` and `MASS` packages that can be used.
+
+ - `stats::contr.treatment()`: Equivalent to treatment coding (`treatment_code()`)
+ - `stats::contr.SAS()`: Equivalent to treatment coding, but uses the last level as
+ the reference level by default. Note that this difference is neutralized due
+ to this package always setting the first level as the reference level.
+ - `stats::contr.poly`: Equivalent to polynomial coding (`polynomial_code()`)
+ - `MASS::contr.sdif`: Equivalent to backwards difference coding (`backwards_difference_code()`)
+ - `stats::contr.sum`: Equivalent to sum coding (`sum_code()`)
+ - `stats::contr.helmert`: Provides nested comparisons like helmert coding (`helmert_code()`),
+ but the matrix is not scaled. This means that the effect estimates are off by
+ a scaling factor dependent on the number of levels. This is reflected in
+ the default comparison labels this package provides. See below.
+ 
+```{r}
+enlist_contrasts(mtcars, carb ~ contr.helmert)
+```
+
+```{r, eval = FALSE}
+enlist_contrasts(mtcars, carb ~ helmert_code())
+```
+
+```{r, echo = FALSE}
+carb_contrasts <- enlist_contrasts(mtcars, carb ~ helmert_code())
+carb_contrasts[["carb"]] <- MASS::fractions(carb_contrasts[[1]])
+carb_contrasts
+```
+ 
+See `vignette("contrasts")` for more information.
