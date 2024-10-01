@@ -11,7 +11,8 @@ coverage](https://codecov.io/gh/tsostarics/contrastable/branch/main/graph/badge.
 stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11869428.svg)](https://doi.org/10.5281/zenodo.11869428)
-
+[![CRAN
+status](https://www.r-pkg.org/badges/version/contrastable)](https://CRAN.R-project.org/package=contrastable)
 <!-- badges: end -->
 
 This package provides utilities to set different common contrast coding
