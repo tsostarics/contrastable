@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_cumulative_split.R
 \name{cumulative_split_code}
 \alias{cumulative_split_code}
-\title{Cumulative split contrasts}
+\title{Use cumulative split coding}
 \usage{
 cumulative_split_code(n)
 }

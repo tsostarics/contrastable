@@ -1,4 +1,4 @@
-#' Helmert code
+#' Use helmert coding
 #'
 #' @description R's [stats::contr.helmert()] function is unscaled, meaning
 #' that you need to scale the coefficients of a model fit to get the actual
@@ -32,7 +32,7 @@ helmert_code <- function(n) {
   apply(unname(stats::contr.helmert(n)), 2L, function(x) x / sum(x != 0))
 }
 
-#' Reverse Helmert code
+#' Use reverse helmert coding
 #'
 #' @description
 #' Reverse helmert coding is the same concept as helmert coding, but the order

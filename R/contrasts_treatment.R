@@ -1,4 +1,4 @@
-#' Treatment code
+#' Use treatment coding
 #'
 #' @description Wrapper around [stats::contr.treatment()]. Returns a contrast
 #' matrix where comparisons give differences between each comparison level and a

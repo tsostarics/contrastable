@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_scaled_sum.R
 \name{scaled_sum_code}
 \alias{scaled_sum_code}
-\title{Scaled sum coding}
+\title{Use scaled sum coding}
 \usage{
 scaled_sum_code(n)
 }

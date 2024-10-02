@@ -1,4 +1,4 @@
-#' Orthogonal Polynomial code
+#' Use orthogonal polynomial coding
 #'
 #' @description
 #' Wrapper around [stats::contr.poly()]. You can also use [polynomial_code()]
@@ -37,7 +37,7 @@ orth_polynomial_code <- function(n) {
 #' @export
 polynomial_code <- orth_polynomial_code
 
-#' Raw Polynomial code
+#' Use raw polynomial coding
 #'
 #' @description
 #' Make raw polynomial contrast, rather than orthogonal ones. Normally you

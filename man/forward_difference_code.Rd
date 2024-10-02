@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_successive_differences.R
 \name{forward_difference_code}
 \alias{forward_difference_code}
-\title{Forward difference code}
+\title{Use forward difference coding}
 \usage{
 forward_difference_code(n)
 }

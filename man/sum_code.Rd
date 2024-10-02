@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_sum.R
 \name{sum_code}
 \alias{sum_code}
-\title{Sum code}
+\title{Use sum coding}
 \usage{
 sum_code(n)
 }
@@ -13,7 +13,7 @@ sum_code(n)
 A contrast matrix with dimensions n rows and (n-1) columns.
 }
 \description{
-Wrapper around \link[stats]{contr.sum}, but ensures that the reference level
+Same as \link[stats]{contr.sum}, but ensures that the reference level
 is the first level alphabetically, not the last. Returns a contrast matrix
 where comparisons give differences between comparison levels and the grand
 mean.

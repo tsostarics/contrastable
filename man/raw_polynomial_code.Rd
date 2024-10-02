@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_polynomial.R
 \name{raw_polynomial_code}
 \alias{raw_polynomial_code}
-\title{Raw Polynomial code}
+\title{Use raw polynomial coding}
 \usage{
 raw_polynomial_code(n)
 }

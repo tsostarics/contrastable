@@ -1,4 +1,4 @@
-#' Scaled sum coding
+#' Use scaled sum coding
 #'
 #' @description Contrast coding scheme with a centered intercept and comparisons
 #' from a baseline reference level.

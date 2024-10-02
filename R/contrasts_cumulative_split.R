@@ -1,4 +1,4 @@
-#' Cumulative split contrasts
+#' Use cumulative split coding
 #'
 #' @description
 #' Contrast coding scheme that repeatedly dichotomizes the factor levels.

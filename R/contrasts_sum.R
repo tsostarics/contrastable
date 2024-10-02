@@ -1,7 +1,7 @@
-#' Sum code
+#' Use sum coding
 #'
 #' @description
-#' Wrapper around \link[stats]{contr.sum}, but ensures that the reference level
+#' Same as \link[stats]{contr.sum}, but ensures that the reference level
 #' is the first level alphabetically, not the last. Returns a contrast matrix
 #' where comparisons give differences between comparison levels and the grand
 #' mean.
@@ -39,11 +39,12 @@
 #' lm(resp ~ grp, data = mydf)
 #'
 sum_code <- function(n) {
-
-
-  if (n == 2) {
+if (n == 2) {
     return(-stats::contr.sum(n))
   }
 
-  stats::contr.sum(n)[c(n, seq_len(n - 1)), ]
+  result <- stats::contr.treatment(n)
+  result[1,] <- -1
+
+  result
 }

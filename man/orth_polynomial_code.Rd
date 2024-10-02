@@ -3,7 +3,7 @@
 \name{orth_polynomial_code}
 \alias{orth_polynomial_code}
 \alias{polynomial_code}
-\title{Orthogonal Polynomial code}
+\title{Use orthogonal polynomial coding}
 \usage{
 orth_polynomial_code(n)
 

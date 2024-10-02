@@ -1,4 +1,4 @@
-#' Forward difference code
+#' Use forward difference coding
 #'
 #' @description
 #' Compares the mean of level k to level k+1. Differs in direction from
@@ -38,7 +38,7 @@ forward_difference_code <- function(n) {
   )
 }
 
-#' Backward difference code
+#' Use backward difference coding
 #'
 #' @description
 #' Compares the mean of level k to level k-1. Differs in direction from

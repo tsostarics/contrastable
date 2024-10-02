@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_helmert.R
 \name{reverse_helmert_code}
 \alias{reverse_helmert_code}
-\title{Reverse Helmert code}
+\title{Use reverse helmert coding}
 \usage{
 reverse_helmert_code(n)
 }

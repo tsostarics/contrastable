@@ -2,7 +2,7 @@
 % Please edit documentation in R/contrasts_treatment.R
 \name{treatment_code}
 \alias{treatment_code}
-\title{Treatment code}
+\title{Use treatment coding}
 \usage{
 treatment_code(n)
 }
