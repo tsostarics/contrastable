@@ -5,19 +5,22 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/contrastable)](https://CRAN.R-project.org/package=contrastable)
+[![](https://img.shields.io/badge/doi-10.32614/CRAN.package.contrastable-blue.svg)](https://doi.org/10.32614/CRAN.package.contrastable)
+
 [![Codecov test
 coverage](https://codecov.io/gh/tsostarics/contrastable/branch/main/graph/badge.svg?token=PW2NOWO8NE)](https://app.codecov.io/gh/tsostarics/contrastable?branch=main)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tsostarics/contrastable/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11869428.svg)](https://doi.org/10.5281/zenodo.11869428)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/contrastable)](https://CRAN.R-project.org/package=contrastable)
 <!-- badges: end -->
 
 This package provides utilities to set different common contrast coding
-schemes for use with regression models. Detailed usage is available in
-the `contrasts` vignette with `vignette('contrasts', 'contrastable')`.
+schemes for use with regression models. Please see
+[tsostarics.github.io/contrastable/](tsostarics.github.io/contrastable/)
+for the package website containing documentation, get started guide, and
+related vignettes.
 
 ## Installation
 
@@ -37,20 +40,22 @@ devtools::install_github("tsostarics/contrastable", build_vignettes = TRUE)
 
 ## Citation
 
-To cite contrastable in publications, please use
+To cite `contrastable` in publications, please use
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
 package version 1.0.2.
+<https://CRAN.R-project.org/package=contrastable>.
+<doi:10.32614/CRAN.package.contrastable>
 
 A BibTeX entry for LaTeX users is
 
-    @Manual{,
-    author = {Thomas Sostarics},
-    title = {{contrastable}: Contrast Coding Utilities in {R}},
-    year = {2024},
-    note = {R package version 1.0.2},
-    url = {https://CRAN.R-project.org/package=contrastable},
-    doi = {10.5281/zenodo.11869427},
+    @Manual{contrastable,
+      author = {Thomas Sostarics},
+      title = {{contrastable}: Contrast Coding Utilities in {R}},
+      year = {2024},
+      note = {R package version 1.0.2},
+      url = {https://CRAN.R-project.org/package=contrastable},
+      doi = {10.32614/CRAN.package.contrastable},
     }
 
 See the Citation Examples section in the contrasts vignette for

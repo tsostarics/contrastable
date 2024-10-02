@@ -3,3 +3,32 @@ url: https://tsostarics.github.io/contrastable/
 template:
   bootstrap: 5
   light-switch: true
+
+references:
+ - title: "Main functions"
+
+   desc: >
+      Functions for setting and summarizing contrast matrices
+
+   contents:
+   - matches("(set|enlist|glimpse)_contrasts")
+
+ - title: "Contrast-generating functions"
+
+   desc: >
+      Functions for creating contrast matrices given some number of levels
+
+   contents:
+   - ends_with("_code")
+
+ - title: "Miscellaneous"
+
+   desc: >
+      Functions for creating contrast matrices given some number of levels
+
+   contents:
+   - decompose_contrasts
+   - interpret_intercept
+   - starts_with("is.")
+   - as.unordered
+   - matches("use_contrasts")
