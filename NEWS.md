@@ -1,8 +1,15 @@
 # contrastable (development version)
 
- * Added get started vignette, see `vignette("contrastable")`
+Documentation:
+
+ * Added get started vignette (vignette name: "contrastable")
  * Created pkgdown website, now linked in DESCRIPTION
- * Citation updated following CRAN acceptance
+ * Citation and DOI updated following CRAN acceptance
+ * Docs for various functions tweaked
+ 
+Bug fixes:
+
+ * Example for cumulative_split_code was incorrect due to recycled values
 
 # contrastable 1.0.2
 
