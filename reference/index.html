@@ -44,9 +44,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="main-functions">Main functions<a class="anchor" aria-label="anchor" href="#main-functions"></a></h2>
 
-
+      <div class="section-desc"><p>Functions for setting and summarizing contrast matrices</p></div>
 
 
     </div><div class="section level2">
@@ -56,70 +56,110 @@
 
       <dl><dt>
 
-          <code><a href="as.unordered.html">as.unordered()</a></code>
-
-        </dt>
-        <dd>Convert to unordered factor</dd>
-      </dl><dl><dt>
-
-          <code><a href="backward_difference_code.html">backward_difference_code()</a></code>
-
-        </dt>
-        <dd>Backward difference code</dd>
-      </dl><dl><dt>
-
-          <code><a href="cumulative_split_code.html">cumulative_split_code()</a></code>
-
-        </dt>
-        <dd>Cumulative split contrasts</dd>
-      </dl><dl><dt>
-
-          <code><a href="decompose_contrasts.html">decompose_contrasts()</a></code>
-
-        </dt>
-        <dd>Decompose contrasts into new columns</dd>
-      </dl><dl><dt>
-
-          <code><a href="dot-add_namespace.html">.add_namespace()</a></code>
-
-        </dt>
-        <dd>Lookup namespace of contrast scheme function</dd>
-      </dl><dl><dt>
-
-          <code><a href="dot-get_from_params.html">.get_from_params()</a></code>
-
-        </dt>
-        <dd>Retrieve value from param list</dd>
-      </dl><dl><dt>
-
-          <code><a href="dot-warn_if_nondefault.html">.warn_if_nondefault()</a></code>
-
-        </dt>
-        <dd>Warn user if nondefault contrasts are set</dd>
-      </dl><dl><dt>
-
           <code><a href="enlist_contrasts.html">enlist_contrasts()</a></code>
 
         </dt>
-        <dd>List of contrast matrices</dd>
-      </dl><dl><dt>
-
-          <code><a href="forward_difference_code.html">forward_difference_code()</a></code>
-
-        </dt>
-        <dd>Forward difference code</dd>
+        <dd>Get a list of contrast matrices</dd>
       </dl><dl><dt>
 
           <code><a href="glimpse_contrasts.html">glimpse_contrasts()</a></code>
 
         </dt>
-        <dd>Glimpse contrasts in dataframe</dd>
+        <dd>Get quick summary of contrasts in dataframe</dd>
+      </dl><dl><dt>
+
+          <code><a href="set_contrasts.html">set_contrasts()</a></code>
+
+        </dt>
+        <dd>Set contrasts to factor columns in dataframe</dd>
+      </dl></div><div class="section level2">
+      <h2 id="contrast-generating-functions">Contrast-generating functions<a class="anchor" aria-label="anchor" href="#contrast-generating-functions"></a></h2>
+
+      <div class="section-desc"><p>Functions for creating contrast matrices given some number of levels</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="backward_difference_code.html">backward_difference_code()</a></code>
+
+        </dt>
+        <dd>Use backward difference coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="cumulative_split_code.html">cumulative_split_code()</a></code>
+
+        </dt>
+        <dd>Use cumulative split coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="forward_difference_code.html">forward_difference_code()</a></code>
+
+        </dt>
+        <dd>Use forward difference coding</dd>
       </dl><dl><dt>
 
           <code><a href="helmert_code.html">helmert_code()</a></code>
 
         </dt>
-        <dd>Helmert code</dd>
+        <dd>Use helmert coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="orth_polynomial_code.html">orth_polynomial_code()</a></code> <code><a href="orth_polynomial_code.html">polynomial_code()</a></code>
+
+        </dt>
+        <dd>Use orthogonal polynomial coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="raw_polynomial_code.html">raw_polynomial_code()</a></code>
+
+        </dt>
+        <dd>Use raw polynomial coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="reverse_helmert_code.html">reverse_helmert_code()</a></code>
+
+        </dt>
+        <dd>Use reverse helmert coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="scaled_sum_code.html">scaled_sum_code()</a></code>
+
+        </dt>
+        <dd>Use scaled sum coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="sum_code.html">sum_code()</a></code>
+
+        </dt>
+        <dd>Use sum coding</dd>
+      </dl><dl><dt>
+
+          <code><a href="treatment_code.html">treatment_code()</a></code>
+
+        </dt>
+        <dd>Use treatment coding</dd>
+      </dl></div><div class="section level2">
+      <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
+
+      <div class="section-desc"><p>Other utilities provided by the package</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="decompose_contrasts.html">decompose_contrasts()</a></code>
+
+        </dt>
+        <dd>Decompose contrasts into new columns</dd>
       </dl><dl><dt>
 
           <code><a href="interpret_intercept.html">interpret_intercept()</a></code>
@@ -137,7 +177,7 @@
           <code><a href="is_centered.html">is_centered()</a></code>
 
         </dt>
-        <dd>Check for orthogonality</dd>
+        <dd>Check for intercept centering</dd>
       </dl><dl><dt>
 
           <code><a href="is_orthogonal.html">is_orthogonal()</a></code>
@@ -146,46 +186,10 @@
         <dd>Check for orthogonality</dd>
       </dl><dl><dt>
 
-          <code><a href="orth_polynomial_code.html">orth_polynomial_code()</a></code> <code><a href="orth_polynomial_code.html">polynomial_code()</a></code>
+          <code><a href="as.unordered.html">as.unordered()</a></code>
 
         </dt>
-        <dd>Orthogonal Polynomial code</dd>
-      </dl><dl><dt>
-
-          <code><a href="raw_polynomial_code.html">raw_polynomial_code()</a></code>
-
-        </dt>
-        <dd>Raw Polynomial code</dd>
-      </dl><dl><dt>
-
-          <code><a href="reverse_helmert_code.html">reverse_helmert_code()</a></code>
-
-        </dt>
-        <dd>Reverse Helmert code</dd>
-      </dl><dl><dt>
-
-          <code><a href="scaled_sum_code.html">scaled_sum_code()</a></code>
-
-        </dt>
-        <dd>Scaled sum coding</dd>
-      </dl><dl><dt>
-
-          <code><a href="set_contrasts.html">set_contrasts()</a></code>
-
-        </dt>
-        <dd>Set contrasts to dataframe</dd>
-      </dl><dl><dt>
-
-          <code><a href="sum_code.html">sum_code()</a></code>
-
-        </dt>
-        <dd>Sum code</dd>
-      </dl><dl><dt>
-
-          <code><a href="treatment_code.html">treatment_code()</a></code>
-
-        </dt>
-        <dd>Treatment code</dd>
+        <dd>Convert to unordered factor</dd>
       </dl><dl><dt>
 
           <code><a href="use_contrasts.AsIs.html">use_contrasts(<i>&lt;AsIs&gt;</i>)</a></code>
@@ -197,7 +201,7 @@
           <code><a href="use_contrasts.html">use_contrasts()</a></code>
 
         </dt>
-        <dd>Contrast code factors</dd>
+        <dd>Use contrast specification for given factor</dd>
       </dl><dl><dt>
 
           <code><a href="use_contrasts.default.html">use_contrasts(<i>&lt;default&gt;</i>)</a></code>
@@ -215,7 +219,7 @@
           <code><a href="use_contrasts.hypr.html">use_contrasts(<i>&lt;hypr&gt;</i>)</a></code>
 
         </dt>
-        <dd>Use a hypr object for contrasts</dd>
+        <dd>hypr method for use_contrasts</dd>
       </dl><dl><dt>
 
           <code><a href="use_contrasts.matrix.html">use_contrasts(<i>&lt;matrix&gt;</i>)</a></code>
@@ -229,7 +233,8 @@
         </dt>
         <dd>Symbol method for use_contrasts</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

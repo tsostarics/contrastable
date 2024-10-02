@@ -13,13 +13,11 @@
 <url><loc>https://tsostarics.github.io/contrastable/reference/backward_difference_code.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/cumulative_split_code.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/decompose_contrasts.html</loc></url>
-<url><loc>https://tsostarics.github.io/contrastable/reference/dot-add_namespace.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-bundle_params.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-cols_where.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-convert_to_factors.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-expand_formulas.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_dimnames.html</loc></url>
-<url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_from_params.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_reference_level.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_reference_levels.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_reserved_operator.html</loc></url>
@@ -45,7 +43,6 @@
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-switch_reference_if_needed.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-switch_reference_level.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-warn_if_mismatched_contrasts.html</loc></url>
-<url><loc>https://tsostarics.github.io/contrastable/reference/dot-warn_if_nondefault.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-warn_if_onelevel.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/enlist_contrasts.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/find_same_col.html</loc></url>
