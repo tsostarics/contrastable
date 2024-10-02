@@ -1,4 +1,4 @@
-#' Glimpse contrasts in dataframe
+#' Get quick summary of contrasts in dataframe
 #'
 #' Uses the same syntax as [enlist_contrasts()] and
 #' [set_contrasts()]. Returns a summary table of the contrasts you've set. If
@@ -203,15 +203,14 @@ glimpse_contrasts <- function(model_data,
   glimpse
 }
 
-#' Lookup namespace of contrast scheme function
+#' Look up namespace of contrast scheme function
 #'
 #' Given the name of a contrast scheme (ie the function name that creates
-#' the contrast matrix), lookup which namespace it belongs to and add it
-#' to the string. Used to report which packages are used in the glimpse table,
-#' e.g., stats, contrastable, bayesTestR
+#' the contrast matrix), look up which namespace it belongs to and add it
+#' to the string.
 #'
 #' @param scheme_names Character vector
-#'
+#' @noRd
 #' @return character vector of updated function names with namespaces
 .add_namespace <- function(scheme_names) {
   vapply(scheme_names,
@@ -431,7 +430,7 @@ glimpse_contrasts <- function(model_data,
 #' @param which_ordered Which of the factors are ordered
 #' @param schemes_to_use Character vector of schemes, if any don't match the
 #' default for a factor, it will be replaced wtih ??? in th eoutput
-#'
+#' @noRd
 #' @return Warns if non default contrasts are set, returns schemes_to_use with
 #' modifications if necessary
 .warn_if_nondefault <- function(contrast_list,
@@ -630,7 +629,7 @@ glimpse_contrasts <- function(model_data,
 #' @param what Which parameter to retrieve
 #' @param list_params List of params, see [.make_parameters()]
 #' @param formulas Formulas used to set contrasts
-#'
+#' @noRd
 #' @return Requested value for each parameter as a string
 .get_from_params <- function(what, list_params, formulas) {
   stopifnot(what %in% names(list_params[[1]]))

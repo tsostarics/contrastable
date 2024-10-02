@@ -1,11 +1,10 @@
-#' Set contrasts to dataframe
+#' Set contrasts to factor columns in dataframe
 #'
 #' @description Uses the same syntax as [enlist_contrasts()],
 #'   but returns the dataframe with the new contrasts applied. Use this when
 #'   your model function doesnt have a contrasts argument and you want to avoid
-#'   writing `contrasts<-` multiple times. See
-#'   [enlist_contrasts()] for details about the
-#'   package-specific syntax.
+#'   writing `contrasts<-` multiple times. See [enlist_contrasts()] for details
+#'   about the package-specific syntax.
 #'
 #' @inherit enlist_contrasts params details
 #' @param print_contrasts Logical, default FALSE, whether to print the contrasts

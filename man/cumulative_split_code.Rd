@@ -38,17 +38,18 @@ each group. The intercept is the grand mean.
 
 set.seed(111)
 mydf <- data.frame(
-  grp = rep(c("a", "b", "c", "d"), each = 2000),
+  grp = rep(c("a", "b", "c", "d"), each = 400),
   val = c(
-    rnorm(200, 2, 1),
-    rnorm(200, 5, 1),
-    rnorm(200, 7.5, 1),
-    rnorm(200, 15, 1)
+    rnorm(400, 2,   .05),
+    rnorm(400, 4,   .05),
+    rnorm(400, 12,  .05),
+    rnorm(400, 20,  .05)
   )
 ) |>
   set_contrasts(grp ~ cumulative_split_code |
-    c("a-rest", "ab-rest", "abc-rest"))
+                      c("a-rest", "ab-rest", "abc-rest"))
 
+# Coefficients: ~ 9.5, -10, -13, -14
 lm(val ~ grp, data = mydf)
 
 }

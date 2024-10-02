@@ -2,7 +2,7 @@
 % Please edit documentation in R/enlist_contrasts.R
 \name{enlist_contrasts}
 \alias{enlist_contrasts}
-\title{List of contrast matrices}
+\title{Get a list of contrast matrices}
 \usage{
 enlist_contrasts(model_data, ..., verbose = getOption("contrastable.verbose"))
 }

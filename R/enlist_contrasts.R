@@ -1,4 +1,4 @@
-#' List of contrast matrices
+#' Get a list of contrast matrices
 #'
 #' @description Returns a named list of contrast matrices to use with modeling
 #'   functions directly. See [set_contrasts()] for a function

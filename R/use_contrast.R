@@ -1,10 +1,6 @@
-#' Contrast code factors
+#' Use contrast specification for given factor
 #'
-#' Helper to do contrast coding. There are two options:
-#'  - Manually specify a matrix for code_by (implements use_contrast_matrix).
-#'  Reference level is automatically set to the row that's always negative.
-#'  - Specify a style of contrast coding as a function. Label of the reference
-#'  level should be specified in ...
+#' Generic for setting contrasts, primarily intended for internal use.
 #'
 #' @param factor_col The factor column to use, eg data$gender
 #' @param code_by Either a matrix or a function
@@ -20,7 +16,7 @@
 #'
 #' @return A contrast coding matrix with labels and proper reference level
 #' @export
-#'
+#' @seealso [set_contrasts()] [enlist_contrasts()]
 #' @examples
 #'
 #' # Create a contrast matrix given some factor vector with the specified
@@ -348,7 +344,7 @@ use_contrasts.default <- function(factor_col,
   get(contrast_function)(nlevels(factor_col))
 }
 
-#' Use a hypr object for contrasts
+#' hypr method for use_contrasts
 #'
 #' @param factor_col A factor vector, eg from df$factorVarName
 #' @param code_by A hypr object created with `hypr::hypr()`

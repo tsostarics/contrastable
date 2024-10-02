@@ -2,7 +2,7 @@
 % Please edit documentation in R/is_centered.R
 \name{is_centered}
 \alias{is_centered}
-\title{Check for orthogonality}
+\title{Check for intercept centering}
 \usage{
 is_centered(contrast_matrices, USE.NAMES = FALSE)
 }
@@ -23,4 +23,7 @@ centered or not.
 is_centered(treatment_code(5)) # FALSE
 is_centered(scaled_sum_code(5)) # TRUE
 
+}
+\seealso{
+\code{\link[=is_orthogonal]{is_orthogonal()}}
 }

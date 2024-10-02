@@ -2,7 +2,7 @@
 % Please edit documentation in R/use_contrast.R
 \name{use_contrasts.hypr}
 \alias{use_contrasts.hypr}
-\title{Use a hypr object for contrasts}
+\title{hypr method for use_contrasts}
 \usage{
 \method{use_contrasts}{hypr}(
   factor_col,
@@ -36,7 +36,7 @@
 Contrast matrix specified by the hypr object
 }
 \description{
-Use a hypr object for contrasts
+hypr method for use_contrasts
 }
 \examples{
 \dontshow{if (rlang::is_installed("hypr")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/use_contrast.R
 \name{use_contrasts}
 \alias{use_contrasts}
-\title{Contrast code factors}
+\title{Use contrast specification for given factor}
 \usage{
 use_contrasts(
   factor_col,
@@ -39,13 +39,7 @@ specifically, which level you want the reference level to be}
 A contrast coding matrix with labels and proper reference level
 }
 \description{
-Helper to do contrast coding. There are two options:
-\itemize{
-\item Manually specify a matrix for code_by (implements use_contrast_matrix).
-Reference level is automatically set to the row that's always negative.
-\item Specify a style of contrast coding as a function. Label of the reference
-level should be specified in ...
-}
+Generic for setting contrasts, primarily intended for internal use.
 }
 \examples{
 
@@ -61,4 +55,7 @@ my_data$gear <- factor(mtcars$gear)
 
 MASS::fractions(use_contrasts(my_data$gear, helmert_code))
 
+}
+\seealso{
+\code{\link[=set_contrasts]{set_contrasts()}} \code{\link[=enlist_contrasts]{enlist_contrasts()}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_contrasts.R
 \name{set_contrasts}
 \alias{set_contrasts}
-\title{Set contrasts to dataframe}
+\title{Set contrasts to factor columns in dataframe}
 \usage{
 set_contrasts(
   model_data,
@@ -32,9 +32,8 @@ The \code{model_data} dataframe, but with updated contrasts.
 Uses the same syntax as \code{\link[=enlist_contrasts]{enlist_contrasts()}},
 but returns the dataframe with the new contrasts applied. Use this when
 your model function doesnt have a contrasts argument and you want to avoid
-writing \verb{contrasts<-} multiple times. See
-\code{\link[=enlist_contrasts]{enlist_contrasts()}} for details about the
-package-specific syntax.
+writing \verb{contrasts<-} multiple times. See \code{\link[=enlist_contrasts]{enlist_contrasts()}} for details
+about the package-specific syntax.
 }
 \details{
 \code{\link[=enlist_contrasts]{enlist_contrasts()}}, \code{\link[=set_contrasts]{set_contrasts()}},

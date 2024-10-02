@@ -2,7 +2,7 @@
 % Please edit documentation in R/glimpse_contrasts.R
 \name{glimpse_contrasts}
 \alias{glimpse_contrasts}
-\title{Glimpse contrasts in dataframe}
+\title{Get quick summary of contrasts in dataframe}
 \usage{
 glimpse_contrasts(
   model_data,

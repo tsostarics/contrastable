@@ -24,3 +24,6 @@ orthogonal or not.
 is_orthogonal(treatment_code(5)) # FALSE
 is_orthogonal(helmert_code(5)) # TRUE
 }
+\seealso{
+\code{\link[=is_centered]{is_centered()}}
+}

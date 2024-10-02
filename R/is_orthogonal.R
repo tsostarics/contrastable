@@ -9,7 +9,7 @@
 #'
 #' @return Logical vector, will retain names of a passed list
 #' @export
-#'
+#' @seealso [is_centered()]
 #' @examples
 #'
 #' is_orthogonal(treatment_code(5)) # FALSE
