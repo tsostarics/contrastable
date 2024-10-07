@@ -28,8 +28,7 @@ knitr::opts_chunk$set(
 
 This package provides utilities to set different common contrast coding schemes
 for use with regression models.
-Please see [tsostarics.github.io/contrastable/](tsostarics.github.io/contrastable/) 
-for the package website containing documentation, get started guide, and related vignettes.
+Please see [tsostarics.github.io/contrastable/](https://tsostarics.github.io/contrastable/) for the package website containing documentation, get started guide, and related vignettes.
 
 
 ## Installation
