@@ -197,6 +197,10 @@ document a few cases of illformedness, but I can’t do every case.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span> <span class="op">~</span> <span class="fl">4</span> <span class="op">+</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span>    <span class="co"># bad!</span></span>
 <span><span class="co">#&gt; Converting to factors: <span style="color: #0000BB;">cyl</span></span></span>
+<span><span class="co">#&gt; Error in use_contrasts.default(factor_col = get(params[["factor_col"]],  : </span></span>
+<span><span class="co">#&gt;   Can't set contrasts with atomic type object, see example below:</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> var ~ 1 + sum_code</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> var ~ sum_code + 1</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span> <span class="op">~</span> <span class="va">sum_code</span> <span class="op">+</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># good!</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Converting to factors: <span style="color: #0000BB;">cyl</span></span></span>
@@ -204,12 +208,23 @@ document a few cases of illformedness, but I can’t do every case.</p>
 <span><span class="co"># These give different kinds of errors, all are ill-formed</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span> <span class="op">~</span> <span class="op">+</span><span class="fl">4</span> <span class="op">+</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Converting to factors: <span style="color: #0000BB;">cyl</span></span></span>
+<span><span class="co">#&gt; Error in value[[3L]](cond) : subscript out of bounds</span></span>
+<span><span class="co">#&gt;   Is the contrast object/function in the wrong place? See example:</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> var ~ +1 + sum_code</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> var ~ sum_code + 1</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span> <span class="op">+</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Converting to factors: <span style="color: #0000BB;">cyl</span></span></span>
+<span><span class="co">#&gt; Error in .postprocess_matrix(new_contrasts, code_by, reference_level,  : </span></span>
+<span><span class="co">#&gt;   Reference level is a function instead of an atomic type object.</span></span>
+<span><span class="co">#&gt;   Is the contrast object/function in the wrong place? See example:</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> var ~ 1 + sum_code</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> var ~ sum_code + 1</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">+</span> <span class="fl">3</span> <span class="op">+</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Converting to factors: <span style="color: #0000BB;">cyl</span></span></span>
 <span><span class="co">#&gt; Warning in is.na(params[[which_param]]): is.na() applied to non-(list or</span></span>
-<span><span class="co">#&gt; vector) of type 'symbol'</span></span></code></pre></div>
+<span><span class="co">#&gt; vector) of type 'symbol'</span></span>
+<span><span class="co">#&gt; Error in .set_param(cur_expr, params, env, x, verbose) : </span></span>
+<span><span class="co">#&gt;   You may only use *, -, and * once</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="hypr-integration">hypr integration<a class="anchor" aria-label="anchor" href="#hypr-integration"></a>
 </h3>
