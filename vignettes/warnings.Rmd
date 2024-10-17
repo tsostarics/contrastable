@@ -134,7 +134,7 @@ Failure to do this can lead to other kinds of errors depending on what the
 first element to the right hand side is.
 I've tried to document a few cases of illformedness, but I can't do every case.
 
-```{r, results='hide'}
+```{r}
 try(set_contrasts(mtcars, cyl ~ 4 + sum_code))    # bad!
 try(set_contrasts(mtcars, cyl ~ sum_code + 4)) |> # good!
   invisible()
