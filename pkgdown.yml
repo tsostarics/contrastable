@@ -1,11 +1,11 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   contrastable: contrastable.html
   contrasts: contrasts.html
   warnings: warnings.html
-last_built: 2025-01-21T18:15Z
+last_built: 2025-10-18T21:04Z
 urls:
   reference: https://tsostarics.github.io/contrastable/reference
   article: https://tsostarics.github.io/contrastable/articles

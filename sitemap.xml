@@ -16,6 +16,7 @@
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-bundle_params.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-cols_where.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-convert_to_factors.html</loc></url>
+<url><loc>https://tsostarics.github.io/contrastable/reference/dot-droplevels_as_needed.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-expand_formulas.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_dimnames.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/dot-get_reference_level.html</loc></url>
@@ -55,6 +56,7 @@
 <url><loc>https://tsostarics.github.io/contrastable/reference/is_centered.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/is_orthogonal.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/orth_polynomial_code.html</loc></url>
+<url><loc>https://tsostarics.github.io/contrastable/reference/print_contrasts.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/raw_polynomial_code.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/reverse_helmert_code.html</loc></url>
 <url><loc>https://tsostarics.github.io/contrastable/reference/scaled_sum_code.html</loc></url>

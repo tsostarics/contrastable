@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">contrastable</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -149,7 +149,7 @@ also be shown.</p>
 <span><span class="co">#&gt; Expect <span style="color: #0000BB;">contr.treatment</span> or <span style="color: #BB0000;">contr.poly</span> for unset factors: <span style="color: #0000BB;">boo</span></span></span>
 <span><span class="co">#&gt; Warning: Contrasts undefined for factors with only one level: <span style="color: #00BBBB;">foo</span></span></span>
 <span><span class="co">#&gt; Error in enlist_contrasts(my_data, foo ~ sum_code) : </span></span>
-<span><span class="co">#&gt;   No factors with more than 1 level found</span></span></code></pre></div>
+<span><span class="co">#&gt;   No factors with more than 1 level provided</span></span></code></pre></div>
 <p>Contrastable provides some flexibility in how contrasts are passed to
 formulas. Under the hood, methods are defined for the following object
 classes:</p>
@@ -530,7 +530,7 @@ same variable more than once:</p>
 dataframe:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="va">cyl</span> <span class="op">~</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose) : </span></span>
+<span><span class="co">#&gt; Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose,  : </span></span>
 <span><span class="co">#&gt;   Formula passed to model_data, did you forget to pass a data frame?</span></span></code></pre></div>
 <p>You’ll receive an error if you forget to pass any contrasts
 formulas:</p>
@@ -546,8 +546,8 @@ still get the warning message.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/set_contrasts.html">set_contrasts</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                  <span class="va">a</span> <span class="op">~</span> <span class="va">sum_code</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Contrasts undefined for factors with only one level: <span style="color: #00BBBB;">a</span></span></span>
-<span><span class="co">#&gt; Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose) : </span></span>
-<span><span class="co">#&gt;   No factors with more than 1 level found</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose,  : </span></span>
+<span><span class="co">#&gt;   No factors with more than 1 level provided</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -560,7 +560,7 @@ still get the warning message.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
