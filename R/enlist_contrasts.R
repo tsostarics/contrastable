@@ -67,8 +67,11 @@
 #'   level can be set with `+`, the intercept can be overwritten with `*`,
 #'   comparison labels can be set using `|`, and trends for polynomial coding
 #'   can be removed using `-`.
-#' @param verbose Logical, defaults to FALSE, whether messages should be printed
-#'
+#' @param verbose Logical, defaults to TRUE, whether messages should be printed.
+#' See \code{Options("contrastable.verbose")}
+#' @param .droplevels Logical, defaults to TRUE, whether missing levels from
+#' existing factor columns should be dropped before applying new contrasts. See
+#' \code{Options("contrastable.droplevels")}
 #' @return List of named contrast matrices. Internally, if called within
 #' set_contrasts, will return a named list with `contrasts` equal to the list
 #' of named contrast matrices and `data` equal to the passed `model_data` with
@@ -184,7 +187,8 @@
 #'                      verbose = FALSE))
 enlist_contrasts <- function(model_data,
                              ...,
-                             verbose = getOption("contrastable.verbose")) {
+                             verbose = getOption("contrastable.verbose"),
+                             .droplevels = getOption("contrastable.droplevels")) {
 
   if (!inherits(model_data, "data.frame")) {
     if (inherits(model_data, "formula")) {
@@ -210,6 +214,10 @@ enlist_contrasts <- function(model_data,
   formulas <- .expand_formulas(formulas, model_data)
   lhs_variables <- names(formulas)
 
+  if (.droplevels) {
+    model_data <- .droplevels_as_needed(model_data, lhs_variables, verbose)
+  }
+
   model_data <- .convert_to_factors(model_data, lhs_variables, verbose)
 
   if (verbose) {
@@ -229,7 +237,7 @@ enlist_contrasts <- function(model_data,
   lhs_variables <- lhs_variables[!is_onelevel_factor]
 
   if (length(formulas) == 0L) {
-    stop("No factors with more than 1 level found")
+    stop("No factors with more than 1 level provided")
   }
 
   contrast_list <-

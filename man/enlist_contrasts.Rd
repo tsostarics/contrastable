@@ -4,7 +4,12 @@
 \alias{enlist_contrasts}
 \title{Get a list of contrast matrices}
 \usage{
-enlist_contrasts(model_data, ..., verbose = getOption("contrastable.verbose"))
+enlist_contrasts(
+  model_data,
+  ...,
+  verbose = getOption("contrastable.verbose"),
+  .droplevels = getOption("contrastable.droplevels")
+)
 }
 \arguments{
 \item{model_data}{Data frame you intend on passing to your model}
@@ -15,7 +20,12 @@ level can be set with \code{+}, the intercept can be overwritten with \code{*},
 comparison labels can be set using \code{|}, and trends for polynomial coding
 can be removed using \code{-}.}
 
-\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
+\item{verbose}{Logical, defaults to TRUE, whether messages should be printed.
+See \code{Options("contrastable.verbose")}}
+
+\item{.droplevels}{Logical, defaults to TRUE, whether missing levels from
+existing factor columns should be dropped before applying new contrasts. See
+\code{Options("contrastable.droplevels")}}
 }
 \value{
 List of named contrast matrices. Internally, if called within

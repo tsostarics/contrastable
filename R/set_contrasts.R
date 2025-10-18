@@ -25,13 +25,14 @@
 set_contrasts <- function(model_data,
                           ...,
                           verbose = getOption("contrastable.verbose"),
+                          .droplevels = getOption("contrastable.droplevels"),
                           print_contrasts = FALSE) {
   formulas <- rlang::dots_list(...)
 
   # Because enlist_contrasts is being called from within this function, it will
   # return a list with both the contrasts and the factor-coerced data
   attr(formulas, "omit_drop") <- TRUE
-  contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose)
+  contrast_list <- enlist_contrasts(model_data, !!!formulas, verbose = verbose, .droplevels = .droplevels)
   model_data <- contrast_list$data
   contrast_list <- contrast_list$contrasts
 

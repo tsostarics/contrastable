@@ -27,6 +27,9 @@
 #' @param minimal Logical, default TRUE, whether to omit the orthogonal,
 #'   centered, dropped_trends, and explicitly_set columns from the output table
 #' @param verbose Logical, defaults to TRUE, whether messages should be printed
+#' @param .droplevels Logical, defaults to TRUE, whether missing levels from
+#' existing factor columns should be dropped before applying new contrasts. See
+#' \code{Options("contrastable.droplevels")}
 #'
 #' @seealso [enlist_contrasts()] [set_contrasts()]
 #' @return A dataframe if return.list is FALSE, a list with a dataframe and list
@@ -48,7 +51,8 @@ glimpse_contrasts <- function(model_data,
                               add_namespace = FALSE,
                               show_one_level_factors = FALSE,
                               minimal = TRUE,
-                              verbose = getOption("contrastable.verbose")) {
+                              verbose = getOption("contrastable.verbose"),
+                              .droplevels = getOption("contrastable.droplevels")) {
   formulas <- purrr::list_flatten(rlang::dots_list(...))
 
   # Get symbols passed to ... and model_data for .warn_if_mismatched_contrasts
@@ -93,7 +97,7 @@ glimpse_contrasts <- function(model_data,
 
   # We do need to compute the contrast matrices so we can get information
   # about orthogonality, centering, etc.
-  contrast_list <- enlist_contrasts(model_data, ..., verbose = FALSE)
+  contrast_list <- enlist_contrasts(model_data, ..., verbose = FALSE, .droplevels = .droplevels)
 
   # The formulas need to be expanded to extract the parameters correctly,
   # but we still need the unexpanded formulas provided by the user so we

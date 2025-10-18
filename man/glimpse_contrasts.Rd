@@ -12,7 +12,8 @@ glimpse_contrasts(
   add_namespace = FALSE,
   show_one_level_factors = FALSE,
   minimal = TRUE,
-  verbose = getOption("contrastable.verbose")
+  verbose = getOption("contrastable.verbose"),
+  .droplevels = getOption("contrastable.droplevels")
 )
 }
 \arguments{
@@ -36,6 +37,10 @@ included in the output? Default is FALSE to omit}
 centered, dropped_trends, and explicitly_set columns from the output table}
 
 \item{verbose}{Logical, defaults to TRUE, whether messages should be printed}
+
+\item{.droplevels}{Logical, defaults to TRUE, whether missing levels from
+existing factor columns should be dropped before applying new contrasts. See
+\code{Options("contrastable.droplevels")}}
 }
 \value{
 A dataframe if return.list is FALSE, a list with a dataframe and list

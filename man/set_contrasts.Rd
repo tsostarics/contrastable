@@ -8,6 +8,7 @@ set_contrasts(
   model_data,
   ...,
   verbose = getOption("contrastable.verbose"),
+  .droplevels = getOption("contrastable.droplevels"),
   print_contrasts = FALSE
 )
 }
@@ -20,7 +21,12 @@ level can be set with \code{+}, the intercept can be overwritten with \code{*},
 comparison labels can be set using \code{|}, and trends for polynomial coding
 can be removed using \code{-}.}
 
-\item{verbose}{Logical, defaults to FALSE, whether messages should be printed}
+\item{verbose}{Logical, defaults to TRUE, whether messages should be printed.
+See \code{Options("contrastable.verbose")}}
+
+\item{.droplevels}{Logical, defaults to TRUE, whether missing levels from
+existing factor columns should be dropped before applying new contrasts. See
+\code{Options("contrastable.droplevels")}}
 
 \item{print_contrasts}{Logical, default FALSE, whether to print the contrasts
 set for each factor. Fractions are displayed using \code{\link[MASS:fractions]{MASS::fractions()}}}
