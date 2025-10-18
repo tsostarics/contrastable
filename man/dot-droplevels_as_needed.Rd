@@ -22,3 +22,4 @@ Missing levels can cause unexpected behavior when fitting a model after
 setting contrasts. This function removes missing levels and informs the user
 of how many levels were dropped from each factor.
 }
+\keyword{internal}

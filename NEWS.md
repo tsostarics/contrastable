@@ -1,15 +1,26 @@
-# contrastable (development version)
+# contrastable 1.0.3
 
-Documentation:
+## New features
+
+ * New `print_contrasts()` prints contrasts for the factor columns in a given
+ dataframe
+ * New option `contrastable.droplevels` controls whether missing levels are
+ automatically dropped
+
+## Minor improvements and fixes
+
+ * Example for cumulative_split_code now shows correct values
+ * `set_contrasts()` and `enlist_contrasts()` will now drop missing levels
+ before applying contrasts to factor variables by default
+
+## Documentation
 
  * Added get started vignette (vignette name: "contrastable")
  * Created pkgdown website, now linked in DESCRIPTION
  * Citation and DOI updated following CRAN acceptance
  * Docs for various functions tweaked
- 
-Bug fixes:
+ * Adjusted warning when no variables with more than 1 level are provided
 
- * Example for cumulative_split_code was incorrect due to recycled values
 
 # contrastable 1.0.2
 

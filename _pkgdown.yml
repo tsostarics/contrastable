@@ -21,3 +21,4 @@ reference:
     - starts_with("is.")
     - as.unordered
     - matches("use_contrasts")
+    - print_contrasts

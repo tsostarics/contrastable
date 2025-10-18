@@ -10,6 +10,7 @@
 #'
 #' @returns model_data where existing factor columns have had any missing levels
 #' removed
+#' @keywords internal
 .droplevels_as_needed <- function(model_data, lhs_variables, verbose = TRUE) {
 
   var_is_factor <- vapply(lhs_variables, \(v) is.factor(model_data[[v]]), TRUE)
