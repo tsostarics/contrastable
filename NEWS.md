@@ -1,4 +1,4 @@
-# contrastable 1.0.3
+# contrastable 1.1.0
 
 ## New features
 
@@ -9,7 +9,7 @@
 
 ## Minor improvements and fixes
 
- * Example for cumulative_split_code now shows correct values
+ * Example for `cumulative_split_code()` now shows correct values
  * `set_contrasts()` and `enlist_contrasts()` will now drop missing levels
  before applying contrasts to factor variables by default
 
@@ -20,7 +20,7 @@
  * Citation and DOI updated following CRAN acceptance
  * Docs for various functions tweaked
  * Adjusted warning when no variables with more than 1 level are provided
-
+ * Depends R>=4.1 added to DESCRIPTION
 
 # contrastable 1.0.2
 
