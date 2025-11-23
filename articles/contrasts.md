@@ -1,0 +1,1339 @@
+# Contrastable Overview
+
+This vignette describes some of the contrast coding helpers this package
+provides. It should be noted that this package does not seek to provide
+an interface for creating hypothesis matrices and their respective
+contrast matrices. For that functionality you might look into the
+`multcomp` or `hypr` packages. The contrast functionality of this
+package is focused on the following:
+
+- Easily implement commonly used contrast coding schemes
+- Make reference levels explicit
+- Cut down on repetitive coding involved in setting contrasts
+- Retain interpretable labels in model summary coefficients
+- Allow the implementation of custom contrasts (but again not their
+  creation)
+
+This vignette will not go into detail how different contrast schemes are
+derived or interpreted, but will describe some of the high level
+differences. I recommend reading the following:
+
+- [UCLA R Library Contrast Coding Systems for Categorical
+  Variables](https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/)
+- [How to capitalize on a priori contrasts in linear (mixed) models: A
+  tutorial](https://doi.org/10.1016/j.jml.2019.104038)
+- [Regresion modeling for linguistic data
+  (preprint)](https://osf.io/pnumg/)
+
+I also have a few blog posts about contrast coding; if you need further
+explanation of contrasts and more working examples beyond this vignette,
+read the first one below:
+
+- [Introduction to Contrasts using
+  Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
+- [On Helmert Coding](https://tsostaricsblog.netlify.app/posts/helmert/)
+
+``` r
+library(contrastable)
+library(dplyr)
+library(MASS)
+```
+
+## Introduction to contrasts
+
+Statistical models such as linear regression need numbers to operate
+with, but often we have discrete categories that we want to model such
+as ethnicity, country, treatment group, etc. Typically, we have some
+comparisons in mind before we do our statistics: compare the group
+receiving treatment to a reference level who did not, or something like
+compare group A to group B. **Contrast coding** is the process of
+assigning numbers that encode the comparisons we want to make prior to
+fitting a statistical model. What this allows us to do is strategically
+set up our model to be interpretable in a way that’s meaningful to us
+even though the *fit* of the statistical model is unchanged. So,
+contrast coding is important for inferential statistics and reporting
+coefficients correctly, but is not that important for group-level
+predictions.
+
+Throughout this vignette and package, I refer to different **contrast
+schemes**, which I define as *an encoding of a principled set of
+comparisons for an arbitrary number of factor levels*. The important bit
+here is the *arbitrary* number part.
+
+To start with an example, consider an experiment where people are tasked
+with keeping track of the location of different shapes under different
+levels of cognitive load, such as needing to remember different strings
+of numbers. Basically, a change detection task with a digit span
+cognitive load manipulation. We’ll call the levels of this *cognitive
+load* factor none, low, and high. A priori, the speed with which people
+detect a shape that changes location should vary depending on the
+cognitive load. Specifically, reaction time (RT) should be slower when
+cognitive load is higher.
+
+What kinds of comparisons could we make, and how do we encode these in
+our statistical model? One comparison might be to compare low to none,
+then high to none. Another could be to compare low to none, then high to
+*low*. Yet another could be to compare low to none, then high to *low
+and none* together. Or, we could compare each level to the average
+across the conditions.[¹](#fn1) Specifying these different comparisons,
+which will really just amount to differences in group means, is our goal
+here.
+
+In our example, what if we went found that our high cognitive load
+condition wasn’t high enough? What if we needed to add an extra-high
+level? We could add a comparison of extra-high to none, or compare
+extra-high to high. Or, we could compare extra-high to none plus low
+plus high together. Ideally, if we’re going for pairwise comparisons
+from a reference level, successive differences between levels, or some
+kind of nested set of comparisons, we would want to be able to specify
+this consistently without needing to revisit every instance of
+specifying our comparisons just to accommodate the new level.
+
+Throughout this vignette and package, I refer to different **contrast
+schemes**, which I define as *an encoding of a principled set of
+comparisons for an arbitrary number of factor levels*. The important bit
+here is the *arbitrary* number part such that if the goal is to take
+pairwise comparisons from a reference level, then adding a new level
+should only amount to encoding an additional pairwise comparison to the
+same reference level. I’ll contrast this approach to a more manual
+approach to contrast coding, where you would explicitly write out, in
+code, every single comparison for every single factor you want to make.
+Consider if we added a new three-level predictor crossed with our four
+level example from before (we’ll call the new predictor *group* with
+levels A, B, C). If we also just wanted to do pairwise comparisons, a
+scheme approach would encode *pairwise comparisons* for cognitive load
+and *pairwise comparisons* for the new factor. The manual approach would
+say to encode low-none, high-none, and extra high-none; then, encode
+B-A, and C-A. If we introduce a new group D later, we have to remember
+to go in and specify D-A too.
+
+So, while the manual approach is maximally explicit about exactly what
+we want to compare, it’s also more things to write out and more chances
+that we make a mistake while implementing it. Given that contrasts are
+specified using matrices in R, the chances of a mistake are high.
+Accordingly, R provides a few functions that implement common contrast
+schemes such as `contr.treatment` and `contr.sum`, which return matrices
+given a number of levels. However, there’s some trickiness with them.
+Below is a quick list of some issues this package attempts to
+circumvent; if you’re familiar with contrast coding from your own work,
+some of this may sound familiar and some of it may surprise you.
+
+- When setting contrasts to a factor that differ from the R session’s
+  default contrasts, the labels for the comparisons in the output of the
+  statistical model are reset. This requires the researcher to keep
+  track of which numeric indices (1, 2, etc.) correspond to which
+  comparisons—which also requires keeping track of the alphabetical
+  order of the levels. Alternatively, the researcher can set the
+  comparison labels using [`dim()`](https://rdrr.io/r/base/dim.html),
+  [`dimnames()`](https://rdrr.io/r/base/dimnames.html), or
+  [`colnames()`](https://rdrr.io/r/base/colnames.html). In my
+  experience, I rarely see people in my field do this, and so I believe
+  it would be naive to expect people to suddenly (learn how to and)
+  start doing so.
+- The default contrast scheme, `contr.treatment`, places the reference
+  level as the first level alphabetically while `contr.sum` places the
+  reference level as the LAST level alphabetically. To verify for
+  yourself, try running `contr.treatment(5)` and `contr.sum(5)`.
+  respectively, the reference levels are identifiable by the rows
+  containing either all 0s or all -1s.
+- Related to the above, when people want to use $\pm .5$ for their
+  contrasts for a two-level factor, it is not uncommon to see something
+  like `-contr.sum(2)/2`. However, this ***does not generalize*** when
+  the number of levels is greater than 2, i.e,. `-contr.sum(3)/2` will
+  not give you what you expect.
+- `contr.helmert` returns unscaled matrices, giving effect estimates
+  that need to be manually scaled. Tests of statistical significance are
+  still meaningful, but interpreting the magnitude of effects using
+  matrices from this function are likely to be incorrect if not scaled
+  manually.
+- Quite a few contrasts simplify to $\pm .5$ when there are two levels.
+  For example, helmert coding and backward difference coding both give
+  +.5 and -.5. But, if we were to add a third level to these, the values
+  for the newly added comparison are NOT the same. Accordingly, if we’re
+  not explicit about what the **goal** of the comparisons are (nested
+  comparisons vs successive comparisons) then future researchers
+  following up on our work might attempt to use the same contrast scheme
+  but not understand what the new comparison is.
+
+## Motivation
+
+I’m going to use the mtcars dataset just to have something to work with.
+We’ll convert a bunch of the columns to factors up front.
+
+``` r
+mdl_data <- 
+  mtcars |> 
+  as_tibble() |> 
+  mutate(cyl = factor(cyl), 
+         twolevel = factor(rep(c("a", "b"), times = nrow(mtcars) / 2)),
+         gear = factor(gear),
+         carb = factor(carb))
+```
+
+We can inspect the contrasts for the factors using
+[`contrasts()`](https://rdrr.io/r/stats/contrasts.html), which will use
+the default contrasts for unordered factors
+
+``` r
+options("contrasts") # Show defaults for unordered and ordered
+#> $contrasts
+#>         unordered           ordered 
+#> "contr.treatment"      "contr.poly"
+contrasts(mdl_data$twolevel)
+#>   b
+#> a 0
+#> b 1
+contrasts(mdl_data$carb) # Note the reference level
+#>   2 3 4 6 8
+#> 1 0 0 0 0 0
+#> 2 1 0 0 0 0
+#> 3 0 1 0 0 0
+#> 4 0 0 1 0 0
+#> 6 0 0 0 1 0
+#> 8 0 0 0 0 1
+```
+
+We can see that the levels for `carb` are reflected in the coefficient
+labels:
+
+``` r
+summary(lm(mpg ~ carb, data = mdl_data))
+#> 
+#> Call:
+#> lm(formula = mpg ~ carb, data = mdl_data)
+#> 
+#> Residuals:
+#>    Min     1Q Median     3Q    Max 
+#> -7.243 -3.325  0.000  2.360  8.557 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)   25.343      1.854  13.670 2.21e-13 ***
+#> carb2         -2.943      2.417  -1.218  0.23435    
+#> carb3         -9.043      3.385  -2.672  0.01285 *  
+#> carb4         -9.553      2.417  -3.952  0.00053 ***
+#> carb6         -5.643      5.243  -1.076  0.29174    
+#> carb8        -10.343      5.243  -1.973  0.05927 .  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 4.905 on 26 degrees of freedom
+#> Multiple R-squared:  0.4445, Adjusted R-squared:  0.3377 
+#> F-statistic: 4.161 on 5 and 26 DF,  p-value: 0.006546
+```
+
+But if we changed the contrasts ourselves those helpful labels go away
+and are replaced with numeric indices. Note that the level names were
+originally also numbers, so it would be easy to get mixed up at this
+point.
+
+``` r
+mdl_data2 <- mdl_data
+contrasts(mdl_data2$carb) <- contr.sum(6)
+
+contrasts(mdl_data2$carb) # Note the reference level
+#>   [,1] [,2] [,3] [,4] [,5]
+#> 1    1    0    0    0    0
+#> 2    0    1    0    0    0
+#> 3    0    0    1    0    0
+#> 4    0    0    0    1    0
+#> 6    0    0    0    0    1
+#> 8   -1   -1   -1   -1   -1
+summary(lm(mpg ~ carb, data = mdl_data2))
+#> 
+#> Call:
+#> lm(formula = mpg ~ carb, data = mdl_data2)
+#> 
+#> Residuals:
+#>    Min     1Q Median     3Q    Max 
+#> -7.243 -3.325  0.000  2.360  8.557 
+#> 
+#> Coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)  19.0888     1.3373  14.274 8.18e-14 ***
+#> carb1         6.2540     2.0198   3.096  0.00465 ** 
+#> carb2         3.3112     1.8418   1.798  0.08383 .  
+#> carb3        -2.7888     2.6710  -1.044  0.30605    
+#> carb4        -3.2988     1.8418  -1.791  0.08493 .  
+#> carb5         0.6112     4.2221   0.145  0.88602    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 4.905 on 26 degrees of freedom
+#> Multiple R-squared:  0.4445, Adjusted R-squared:  0.3377 
+#> F-statistic: 4.161 on 5 and 26 DF,  p-value: 0.006546
+```
+
+## Usage
+
+Now I’ll introduce the main workhorse of this package: the
+`set_contrasts` function. This function features a special syntax to
+quickly set contrast schemes. I’ll introduce features one at a time.
+
+First, we’ll set `carb` to use sum coding as we did before. We do this
+using two-sided formulas, where the left hand side of the formula is a
+column in our dataset and the right hand side includes information about
+the contrasts we want to set. For example, this takes the form
+`varname ~ code_by`. Below, we specify that we want `carb` to use
+contrasts generated by the `sum_code` function. Two things to note:
+`set_contrasts` will ***automatically*** coerce specified columns into
+factors, so you don’t need to worry about calling
+[`factor()`](https://rdrr.io/r/base/factor.html) on columns first. Note
+that the function will also give messages about other factors that you
+haven’t set explicitly.
+
+``` r
+mdl_data3 <- set_contrasts(mdl_data, carb ~ sum_code)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+
+contrasts(mdl_data2$carb) # matrix from before
+#>   [,1] [,2] [,3] [,4] [,5]
+#> 1    1    0    0    0    0
+#> 2    0    1    0    0    0
+#> 3    0    0    1    0    0
+#> 4    0    0    0    1    0
+#> 6    0    0    0    0    1
+#> 8   -1   -1   -1   -1   -1
+contrasts(mdl_data3$carb) # new matrix, note the column names
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+```
+
+Note that, unlike last time, the reference level is now the first level
+alphabetically and the labels are retained (compare the contrast
+matrices) For schemes that have a singular reference level, setting
+contrasts with `set_contrasts` will always set the reference level to
+the first level alphabetically. Currently, the reference level for
+`carb` is `1`. If we want to change the reference level, we use the `+`
+operator in our formula. The change to the formula looks like
+`varname ~ code_by + reference`. Let’s change it to `3`:
+
+``` r
+mdl_data4 <- set_contrasts(mdl_data, carb ~ sum_code + "3")  
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+
+contrasts(mdl_data4$carb)
+#>    1  2  4  6  8
+#> 1  1  0  0  0  0
+#> 2  0  1  0  0  0
+#> 3 -1 -1 -1 -1 -1
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+```
+
+Note that when using sum coding, the intercept will be the mean of the
+group means:
+
+``` r
+# mean of group means:
+group_means <- summarize(mdl_data4, grp_mean = mean(mpg), .by = "carb")
+group_means
+#> # A tibble: 6 × 2
+#>   carb  grp_mean
+#>   <fct>    <dbl>
+#> 1 4         15.8
+#> 2 1         25.3
+#> 3 2         22.4
+#> 4 3         16.3
+#> 5 6         19.7
+#> 6 8         15
+mean(group_means$grp_mean)
+#> [1] 19.08881
+
+# model coefficients
+coef(lm(mpg ~ carb, data = mdl_data4))
+#> (Intercept)       carb1       carb2       carb4       carb6       carb8 
+#>  19.0888095   6.2540476   3.3111905  -3.2988095   0.6111905  -4.0888095
+```
+
+Let’s say, hypothetically, we wanted to get differences of each
+comparison level to the grand mean, but we also wanted the intercept to
+be not the grand mean but the mean of our reference level? We can set
+this using the `*` operator:
+`varname ~ code_by + reference * intercept`.
+
+``` r
+mdl_data5 <- set_contrasts(mdl_data, carb ~ sum_code + 3 * 3)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+
+contrasts(mdl_data5$carb)
+#>   1 2 4 6 8
+#> 1 2 1 1 1 1
+#> 2 1 2 1 1 1
+#> 3 0 0 0 0 0
+#> 4 1 1 2 1 1
+#> 6 1 1 1 2 1
+#> 8 1 1 1 1 2
+coef(lm(mpg ~ carb, data = mdl_data5))
+#> (Intercept)       carb1       carb2       carb4       carb6       carb8 
+#>  16.3000000   6.2540476   3.3111905  -3.2988095   0.6111905  -4.0888095
+```
+
+Finally, let’s say we wanted labels that were a bit more clear about
+what the comparisons are here. We can set the label names ourselves
+using the `|` operator:
+`varname ~ code_by + reference * intercept | labels`
+
+``` r
+mdl_data6 <- set_contrasts(mdl_data, 
+                           carb ~ sum_code + 3 * 3 | c("1-3",
+                                                       "2-3",
+                                                       "4-3",
+                                                       "6-3",
+                                                       "8-3"))
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+
+contrasts(mdl_data5$carb)
+#>   1 2 4 6 8
+#> 1 2 1 1 1 1
+#> 2 1 2 1 1 1
+#> 3 0 0 0 0 0
+#> 4 1 1 2 1 1
+#> 6 1 1 1 2 1
+#> 8 1 1 1 1 2
+coef(lm(mpg ~ carb, data = mdl_data6))
+#> (Intercept)     carb1-3     carb2-3     carb4-3     carb6-3     carb8-3 
+#>  16.3000000   6.2540476   3.3111905  -3.2988095   0.6111905  -4.0888095
+```
+
+Here’s what it would look like if you tried to manually do this
+yourself. It’s highly unlikely you would correctly specify every single
+value and every single label correctly on the first go (I actually
+messed up myself while writing out the matrix).
+
+``` r
+mdl_data7 <- mdl_data
+
+my_contrasts <- matrix(c(2, 1, 0, 1, 1, 1, 
+                         1, 2, 0, 1, 1, 1, 
+                         1, 1, 0, 2, 1, 1, 
+                         1, 1, 0, 1, 2, 1,
+                         1, 1, 0, 1, 1, 2),
+                       nrow = 6)
+dimnames(my_contrasts) <- 
+  list(
+    c("1", "2", "3", "4", "6", "8"), 
+    c("1-3", "2-3", "4-3", "6-3", "8-3")
+  )
+
+
+contrasts(mdl_data7$carb) <- my_contrasts
+contrasts(mdl_data7$carb)
+#>   1-3 2-3 4-3 6-3 8-3
+#> 1   2   1   1   1   1
+#> 2   1   2   1   1   1
+#> 3   0   0   0   0   0
+#> 4   1   1   2   1   1
+#> 6   1   1   1   2   1
+#> 8   1   1   1   1   2
+```
+
+To see how this can get even more error prone, consider a contrast
+matrix like the one below. Personally I would not trust myself to get
+the matrix correct, and if I ever had to add a level to the design it
+would be obscene to try and edit it.
+
+``` r
+mdl_data8 <- set_contrasts(mdl_data, carb ~ helmert_code * 4)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+
+MASS::fractions(contrasts(mdl_data8$carb))
+#>   <2   <3   <4   <6   <8  
+#> 1 -1/2 -1/3   -1    0    0
+#> 2  1/2 -1/3   -1    0    0
+#> 3    0  2/3   -1    0    0
+#> 4    0    0    0    0    0
+#> 6    0    0 -3/4    1    0
+#> 8    0    0 -3/4  1/5    1
+```
+
+The work would compound when we have multiple factors, but with the
+`set_contrasts` function we can specify what our desired scheme is
+easily:
+
+``` r
+mdl_data9 <- set_contrasts(mdl_data,
+                           carb ~ helmert_code * 4,
+                           cyl ~ scaled_sum_code + 4,
+                           twolevel ~ scaled_sum_code + "a",
+                           gear ~ helmert_code)
+
+MASS::fractions(contrasts(mdl_data9$carb))
+#>   <2   <3   <4   <6   <8  
+#> 1 -1/2 -1/3   -1    0    0
+#> 2  1/2 -1/3   -1    0    0
+#> 3    0  2/3   -1    0    0
+#> 4    0    0    0    0    0
+#> 6    0    0 -3/4    1    0
+#> 8    0    0 -3/4  1/5    1
+MASS::fractions(contrasts(mdl_data9$cyl))
+#>   6    8   
+#> 4 -1/3 -1/3
+#> 6  2/3 -1/3
+#> 8 -1/3  2/3
+MASS::fractions(contrasts(mdl_data9$twolevel))
+#>   b   
+#> a -1/2
+#> b  1/2
+MASS::fractions(contrasts(mdl_data9$gear))
+#>   <4   <5  
+#> 3 -1/2 -1/3
+#> 4  1/2 -1/3
+#> 5    0  2/3
+```
+
+Practically speaking, the most common things you’ll be doing is setting
+a contrast scheme and maybe changing the reference level, so the `+`
+operator is very important.
+
+### enlist_contrasts
+
+A related function is the `enlist_contrasts` function, which follows the
+same exact rules as `set_contrasts` but will return a list of contrasts
+instead of setting the contrasts to the data itself. Henceforth, when
+I’m not going to use the dataframe in an example, I’ll just use this to
+show the contrast matrices.
+
+``` r
+enlist_contrasts(mdl_data,
+                 carb ~ helmert_code * 4,
+                 cyl ~ scaled_sum_code + 4)
+#> Expect contr.treatment or contr.poly for unset factors: gear twolevel
+#> $carb
+#>     <2            <3    <4  <6 <8
+#> 1 -0.5 -3.333333e-01 -1.00 0.0  0
+#> 2  0.5 -3.333333e-01 -1.00 0.0  0
+#> 3  0.0  6.666667e-01 -1.00 0.0  0
+#> 4  0.0  0.000000e+00  0.00 0.0  0
+#> 6  0.0  5.551115e-17 -0.75 1.0  0
+#> 8  0.0  3.700743e-17 -0.75 0.2  1
+#> 
+#> $cyl
+#>            6          8
+#> 4 -0.3333333 -0.3333333
+#> 6  0.6666667 -0.3333333
+#> 8 -0.3333333  0.6666667
+```
+
+### Contrast functions
+
+I showed a few functions that generate contrasts like `sum_code` and
+`scaled_sum_code` and `helmert_code`. Below is a list of functions
+provided by this package:
+
+- `treatment_code`: Pairwise comparisons to a reference level, intercept
+  equals the reference level (equivalent to `contr.treatment`)
+- `sum_code`: Comparisons to the grand mean, intercept is the grand mean
+  (equivalent to `contr.sum`, but reference level is the first level)
+- `scaled_sum_code`: Pairwise comparisons to a reference level,
+  intercept equals the grand mean
+- `helmert_code`: Nested comparisons starting from the first level. Note
+  this is NOT equivalent to `contr.helmert`, as the latter gives an
+  unscaled matrix.
+- `reverse_helmert_code`: Nested comparisons starting from the last
+  level.
+- `backward_difference_code`: Successive differences. For levels A, B,
+  C, gives the differences B-A and C-B
+- `forward_difference_code`: Successive differences. For levels A, B, C,
+  gives the differences A-B and B-C.
+- `cumulative_split_code`: Dichotomous differences. For levels A, B, C,
+  D, gives the differences A-(B+C+D), (A+B)-(C+D), (A+B+C)-D.
+- `orth_polynomial_code`: Orthogonal polynomial coding, equivalent to
+  `contr.poly`.
+- `raw_polynomial_code`: Raw polynomial coding, I do not recommend using
+  this unless you know what you’re getting into.
+- `polynomial_code`: An alias for `orthogonal_polynomial_code`
+
+You can also use contrast functions from any other package so long as
+the first argument is the number of levels used to generate the matrix.
+However, again, if there’s a singular level used for the reference
+level, this will always be set to the first level regardless of what the
+original matrix was.
+
+``` r
+# all equivalent to carb ~ sum_code
+foo <- sum_code
+enlist_contrasts(mdl_data, carb ~ contr.sum)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+enlist_contrasts(mdl_data, carb ~ sum_code)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+enlist_contrasts(mdl_data, carb ~ foo)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+```
+
+If you want to suppress this behavior, you can use the wrapper `I` from
+base R. Note this will also result in not setting the labels for you: it
+will use the generated matrix as-is. This is useful if you explicitly
+create a matrix and want to make sure the reference level isn’t shifted
+around.
+
+``` r
+enlist_contrasts(mdl_data, carb ~ I(contr.sum))
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> Warning in .postprocess_matrix(new_contrasts, code_by, reference_level, : No
+#> comparison labels set and as_is=TRUE, contrast labels will be column indices.
+#> $carb
+#>    1  2  3  4  5
+#> 1  1  0  0  0  0
+#> 2  0  1  0  0  0
+#> 3  0  0  1  0  0
+#> 4  0  0  0  1  0
+#> 5  0  0  0  0  1
+#> 6 -1 -1 -1 -1 -1
+```
+
+One last quick note is that you can keep the parentheses with the
+function, so if your tab-autocomplete puts parentheses you don’t have to
+worry about it.
+
+``` r
+enlist_contrasts(mdl_data, carb ~ contr.sum())
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+```
+
+However, the function does need to exist; the following won’t run:
+
+``` r
+foo <- contr.sum(6) # foo is a matrix
+enlist_contrasts(mdl_data, carb ~ foo()) # foo is not a function
+```
+
+### tidyselect functions
+
+If you know you’re going to use the same scheme for multiple variables,
+but don’t need to set the reference level or labels for any one in
+particular, you can use tidyselect functionality to set multiple
+contrasts. I’ll show a few examples of how to do this.
+
+First, you can specify multiple variables on the left hand side using
+the `+` operator.
+
+``` r
+# equivalent to: enlist_contrasts(mdl_data, cyl ~ sum_code, gear ~ sum_code)
+enlist_contrasts(mdl_data, cyl + gear ~ sum_code)
+#> Expect contr.treatment or contr.poly for unset factors: carb twolevel
+#> $cyl
+#>    6  8
+#> 4 -1 -1
+#> 6  1  0
+#> 8  0  1
+#> 
+#> $gear
+#>    4  5
+#> 3 -1 -1
+#> 4  1  0
+#> 5  0  1
+```
+
+You can also use selecting functions like the below:
+
+``` r
+enlist_contrasts(mdl_data, where(is.factor) ~ sum_code)
+#> $cyl
+#>    6  8
+#> 4 -1 -1
+#> 6  1  0
+#> 8  0  1
+#> 
+#> $gear
+#>    4  5
+#> 3 -1 -1
+#> 4  1  0
+#> 5  0  1
+#> 
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+#> 
+#> $twolevel
+#>    b
+#> a -1
+#> b  1
+# see also enlist_contrasts(mdl_data, where(is.unordered) ~ sum_code)
+# see also enlist_contrasts(mdl_data, where(is.numeric) ~ sum_code)
+```
+
+This also lets you programmatically set contrasts like so:
+
+``` r
+these_vars <- c("cyl", "gear")
+enlist_contrasts(mdl_data, all_of(these_vars) ~ sum_code)
+#> Expect contr.treatment or contr.poly for unset factors: carb twolevel
+#> $cyl
+#>    6  8
+#> 4 -1 -1
+#> 6  1  0
+#> 8  0  1
+#> 
+#> $gear
+#>    4  5
+#> 3 -1 -1
+#> 4  1  0
+#> 5  0  1
+```
+
+However, you have to ensure that no variables are duplicated. The
+following are not allowed regardless of whether the right right hand
+sides evaluate to the same contrast schemes.
+
+``` r
+enlist_contrasts(mdl_data, 
+                 cyl ~ sum_code, 
+                 where(is.factor) ~ sum_code) # cyl is a factor for mdl_data
+
+enlist_contrasts(mdl_data, 
+                 cyl ~ sum_code, 
+                 cyl + gear ~ sum_code) # cyl can't be specified twice
+```
+
+You can check out the tidyselect package for more information.
+`is.unordered` is provided in this package as an analogue to
+`is.ordered`.
+
+### Other ways to set contrasts
+
+You can also set contrasts using things other than a function.
+Specifically, you can pass the following classes to `code_by` in the
+two-sided formulas:
+
+- `array`
+- `matrix`
+- `hypr`
+- `function` (must return a contrast matrix, cannot be an anonymous
+  function)
+- `symbol` (must evaluate to a contrast matrix though)
+
+If you’re using a custom matrix for a tricky analysis, then you can
+specify the matrix yourself and then pass it to set_contrasts:
+
+``` r
+my_matrix <- contr.sum(6) / 2
+enlist_contrasts(mdl_data, carb ~ my_matrix)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>      2    3    4    6    8
+#> 1 -0.5 -0.5 -0.5 -0.5 -0.5
+#> 2  0.5  0.0  0.0  0.0  0.0
+#> 3  0.0  0.5  0.0  0.0  0.0
+#> 4  0.0  0.0  0.5  0.0  0.0
+#> 6  0.0  0.0  0.0  0.5  0.0
+#> 8  0.0  0.0  0.0  0.0  0.5
+```
+
+You can also specify a list of formulas and pass that to different
+functions.
+
+``` r
+my_contrasts <- list(carb ~ contr.sum, gear ~ scaled_sum_code)
+
+enlist_contrasts(mdl_data, my_contrasts)
+#> Expect contr.treatment or contr.poly for unset factors: cyl twolevel
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+#> 
+#> $gear
+#>            4          5
+#> 3 -0.3333333 -0.3333333
+#> 4  0.6666667 -0.3333333
+#> 5 -0.3333333  0.6666667
+mdl_data12 <- set_contrasts(mdl_data, my_contrasts)
+#> Expect contr.treatment or contr.poly for unset factors: cyl twolevel
+```
+
+This functionality is very important for the next function I’ll discuss.
+
+### glimpse_contrasts
+
+It can be very useful to get a summary of the different factors and
+their contrasts in your dataset. The `glimpse_contrasts` function does
+this for you by passing it your dataset and your contrasts.
+
+``` r
+my_contrasts <- list(carb ~ contr.sum,
+                     gear ~ treatment_code + 4,
+                     twolevel ~ scaled_sum_code * "b",
+                     cyl ~ helmert_code)
+mdl_data$twolevel
+#>  [1] a b a b a b a b a b a b a b a b a b a b a b a b a b a b a b a b
+#> Levels: a b
+
+enlist_contrasts(mdl_data, cyl ~ scaled_sum_code + 6 * 6)
+#> Expect contr.treatment or contr.poly for unset factors: gear carb twolevel
+#> $cyl
+#>   4 8
+#> 4 1 0
+#> 6 0 0
+#> 8 0 1
+
+mdl_data13 <- set_contrasts(mdl_data, my_contrasts)
+
+glimpse_contrasts(mdl_data13, my_contrasts)
+#>     factor n  level_names          scheme reference  intercept
+#> 1     carb 6 1, 2, 3,....       contr.sum      <NA> grand mean
+#> 2     gear 3      3, 4, 5  treatment_code         4    mean(4)
+#> 3 twolevel 2         a, b scaled_sum_code      <NA>    mean(b)
+#> 4      cyl 3      4, 6, 8    helmert_code      <NA> grand mean
+```
+
+Note that if you haven’t actually set your contrasts to the dataset,
+you’ll receive a series of warnings:
+
+``` r
+glimpse_contrasts(mdl_data, my_contrasts)
+#> Warning: Contrasts for these factors in `mdl_data` don't match formulas:
+#>  - carb
+#>  - gear
+#>  - twolevel
+#>  - cyl
+#> To fix, be sure to run:
+#> mdl_data <- set_contrasts(mdl_data, my_contrasts)
+#>     factor n  level_names          scheme reference  intercept
+#> 1     carb 6 1, 2, 3,....       contr.sum      <NA> grand mean
+#> 2     gear 3      3, 4, 5  treatment_code         4    mean(4)
+#> 3 twolevel 2         a, b scaled_sum_code      <NA>    mean(b)
+#> 4      cyl 3      4, 6, 8    helmert_code      <NA> grand mean
+```
+
+You can also specify the formulas directly, like with `set_contrasts`
+and `enlist_contrasts`— but usually you’ll want to have a list of
+formulas and pass this to the different functions. Note how we retyped
+everything we typed above just to get the summary table.
+
+``` r
+glimpse_contrasts(mdl_data13, 
+                  carb ~ contr.sum,
+                  gear ~ treatment_code + 4,
+                  twolevel ~ scaled_sum_code * "b",
+                  cyl ~ helmert_code)
+#>     factor n  level_names          scheme reference  intercept
+#> 1     carb 6 1, 2, 3,....       contr.sum      <NA> grand mean
+#> 2     gear 3      3, 4, 5  treatment_code         4    mean(4)
+#> 3 twolevel 2         a, b scaled_sum_code      <NA>    mean(b)
+#> 4      cyl 3      4, 6, 8    helmert_code      <NA> grand mean
+```
+
+If you don’t provide any contrast information, `glimpse_contrasts` will
+assume that factors should be using their default contrasts. If the
+contrasts are not the same as the defaults, you’ll receive warnings:
+
+``` r
+glimpse_contrasts(mdl_data)  # no warnings
+#>            factor n  level_names          scheme reference intercept orthogonal
+#> cyl           cyl 3      4, 6, 8 contr.treatment         4   mean(4)         NA
+#> gear         gear 3      3, 4, 5 contr.treatment         3   mean(3)         NA
+#> carb         carb 6 1, 2, 3,.... contr.treatment         1   mean(1)         NA
+#> twolevel twolevel 2         a, b contr.treatment         a   mean(a)         NA
+#>          centered dropped_trends explicitly_set
+#> cyl            NA             NA          FALSE
+#> gear           NA             NA          FALSE
+#> carb           NA             NA          FALSE
+#> twolevel       NA             NA          FALSE
+glimpse_contrasts(mdl_data13) # warnings
+#> Warning in .warn_if_nondefault(default_contrasts, unset_factors, factor_sizes, : Unset factors do not use default contr.treatment or contr.poly. Glimpse table may be unreliable.
+#>  - cyl
+#>  - gear
+#>  - carb
+#>  - twolevel
+#>            factor n  level_names scheme reference  intercept orthogonal
+#> cyl           cyl 3      4, 6, 8    ???      <NA> grand mean         NA
+#> gear         gear 3      3, 4, 5    ???         4    mean(4)         NA
+#> carb         carb 6 1, 2, 3,....    ???         1 grand mean         NA
+#> twolevel twolevel 2         a, b    ???         a    mean(b)         NA
+#>          centered dropped_trends explicitly_set
+#> cyl            NA             NA          FALSE
+#> gear           NA             NA          FALSE
+#> carb           NA             NA          FALSE
+#> twolevel       NA             NA          FALSE
+```
+
+If there are mismatches between the data and the contrasts specified by
+the formulas, you’ll also get warnings:
+
+``` r
+glimpse_contrasts(mdl_data, 
+                  carb ~ contr.sum, 
+                  gear ~ treatment_code * 4,
+                  cyl ~ contr.treatment | c("diff1", "diff2"))
+#> Warning: Contrasts for these factors in `mdl_data` don't match formulas:
+#>  - carb
+#>  - gear
+#> Comparison labels for contrasts in `mdl_data` don't match:
+#>  - cyl   (expected `diff1, diff2` but found `6, 8`)
+#> To fix, be sure to run:
+#> mdl_data <- set_contrasts(mdl_data, 
+#>                           carb ~ contr.sum,
+#>                           gear ~ treatment_code * 4,
+#>                           cyl ~ contr.treatment | c("diff1", "diff2"))
+#>     factor n  level_names          scheme reference  intercept
+#> 1     carb 6 1, 2, 3,....       contr.sum      <NA> grand mean
+#> 2     gear 3      3, 4, 5  treatment_code      <NA>    mean(4)
+#> 3      cyl 3      4, 6, 8 contr.treatment      <NA>    mean(4)
+#> 4 twolevel 2         a, b contr.treatment         a    mean(a)
+```
+
+Remember that `set_contrasts` will automatically coerce dataframe
+columns into factors when specifying a contrast, but `glimpse_contrasts`
+does *not* because it does not modify the provided dataframe.
+
+### Note on polynomial contrasts
+
+There is an additional operator for the formulas that only applies to
+polynomial contrasts. For background, polynomial contrasts encode
+polynomial “trends” across the levels of a factor. So, testing for a
+linear-like trend, a quadratic-like trend, etc. One thing you *can* do,
+though I don’t necessarily *recommend* it is removing higher-order
+trends. For instance, if you have 8 levels but don’t want to bother with
+polynomials over degree 3 (even though you’ll get up to degree 7 for
+“free”). In this situation you can use the `-` operator:
+`varname ~ code_by + reference * intercept - low:high | labels`
+
+``` r
+enlist_contrasts(mdl_data, carb ~ contr.poly)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>           .L         .Q         .C         ^4          ^5
+#> 1 -0.5976143  0.5455447 -0.3726780  0.1889822 -0.06299408
+#> 2 -0.3585686 -0.1091089  0.5217492 -0.5669467  0.31497039
+#> 3 -0.1195229 -0.4364358  0.2981424  0.3779645 -0.62994079
+#> 4  0.1195229 -0.4364358 -0.2981424  0.3779645  0.62994079
+#> 6  0.3585686 -0.1091089 -0.5217492 -0.5669467 -0.31497039
+#> 8  0.5976143  0.5455447  0.3726780  0.1889822  0.06299408
+enlist_contrasts(mdl_data, carb ~ contr.poly - 3:5)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> $carb
+#>           .L         .Q
+#> 1 -0.5976143  0.5455447
+#> 2 -0.3585686 -0.1091089
+#> 3 -0.1195229 -0.4364358
+#> 4  0.1195229 -0.4364358
+#> 6  0.3585686 -0.1091089
+#> 8  0.5976143  0.5455447
+```
+
+Note that you can ONLY use this with `enlist_contrasts` and
+`glimpse_contrasts`. This is because if you remove columns from a
+contrast matrix, R will fill them back with something else.
+
+``` r
+mdl_data14 <- set_contrasts(mdl_data, carb ~ contr.sum)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+contrasts(mdl_data14$carb)
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+contrasts(mdl_data14$carb) <- contrasts(mdl_data14$carb)[, 1:2]
+contrasts(mdl_data14$carb)
+#>    2  3                                    
+#> 1 -1 -1 -0.23570226 -0.23570226 -0.23570226
+#> 2  1  0 -0.23570226 -0.23570226 -0.23570226
+#> 3  0  1 -0.23570226 -0.23570226 -0.23570226
+#> 4  0  0  0.90236893 -0.09763107 -0.09763107
+#> 6  0  0 -0.09763107  0.90236893 -0.09763107
+#> 8  0  0 -0.09763107 -0.09763107  0.90236893
+```
+
+What do these values correspond to? If we check out the hypothesis
+matrix, we can see that it seems like it’s trying to encode 0 but with
+some floating point error:
+
+``` r
+MASS::fractions(
+  contrastable:::.convert_matrix(
+    contrasts(mdl_data14$carb)
+  )
+)
+#>                     2                 3                                  
+#> 1               1/6              -1/3              -1/3  -1293633/5488420
+#> 2               1/6               2/3              -1/3  -1293633/5488420
+#> 3               1/6              -1/3               2/3  -1293633/5488420
+#> 4               1/6                 0                 0 11956585/13250218
+#> 6               1/6                 0                 0 -1293633/13250218
+#> 8               1/6                 0                 0 -1293633/13250218
+#>                                      
+#> 1  -1293633/5488420  -1293633/5488420
+#> 2  -1293633/5488420  -1293633/5488420
+#> 3  -1293633/5488420  -1293633/5488420
+#> 4 -1293633/13250218 -1293633/13250218
+#> 6 11956585/13250218 -1293633/13250218
+#> 8 -1293633/13250218 11956585/13250218
+```
+
+This is why I don’t recommend actually using the `-` operator. If you
+use something like `lm` to fit functions, you can use the output from
+`enlist_contrasts` as the argument to `contrasts`. Although, I’m pretty
+sure the model matrix will just add in these values anyways. If you try
+to use the `-` operator with `set_contrasts` you’ll get a warning, and
+the `-` operator will be ignored:
+
+``` r
+mdl_data15 <- set_contrasts(mdl_data, carb ~ polynomial_code - 3:5)
+#> Expect contr.treatment or contr.poly for unset factors: cyl gear twolevel
+#> Warning: Cannot use `-` with set_contrasts, ignoring in carb ~ polynomial_code - 3:5.
+#>   Use enlist_contrasts instead.
+```
+
+## decompose_contrasts
+
+This is somewhat related to the `-` operator described above, but has
+more uses. When considering a factor with 3 levels, you’ll end up with
+two coefficients in your model. In other words, a single factor is
+“decomposed” behind the scenes into multiple numeric predictors for the
+model matrix. Sometimes it can be helpful to work directly with these
+decomposed predictors. For example, interactions in GAM models with
+`mgcv` can often be a pain to work with, and sometimes it’s easier to
+just group the interaction of two predictors into a series of individual
+predictors. However, doing the matrix multiplication one at a time (or
+trying to conceptualize how the matrices fit together) can be difficult,
+especially when R’s model matrix functionality can do it for us.
+`decompose_contrasts` provides an interface to do such decomposition.
+
+``` r
+mdl_data16 <- 
+  mdl_data |> 
+  set_contrasts(cyl ~ helmert_code,
+                gear ~ helmert_code) |> 
+  decompose_contrasts(~ cyl * gear) 
+#> Expect contr.treatment or contr.poly for unset factors: carb twolevel
+
+# Look at the decomposed contrast columns
+mdl_data16 |> 
+  dplyr::select(matches("^cyl|gear")) |> 
+  head()
+#>   cyl gear cyl<6      cyl<8 gear<4     gear<5 cyl<6:gear<4 cyl<8:gear<4
+#> 1   6    4   0.5 -0.3333333    0.5 -0.3333333         0.25   -0.1666667
+#> 2   6    4   0.5 -0.3333333    0.5 -0.3333333         0.25   -0.1666667
+#> 3   4    4  -0.5 -0.3333333    0.5 -0.3333333        -0.25   -0.1666667
+#> 4   6    3   0.5 -0.3333333   -0.5 -0.3333333        -0.25    0.1666667
+#> 5   8    3   0.0  0.6666667   -0.5 -0.3333333         0.00   -0.3333333
+#> 6   6    3   0.5 -0.3333333   -0.5 -0.3333333        -0.25    0.1666667
+#>   cyl<6:gear<5 cyl<8:gear<5
+#> 1   -0.1666667    0.1111111
+#> 2   -0.1666667    0.1111111
+#> 3    0.1666667    0.1111111
+#> 4   -0.1666667    0.1111111
+#> 5    0.0000000   -0.2222222
+#> 6   -0.1666667    0.1111111
+```
+
+The column names take the name from the labels, so these may not always
+be easy to work with when there are special characters. You can wrangle
+these or use something like the
+[janitor](https://github.com/sfirke/janitor) package as needed.
+
+Here’s a comparison of using the `cyl` predictor normally (which gives
+us two coefficients), and specifying the comparisons separately after
+decomposing the contrasts:
+
+``` r
+coef(lm(mpg ~ cyl, data = mdl_data16))
+#> (Intercept)       cyl<6       cyl<8 
+#>   20.502165   -6.920779   -8.103247
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+#> (Intercept)     `cyl<6`     `cyl<8` 
+#>   20.502165   -6.920779   -8.103247
+coef(lm(mpg ~ cyl * gear, data = mdl_data16))
+#>  (Intercept)        cyl<6        cyl<8       gear<4       gear<5 cyl<6:gear<4 
+#>   19.7875000   -5.8083333   -8.5500000    0.7291667    1.9687500   -5.4250000 
+#> cyl<8:gear<4 cyl<6:gear<5 cyl<8:gear<5 
+#>   -5.9500000   -4.0375000           NA
+coef(lm(mpg ~ 
+          `cyl<6` + `cyl<8` + 
+          `gear<4` + `gear<5` + 
+          `cyl<6:gear<4` + 
+          `cyl<8:gear<4` + 
+          `cyl<6:gear<5` +
+          `cyl<8:gear<5`, 
+        data = mdl_data16))
+#>    (Intercept)        `cyl<6`        `cyl<8`       `gear<4`       `gear<5` 
+#>     19.7875000     -5.8083333     -8.5500000      0.7291667      1.9687500 
+#> `cyl<6:gear<4` `cyl<8:gear<4` `cyl<6:gear<5` `cyl<8:gear<5` 
+#>     -5.4250000     -5.9500000     -4.0375000             NA
+```
+
+If we *really* wanted to, we could use just one of the comparisons, but
+note that this may give misleading results:
+
+``` r
+coef(lm(mpg ~ `cyl<6` + `cyl<8`, data = mdl_data16))
+#> (Intercept)     `cyl<6`     `cyl<8` 
+#>   20.502165   -6.920779   -8.103247
+coef(lm(mpg ~ `cyl<6`, data = mdl_data16)) # not the same estimate as the above
+#> (Intercept)     `cyl<6` 
+#>   19.556786   -8.541429
+```
+
+This function can be especially valuable for pedagogical purposes, as it
+shows how the qualitative labels in the factor data is converted into
+numeric values for the model to work with.
+
+## Typical patterns
+
+There are two general patterns you’ll take in analyses with this
+package:
+
+### Pattern 1: No glimpsing
+
+Here’s a general usage pattern when you don’t want to use
+`glimpse_contrasts`.
+
+``` r
+raw_data <- mtcars # load raw data from a csv or something here
+
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(carb ~ sum_code) # set contrasts at the very end
+#> Converting to factors: carb
+
+mdl <- lm(mpg ~ carb, data = final_data) # run model with contrasts set
+```
+
+### Pattern 2: With information about contrasts
+
+Here’s a usage pattern if you wanted to, say, publish the contrast
+matrices or report the glimpse table in a publication or
+preregistration:
+
+``` r
+raw_data <- mtcars # load raw data from a csv or something here
+
+# specify contrasts up front
+my_contrasts <- list(carb ~ sum_code,
+                     cyl  ~ scaled_sum_code,
+                     gear ~ sum_code)
+
+# wrangle data for your final model
+final_data <- 
+  mtcars |> 
+  # mutate(# ... some data wrangling transformations ..) |> 
+  set_contrasts(my_contrasts) # set contrasts at the very end
+#> Converting to factors: carb cyl gear
+
+# Show the matrices we're using
+enlist_contrasts(final_data, my_contrasts)
+#> $carb
+#>    2  3  4  6  8
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+#> 
+#> $cyl
+#>            6          8
+#> 4 -0.3333333 -0.3333333
+#> 6  0.6666667 -0.3333333
+#> 8 -0.3333333  0.6666667
+#> 
+#> $gear
+#>    4  5
+#> 3 -1 -1
+#> 4  1  0
+#> 5  0  1
+
+# Show a summary
+glimpse_contrasts(final_data, my_contrasts)
+#>   factor n  level_names          scheme reference  intercept
+#> 1   carb 6 1, 2, 3,....        sum_code      <NA> grand mean
+#> 2    cyl 3      4, 6, 8 scaled_sum_code      <NA> grand mean
+#> 3   gear 3      3, 4, 5        sum_code      <NA> grand mean
+
+# Fit the model with contrasts set
+mdl <- lm(mpg ~ carb, data = final_data)
+```
+
+If you want to show fractions instead of decimals, use
+[`MASS::fractions`](https://rdrr.io/pkg/MASS/man/fractions.html) with
+each element of the list of contrasts:
+
+``` r
+enlist_contrasts(final_data, my_contrasts) |> 
+  lapply(MASS::fractions)
+#> $carb
+#>   2  3  4  6  8 
+#> 1 -1 -1 -1 -1 -1
+#> 2  1  0  0  0  0
+#> 3  0  1  0  0  0
+#> 4  0  0  1  0  0
+#> 6  0  0  0  1  0
+#> 8  0  0  0  0  1
+#> 
+#> $cyl
+#>   6    8   
+#> 4 -1/3 -1/3
+#> 6  2/3 -1/3
+#> 8 -1/3  2/3
+#> 
+#> $gear
+#>   4  5 
+#> 3 -1 -1
+#> 4  1  0
+#> 5  0  1
+```
+
+If you use the `targets` package, you can set up the list of contrasts
+as its own target, then pass that to other targets so that your analyses
+will be rerun whenever you change the contrasts (though this shouldn’t
+happen frequently).
+
+## Conclusion
+
+I discussed the main functions in this package and the special syntax
+that is implemented to set contrasts. If you want additional examples,
+see my blog posts below:
+
+- [Introduction to Contrasts using
+  Contrastable](https://tsostaricsblog.netlify.app/posts/contrastable/)
+- [On Helmert Coding](https://tsostaricsblog.netlify.app/posts/helmert/)
+
+If you need additional information regarding the various warnings and
+messages this package throws, you can check out the `warnings` vignette
+in this package.
+
+## Citation examples
+
+When citing the package in a paper, ideally three things are achieved:
+
+- Mention the contrastable R package (Sostarics, 2024)
+- Mention which contrast scheme is used for each variable with reference
+  levels as appropriate
+- Disambiguate the term “sum coding” when used
+
+In a paper with multiple analyses, these don’t necessarily need to all
+be mentioned on each analysis, especially when there are commonalities
+between them.
+
+Bad *on first mention*: “Condition and group are sum coded.” (this can
+be fine if “sum code” is defined previously)
+
+Good: “Condition is coded using the
+[`sum_code()`](https://tsostarics.github.io/contrastable/reference/sum_code.md)
+function from the contrastable package (Sostarics 2024), using A as the
+reference level. Group is similarly sum coded, with X as the reference
+level.”
+
+Also good: “For all of our analyses, we use the contrastable package
+(Sostarics, 2024) to set the contrasts for our categorical variables.
+Condition and group are sum coded (reference level -1, comparisons +1)
+with A and X as the reference levels, respectively.” The point here is
+to disambiguate what is meant by “sum code”, which has inconsistent
+usage in the literature.
+
+Here’s a paragraph example describing two models:
+
+A bit repetitive: “In the model for Experiment 1, Condition is treatment
+coded using the
+[`treatment_code()`](https://tsostarics.github.io/contrastable/reference/treatment_code.md)
+function from the contrastable package (Sostarics, 2024), with A as the
+reference, and Group is scaled sum coded using the
+[`scaled_sum_code()`](https://tsostarics.github.io/contrastable/reference/scaled_sum_code.md)
+function from the contrastable package, with X as the reference. In the
+model for Experiment 2, Condition is treatment coded with the
+[`treatment_code()`](https://tsostarics.github.io/contrastable/reference/treatment_code.md)
+function (reference=A) and Group is scaled sum coded with
+[`scaled_sum_code()`](https://tsostarics.github.io/contrastable/reference/scaled_sum_code.md)
+(reference=X), while the additional Context predictor is scaled sum
+coded using the
+[`scaled_sum_code()`](https://tsostarics.github.io/contrastable/reference/scaled_sum_code.md)
+function (reference=NoContext).”
+
+Rewritten: “We use the treatment_code() and scaled_sum_code() functions
+from the contrastable package (Sostarics, 2024) when setting the
+contrasts for our categorical variables. In the model for Experiment 1,
+Condition is treatment coded (reference=A) and Group is scaled sum coded
+(reference=X). For Experiment 2, the additional Context predictor is
+scaled sum coded (reference=NoContext); as in Exp. 1, Condition is
+treatment coded (reference=A) and Group is sum coded (reference=X).”
+
+Other examples:
+
+- For all variables, contrasts were set using the
+  [`scaled_sum_code()`](https://tsostarics.github.io/contrastable/reference/scaled_sum_code.md)
+  function from the contrastable package (Sostarics 2024).
+- We use the contrastable package (Sostarics 2024) for contrast coding
+  our categorical variables; details of the contrasts for each model are
+  provided in the appendix. (be sure to do the latter!)
+- Below are the contrast matrices returned by the
+  [`helmert_code()`](https://tsostarics.github.io/contrastable/reference/helmert_code.md)
+  and
+  [`scaled_sum_code()`](https://tsostarics.github.io/contrastable/reference/scaled_sum_code.md)
+  functions from the contrastable R package (Sostarics 2024)
+- We use the
+  [`set_contrasts()`](https://tsostarics.github.io/contrastable/reference/set_contrasts.md)
+  and
+  [`sum_code()`](https://tsostarics.github.io/contrastable/reference/sum_code.md)
+  functions from the contrastable package (Sostarics 2024) to sum code
+  (+1/-1) our variables
+
+I also recommend writing out, potentially in a footnote, what the
+comparisons are.
+
+Good: “We use the contrastable package’s
+[`sum_code()`](https://tsostarics.github.io/contrastable/reference/sum_code.md)
+function (+1/-1, Sostarics 2024) for all categorical variables.”
+
+Better: “We use the contrastable package’s
+[`sum_code()`](https://tsostarics.github.io/contrastable/reference/sum_code.md)
+function (+1/-1, Sostarics 2024) for all categorical variables. This
+contrast scheme encodes differences between each comparison level and
+the grand mean.”
+
+------------------------------------------------------------------------
+
+1.  Technically, due to degrees of freedom, we’d compare only 2 of the 3
+    levels to the average.

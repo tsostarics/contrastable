@@ -1,0 +1,545 @@
+# Warnings, Messages, and Errors
+
+This vignette provides documentation for the different warnings and
+messages that are implemented for the package. Results of calls (eg
+printing of data frames following `set_contrasts`) will be hidden, but
+warnings and messages will still be shown. Code chunks will be
+self-contained, so bear with a little repetitiveness. I will primarily
+be using the `sum_code` function because it is the shortest one to
+write.
+
+``` r
+library(contrastable)
+library(rlang)
+```
+
+## Common Messages
+
+User will be notified if a non-factor column is coerced to a factor with
+`set_contrasts` and `enlist_contrasts`:
+
+``` r
+set_contrasts(mtcars, cyl ~ sum_code)
+#> Converting to factors: cyl
+```
+
+User will be notified if there exist other factors in the dataframe that
+have not been set in a call to `set_contrasts` or `enlist_contrasts`.
+Unordered factors are color coded in blue, while ordered factors are
+colored red. The default contrasts from `options("contrasts")` are also
+displayed and color coded accordingly.
+
+``` r
+my_data <- mtcars
+my_data$gear <- ordered(my_data$gear)
+my_data$carb <- factor(my_data$carb)
+my_data$cyl <- factor(my_data$cyl)
+
+set_contrasts(my_data, cyl ~ sum_code)
+#> Expect contr.treatment or contr.poly for unset factors: gear carb
+```
+
+Ordered factors by default use `contr.poly` and return coefficient
+estimates interpretable as nth-degree polynomial trends. Typically,
+contrast matrices are set for unordered factors, so ordered factors are
+a bit of a special case. So, user will be notified if setting the
+contrasts for an ordered factor with `set_contrasts` or
+`enlist_contrasts`
+
+``` r
+my_data <- mtcars
+my_data$gear <- ordered(my_data$gear)
+
+set_contrasts(my_data, gear ~ sum_code)
+#> These factors are ordered, you may lose contr.poly: gear
+```
+
+## Warnings
+
+User will be warned if attempting to set contrasts on a factor with only
+one level. If the user sets contrasts for multiple variables, any
+variables with more than one level will successfully be computed.
+However, the variables with only one level will just show no results.
+Note the output in the example below.
+
+``` r
+my_data <- data.frame(foo = factor("A"),
+                      boo = factor(c("B", "C")))
+
+enlist_contrasts(my_data, foo ~ sum_code, boo ~ sum_code)
+#> Warning: Contrasts undefined for factors with only one level: foo
+#> $boo
+#>    C
+#> B -1
+#> C  1
+```
+
+Related to the above, if the user only sets contrasts on factors that
+have only one level, an error will be thrown. The above warning will
+also be shown.
+
+``` r
+my_data <- data.frame(foo = factor("A"),
+                      boo = factor(c("B", "C")))
+
+try(enlist_contrasts(my_data, foo ~ sum_code))
+#> Expect contr.treatment or contr.poly for unset factors: boo
+#> Warning: Contrasts undefined for factors with only one level: foo
+#> Error in enlist_contrasts(my_data, foo ~ sum_code) : 
+#>   No factors with more than 1 level provided
+```
+
+Contrastable provides some flexibility in how contrasts are passed to
+formulas. Under the hood, methods are defined for the following object
+classes:
+
+- matrix
+- symbol/name
+- function
+- hypr
+
+You’ll receive a warning if you use something else and the default
+contrast (depending on ordered or unordered) will be used instead.
+
+``` r
+my_matrix <- sum_code(3)  # current class is "matrix" "array"
+class(my_matrix) <- "foo" # now class is "foo"
+
+set_contrasts(mtcars, cyl ~ my_matrix) |>  # idk what to do with "foo" objects
+  invisible()
+#> Converting to factors: cyl
+#> Warning in use_contrasts.default(factor_col = get(params[["factor_col"]], :
+#> Can't set contrasts with object of class foo. Using unordered default
+#> contr.treatment
+```
+
+So long as the object *inherits* one of the above classes though it will
+work as expected. Accordingly, note that no class coercion happens here.
+
+``` r
+class(my_matrix) <- c("foo", "matrix", "array")
+set_contrasts(mtcars, cyl ~ my_matrix) # idk what "foo" is but i know "matrix"!
+#> Converting to factors: cyl
+```
+
+Note that if you accidentally quote the function name, you will receive
+an error instead because it thinks you’re trying to set contrasts with
+an atomic character object.
+
+``` r
+try(set_contrasts(mtcars, cyl ~ "sum_code")) # sum_code shouldnt be in quotes
+#> Converting to factors: cyl
+#> Error in use_contrasts.default(factor_col = get(params[["factor_col"]],  : 
+#>   Can't set contrasts with atomic type object, see example below:
+#> ✖ var ~ 1 + sum_code
+#> ✔ var ~ sum_code + 1
+```
+
+The same issue can commonly occur if you don’t order the right hand side
+correctly. The first term should always be a contrast-generating
+function or a variable name that’s been assigned an object of the above
+classes. Failure to do this can lead to other kinds of errors depending
+on what the first element to the right hand side is. I’ve tried to
+document a few cases of illformedness, but I can’t do every case.
+
+``` r
+try(set_contrasts(mtcars, cyl ~ 4 + sum_code))    # bad!
+#> Converting to factors: cyl
+#> Error in use_contrasts.default(factor_col = get(params[["factor_col"]],  : 
+#>   Can't set contrasts with atomic type object, see example below:
+#> ✖ var ~ 1 + sum_code
+#> ✔ var ~ sum_code + 1
+try(set_contrasts(mtcars, cyl ~ sum_code + 4)) |> # good!
+  invisible()
+#> Converting to factors: cyl
+
+# These give different kinds of errors, all are ill-formed
+try(set_contrasts(mtcars, cyl ~ +4 + sum_code)) 
+#> Converting to factors: cyl
+#> Error in value[[3L]](cond) : subscript out of bounds
+#>   Is the contrast object/function in the wrong place? See example:
+#> ✖ var ~ +1 + sum_code
+#> ✔ var ~ sum_code + 1
+try(set_contrasts(mtcars, cyl ~ c("a", "b") + sum_code)) 
+#> Converting to factors: cyl
+#> Error in .postprocess_matrix(new_contrasts, code_by, reference_level,  : 
+#>   Reference level is a function instead of an atomic type object.
+#>   Is the contrast object/function in the wrong place? See example:
+#> ✖ var ~ 1 + sum_code
+#> ✔ var ~ sum_code + 1
+try(set_contrasts(mtcars, cyl ~ 1 + 2 + 3 + sum_code)) 
+#> Converting to factors: cyl
+#> Warning in is.na(params[[which_param]]): is.na() applied to non-(list or
+#> vector) of type 'symbol'
+#> Error in .set_param(cur_expr, params, env, x, verbose) : 
+#>   You may only use *, -, and * once
+```
+
+### hypr integration
+
+hypr is another package for contrast coding but focuses on setting the
+desired comparisons for a factor manually. The philosophy there is that
+*all* comparisons should be explicitly written down, while the
+philosophy with this package is that well-defined contrast schemes
+should be implemented in a way that is deterministic and not prone to
+typing errors. Accordingly, the special syntax this package provides is
+ignored when using hypr objects.
+
+Note that the examples here are set to not be run so that you’re not
+forced to have the hypr package installed in order to install the
+package/build the vignette.
+
+``` r
+library(hypr)
+my_data <- data.frame(foo = factor(c("A", "B", "C")))
+
+hypr_object <- hypr::hypr(A ~ B, A ~ C)
+
+set_contrasts(my_data, foo ~ hypr_object + "B" * "B" - "C")
+```
+
+    Warning messages:
+    1: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+    reference_level ignored when using hypr object
+    2: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+    set_intercept ignored when using hypr object
+    3: In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+    drop_trends ignored when using hypr object
+
+hypr objects don’t need access to the levels in a factor, so there’s an
+opportunity for mismatches in level names to arise. The matrix might
+still work out to be what you intend, but this isn’t guaranteed.
+
+``` r
+my_data <- data.frame(foo = factor(c("A", "B", "C")))
+
+hypr_object <- hypr::hypr(varA ~ varB, varA ~ varC)
+
+set_contrasts(my_data, foo ~ hypr_object)$foo
+```
+
+    Warning message:
+    In use_contrasts.hypr(factor_col = get(params[["factor_col"]], model_data),  :
+    Levels in hypr object not found in factor column `foo`: varA, varB, varC
+    Contrasts may be misspecified.
+
+Generally, this package isn’t really designed with the hypr-user in
+mind. But, so long as you’re mindful of the level names and the number
+of levels, then you can plug in hypr objects freely in conjunction with
+other methods. This is helpful if you need to use a custom matrix for
+just one variable, but the rest can use “standard” contrasts.
+
+``` r
+my_data <- data.frame(foo = factor(c("A", "B", "C")),
+                      boo = factor(c("A", "B", "C")))
+
+hypr_object <- hypr::hypr(A ~ B, A ~ C)
+
+enlist_contrasts(my_data, foo ~ hypr_object, boo ~ sum_code)
+```
+
+### glimpse_contrasts safety checks
+
+`glimpse_contrasts` has a fairly extensive set of warnings, so I’m
+giving it its own subsection. Broadly, these warnings relate to
+mismatches between what the user defines in a series of formulas and
+what is actually set on the provided dataframe. Special to these
+warnings is that they will provide written out R code that the user can
+copy and paste from the console to fix the issue— where “fix” refers to
+“setting the contrasts to the dataframe explicitly with
+`set_contrasts`”.
+
+User will be warned if the contrast matrix for a factor in a dataframe
+does not match the contrasts defined by the provided formulas.
+
+``` r
+my_data <- data.frame(foo = factor("A"),
+                      boo = factor(c("B", "C")))
+
+glimpse_contrasts(my_data, boo ~ sum_code)
+#> Warning: Contrasts for these factors in `my_data` don't match formulas:
+#>  - boo
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, 
+#>                          boo ~ sum_code)
+#>   factor n level_names   scheme reference  intercept
+#> 1    boo 2        B, C sum_code      <NA> grand mean
+```
+
+Note that you can also define the contrast formulas in a list, and this
+will be reflected in the warning as well.
+
+``` r
+my_data <- data.frame(foo = factor("A"),
+                      boo = factor(c("B", "C")))
+
+# Define our contrasts outside the call
+clist <- list(boo ~ sum_code)
+
+glimpse_contrasts(my_data, clist) # Note the final line in the warning
+#> Warning: Contrasts for these factors in `my_data` don't match formulas:
+#>  - boo
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, clist)
+#>   factor n level_names   scheme reference  intercept
+#> 1    boo 2        B, C sum_code      <NA> grand mean
+```
+
+Using some of the contrast-generating matrix functions in this package
+*with* `set_contrasts` or `enlist_contrasts` will automatically set the
+comparison labels (i.e., the column names of the contrast matrix).
+However, using these functions on their own will not specify the labels
+(because they merely return matrices given some arbitrary number of
+levels). So, if you manually set the contrasts to a factor without also
+defining the comparison labels, then the labels will be missing. When
+using the same contrast generating function in `glimpse_contrast`, the
+user will be warned that the *comparison labels don’t match* (even
+though the *contrast matrices* do).
+
+Here’s an example when the labels are missing:
+
+``` r
+my_data <- mtcars
+my_data$cyl <- factor(my_data$cyl)
+
+# This will erase the column names
+contrasts(my_data$cyl) <- helmert_code(3)
+
+glimpse_contrasts(my_data, cyl ~ helmert_code)
+#> Warning: Comparison labels for contrasts in `my_data` don't match:
+#>  - cyl   (expected `<6, <8` but found ``)
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, 
+#>                          cyl ~ helmert_code)
+#>   factor n level_names       scheme reference  intercept
+#> 1    cyl 3     4, 6, 8 helmert_code      <NA> grand mean
+```
+
+And here’s an example when they exist but don’t match
+
+``` r
+my_data <- mtcars
+my_data$cyl <- factor(my_data$cyl) # contr.treatment by default
+
+glimpse_contrasts(my_data, cyl ~ treatment_code | c("6vs4", "8vs4"))
+#> Warning: Comparison labels for contrasts in `my_data` don't match:
+#>  - cyl   (expected `6vs4, 8vs4` but found `6, 8`)
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, 
+#>                          cyl ~ treatment_code | c("6vs4", "8vs4"))
+```
+
+The user will be warned when specifying contrasts with
+`glimpse_contrasts` for a variable that isn’t a factor. So,
+`set_contrasts` will coerce the variable to a factor, but
+`glimpse_contrasts` doesn’t modify the dataframe it’s given.
+
+``` r
+my_data <- mtcars
+
+glimpse_contrasts(my_data, cyl ~ sum_code)
+#> Warning: These vars in `my_data` are not factors:
+#>  - cyl
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, 
+#>                          cyl ~ sum_code)
+#>   factor n level_names   scheme reference  intercept
+#> 1    cyl 3     4, 6, 8 sum_code      <NA> grand mean
+```
+
+ALL of the above described warnings can occur at the same time. They are
+combined into a single warning. Note that when warned about the
+*comparison labels* not matching, the numeric matrices are nonetheless
+the same. Typically, when the matrices are different, the labels will
+*also* be different, so the latter isn’t reported when the matrices
+differ to save space.
+
+``` r
+my_data <- mtcars
+my_data$cyl <- factor(my_data$cyl) # contr.treatment by default
+my_data$carb <- factor(my_data$carb)
+contrasts(my_data$cyl) <- sum_code(3)
+my_data$am <- factor(my_data$am)
+
+glimpse_contrasts(my_data, 
+                  cyl ~ sum_code, 
+                  carb ~ sum_code, 
+                  gear ~ sum_code,
+                  am ~ treatment_code | c("diffLabel"))
+#> Warning: These vars in `my_data` are not factors:
+#>  - gear
+#> Contrasts for these factors in `my_data` don't match formulas:
+#>  - carb
+#> Comparison labels for contrasts in `my_data` don't match:
+#>  - cyl   (expected `6, 8` but found `2, 3`)
+#>  - am    (expected `diffLabel` but found `1`)
+#> To fix, be sure to run:
+#> my_data <- set_contrasts(my_data, 
+#>                          cyl ~ sum_code,
+#>                          carb ~ sum_code,
+#>                          gear ~ sum_code,
+#>                          am ~ treatment_code | c("diffLabel"))
+#>   factor n  level_names         scheme reference  intercept
+#> 1    cyl 3      4, 6, 8       sum_code      <NA> grand mean
+#> 2   carb 6 1, 2, 3,....       sum_code      <NA> grand mean
+#> 3   gear 3      3, 4, 5       sum_code      <NA> grand mean
+#> 4     am 2         0, 1 treatment_code      <NA>    mean(0)
+```
+
+Currently, `glimpse_contrasts` depends on being provided with the
+desired contrast formulas/matrices to provide a summary table correctly.
+If you set the contrasts, then try to summarize the dataframe without
+the the same formulas, then you’ll get a warning that the factor
+(whether unordered or ordered) does not match the default contrasts that
+would normally be expected. In the example below, the contrasts are set
+to `sum_code`, but because the default contrasts for unordered factors
+is `contr.treatment`, the contrast matrices won’t match for
+`my_data$cyl`. The scheme will be reported as `"???"`
+
+``` r
+my_data <- set_contrasts(mtcars, cyl ~ sum_code, verbose = FALSE)
+
+glimpse_contrasts(my_data)
+#> Warning in .warn_if_nondefault(default_contrasts, unset_factors, factor_sizes, : Unset factors do not use default contr.treatment or contr.poly. Glimpse table may be unreliable.
+#>  - cyl
+#>     factor n level_names scheme reference  intercept orthogonal centered
+#> cyl    cyl 3     4, 6, 8    ???         4 grand mean         NA       NA
+#>     dropped_trends explicitly_set
+#> cyl             NA          FALSE
+```
+
+Currently, there is not an elegant way for `glimpse_contrasts` to check
+what the contrast scheme is based solely on the resulting matrix.
+Moreover, many contrast schemes are the same when the number of levels
+is 2, meaning that a matrix of `+.5/-.5` could be `scaled_sum_code` or
+`helmert_code` (among others). I’m also reluctant to add additional
+attributes to the dataframe for the sole purpose of `glimpse_contrasts`
+being able to summarize things.
+
+The most robust solution if you want to make use of `glimpse_contrasts`
+is to specify a list of contrast matrices, then pass the list to
+`set_contrasts` and `glimpse_contrasts`.
+
+``` r
+contrast_list <- list(cyl ~ scaled_sum_code, 
+                      carb ~ sum_code, 
+                      gear ~ sum_code,
+                      am ~ treatment_code | c("diffLabel"))
+
+my_data <- set_contrasts(mtcars, contrast_list, verbose = FALSE)
+glimpse_contrasts(my_data, contrast_list)
+```
+
+## Errors
+
+Here are some common errors, though not all of them are errors from
+contrastable per se.
+
+You’ll receive an error if you use a matrix that’s a different size from
+what the contrast matrix should be. Specifically, contrasts matrices for
+a factor with n levels should be size `nx(n-1)`.
+
+``` r
+my_matrix <- sum_code(4)
+try(set_contrasts(mtcars, cyl ~ my_matrix)) # cyl has 3 levels, not 4
+#> Converting to factors: cyl
+#> Error in use_contrasts.matrix(factor_col = get(params[["factor_col"]],  : 
+#>   Matrix given to code_by is size 4x3 but factor_col contrast matrix is size 3x2.
+```
+
+You’ll receive an error if you try to set the reference level (or
+intercept) to a level that doesn’t exist in the factor.
+
+``` r
+try(set_contrasts(mtcars, cyl ~ sum_code + 100))
+#> Converting to factors: cyl
+#> Error in .switch_reference_if_needed(new_contrasts, reference_level, new_reference_index) : 
+#>   Reference level not found in factor levels
+try(set_contrasts(mtcars, cyl ~ sum_code * "blah"))
+#> Converting to factors: cyl
+#> Error in .set_intercept(new_contrasts, set_intercept) : 
+#>   Specified level to use as intercept not found in factor level names
+```
+
+You’ll receive an error if you accidentally use `=` instead of `~`
+
+``` r
+try(set_contrasts(mtcars, cyl = sum_code))
+#> Error : In `base::tryCatch(base::withCallingHandlers({     NULL     base::sa...`: 
+#> `x` must be a formula
+#> ℹ Did you use = instead of ~ when setting the contrast?
+```
+
+You’ll receive an error if you accidentally specify contrasts for the
+same variable more than once:
+
+``` r
+try(set_contrasts(mtcars,
+                  cyl ~ sum_code, 
+                  cyl ~ scaled_sum_code))
+#> Error : In `base::tryCatch(base::withCallingHandlers({     NULL     base::sa...`: 
+#> Names must be unique.
+#> ✖ These names are duplicated:
+#>   * "cyl" at locations 1 and 2.
+#> ℹ Left hand side of multiple formulas evaluated to the same column name
+
+try(set_contrasts(mtcars, 
+                  cyl + gear ~ sum_code,
+                  cyl ~ scaled_sum_code))
+#> Error : In `base::tryCatch(base::withCallingHandlers({     NULL     base::sa...`: 
+#> Names must be unique.
+#> ✖ These names are duplicated:
+#>   * "cyl" at locations 1 and 3.
+#> ℹ Left hand side of multiple formulas evaluated to the same column name
+
+try(set_contrasts(mtcars, 
+                  where(is.numeric) ~ sum_code, 
+                  cyl ~ scaled_sum_code))
+#> Error : In `base::tryCatch(base::withCallingHandlers({     NULL     base::sa...`: 
+#> Names must be unique.
+#> ✖ These names are duplicated:
+#>   * "cyl" at locations 2 and 12.
+#> ℹ Left hand side of multiple formulas evaluated to the same column name
+
+these_vars <- c("cyl", "gear")
+
+try(set_contrasts(mtcars, 
+                  all_of(these_vars) ~ sum_code, 
+                  where(is.numeric) ~ scaled_sum_code))
+#> Error : In `base::tryCatch(base::withCallingHandlers({     NULL     base::sa...`: 
+#> Names must be unique.
+#> ✖ These names are duplicated:
+#>   * "cyl" at locations 1 and 4.
+#>   * "gear" at locations 2 and 12.
+#> ℹ Left hand side of multiple formulas evaluated to the same column name
+```
+
+You’ll receive an error if you accidentally forget to pass the
+dataframe:
+
+``` r
+try(set_contrasts(cyl ~ sum_code))
+#> Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose,  : 
+#>   Formula passed to model_data, did you forget to pass a data frame?
+```
+
+You’ll receive an error if you forget to pass any contrasts formulas:
+
+``` r
+try(set_contrasts(mtcars))
+#> Error in .warn_if_onelevel(lhs_variables[is_onelevel_factor]) : 
+#>   If factor names are not provided, the model data and factors being set must be provided
+```
+
+Variables with only one level will be ignored, but you’ll receive an
+error if there are no remaining variables with more than one level
+(i.e., if you *only* specify one-level factors). Note that you’ll still
+get the warning message.
+
+``` r
+try(set_contrasts(data.frame(a = factor(1)),
+                  a ~ sum_code))
+#> Warning: Contrasts undefined for factors with only one level: a
+#> Error in enlist_contrasts(model_data, !!!formulas, verbose = verbose,  : 
+#>   No factors with more than 1 level provided
+```
