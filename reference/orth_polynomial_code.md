@@ -50,6 +50,6 @@ stats::lm(val ~ grp, data = mydf)
 #> 
 #> Coefficients:
 #> (Intercept)        grp.L        grp.Q        grp.C  
-#>   7.374e+00    6.960e-01    7.048e-17    1.392e+00  
+#>   7.374e+00    6.960e-01    3.925e-17    1.392e+00  
 #> 
 ```

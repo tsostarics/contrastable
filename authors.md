@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/tsostarics/contrastable/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/tsostarics/contrastable/blob/v1.1.0/inst/CITATION)
 
 Sostarics, T. (2024). contrastable: Contrast Coding Utilities in R. R
 package version 1.0.2. https://CRAN.R-project.org/package=contrastable.
